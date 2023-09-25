@@ -1,0 +1,95 @@
+@import '../../styles/index.scss';
+
+@keyframes scaleDr {
+  /*定义关键帧、scaleDrew是需要绑定到选择器的关键帧名称*/
+  0% {
+    transform: scale(1);
+    /*开始为原始大小*/
+  }
+  25% {
+    transform: scale(1.1);
+    /*放大1.1倍*/
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+}
+.ac-points__title {
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  color: $label-color;
+}
+.ac-points__image {
+  width: $width;
+  height: $height;
+  cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ac-points__image > img {
+  width: 100%;
+}
+.ac-points__bar {
+  width: $width;
+  height: $control-size;
+  color: $track-label;
+  line-height: $control-size;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-align: center;
+  background: #f7f9fa;
+  border: 1px solid #e4e7eb;
+}
+.ac-points__bar > div {
+  margin-left: 4px;
+}
+.ac-points__bar--success {
+  color: #fff;
+  background: $color-success;
+}
+.ac-points__bar--failure {
+  color: #fff;
+  background: $color-failure;
+}
+.ac-points__bar--active {
+  background: $track-active;
+  color: #fff;
+}
+.ac-points__point {
+  background-color: $brand-color;
+  position: absolute;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+  border: 3px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation-name: scaleDr;
+  animation-duration: 4s;
+  /*动画所花费的时间*/
+  animation-timing-function: ease-in-out;
+  /*动画的速度曲线*/
+  animation-iteration-count: infinite;
+  /*动画播放的次数*/
+}
+.ac-points__point > div {
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+}
+
