@@ -1,7 +1,7 @@
 import type { ISiteConfig } from '@/interfaces';
 import type { QueryKey } from '@tanstack/query-core';
 import type { TError, TMetadata } from '@/types';
-import { querySiteConfig } from '@/services/api';
+import { getSiteConfig } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 
 export default function useUser(
@@ -24,7 +24,7 @@ export default function useUser(
   return useQuery<ISiteConfig, TError>(
     qKey,
     async () => {
-      return (await querySiteConfig()).data as ISiteConfig;
+      return (await getSiteConfig()).data as ISiteConfig;
     },
     {
       initialData,

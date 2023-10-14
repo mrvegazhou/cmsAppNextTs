@@ -5,3 +5,4 @@ export * from './captcha';
 export * from './register';
 export * from './search';
 export * from './siteInfo';
+export * from './article';

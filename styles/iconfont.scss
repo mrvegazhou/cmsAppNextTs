@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4212255 */
-  src: url('//at.alicdn.com/t/c/font_4212255_2fmd0yh492a.woff2?t=1695116514976') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4212255_2fmd0yh492a.woff?t=1695116514976') format('woff'),
-       url('//at.alicdn.com/t/c/font_4212255_2fmd0yh492a.ttf?t=1695116514976') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4212255_5g0upm2b3kr.woff2?t=1697297967822') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4212255_5g0upm2b3kr.woff?t=1697297967822') format('woff'),
+       url('//at.alicdn.com/t/c/font_4212255_5g0upm2b3kr.ttf?t=1697297967822') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,30 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-information:before {
+  content: "\e62d";
+}
+
+.icon-arrowTop-fill:before {
+  content: "\e65d";
+}
+
+.icon-fenxiangcopy:before {
+  content: "\e613";
+}
+
+.icon-collection:before {
+  content: "\e653";
+}
+
+.icon-comment:before {
+  content: "\e671";
+}
+
+.icon-like-o:before {
+  content: "\e96e";
 }
 
 .icon-zhongyingwenqiehuan-xianshizhongyingwen:before {

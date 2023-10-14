@@ -1,20 +1,10 @@
-import type { TBody, TParams } from '@/types';
+import type { TBody } from '@/types';
 import { createConfig, handleReqMiddleware } from '@/lib/api';
 import type {
-    IData,
-    IGenerateCaptchaByEmail
+    IData
   } from '@/interfaces';
 import { GEN_CAPTCHA_URL, CAPTCHAT_GET, CAPTCHAT_CHECK } from '@/lib/constant';
 
-const setConfig = (params?: TParams): TParams => {
-    return createConfig(params, {
-        method: 'POST', 
-        headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        }
-    });
-}
 
 export const picture4Captcha = (
     params: TBody<{
@@ -23,7 +13,12 @@ export const picture4Captcha = (
         ts: number;
     }>
 ): Promise<Response | IData<any>> => {
-    let config = setConfig(params);
+    let config = createConfig(params, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+      }});
     return fetch(config.baseURL + CAPTCHAT_GET, config).then(
         handleReqMiddleware
     );
@@ -37,7 +32,12 @@ export const check4Captcha = (
         ts: number;
     }>
 ): Promise<Response | IData<any>> => {
-    let config = setConfig(params);
+    let config = createConfig(params, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+      }});
     return fetch(config.baseURL + CAPTCHAT_CHECK, config).then(
         handleReqMiddleware
       );

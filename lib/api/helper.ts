@@ -2,15 +2,7 @@ import dayjs from 'dayjs';
 import { nonNull } from '@/lib/tool';
 import { type CookieSerializeOptions, serialize } from 'cookie';
 import type { TBody, TParams } from '@/types';
-import { BASE_URL } from '@/lib/constant/index';
-
-import {
-    type NextFetchEvent,
-    type NextMiddleware,
-    type NextRequest,
-    NextResponse,
-} from 'next/server';
-import { IData } from '@/interfaces';
+import { BASE_URL } from '@/lib/constant';
 
 export const getQueryParams = (
     config: TParams | TBody<any>,
@@ -65,7 +57,7 @@ export const createConfig = (
   };
 
   if (!config.baseURL) {
-    config.baseURL = BASE_URL+'/api';
+    config.baseURL = BASE_URL ?? '/api';
   }
 
   if (
@@ -103,8 +95,8 @@ export const handleReqMiddleware = (
   response: Response,
   skipParse?: boolean,
 ) => {
-  return handleReqError(response).then((value) =>
-    handleReqData(value, skipParse),
+  return handleReqError(response).then((value) => 
+    handleReqData(value, skipParse)
   );
 };
 
@@ -139,7 +131,7 @@ export const handleReqData = async (
     return response;
   }
   if (
-    // isClient() &&
+    isClient() &&
     response.headers.get('content-type')?.includes('application/json')
   ) {
     return await response.json();
@@ -147,15 +139,15 @@ export const handleReqData = async (
   return response;
 };
 
-export const setConfig = (params?: TParams): TParams => {
-  return createConfig(params, {
-    method: 'POST', 
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    }
-  });
-}
+// export const setConfig = (params?: TParams): TParams => {
+//   return createConfig(params, {
+//     method: 'POST', 
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Accept': 'application/json',
+//     }
+//   });
+// }
 
 export const isClient = () => {
   return typeof window !== 'undefined';

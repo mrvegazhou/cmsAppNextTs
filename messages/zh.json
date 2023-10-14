@@ -32,7 +32,8 @@
       "auto": "自动",
       "dark": "深色",
       "light": "浅色",
-      "trendingToday": "今日热门"
+      "trendingToday": "今日热门",
+      "logoutCompleted": "退出登录完成"
     },
     "OtherPage": {
       "sorryAuthRequired": "抱歉，访问此资源需要身份认证",
@@ -72,10 +73,14 @@
       "time": "时间",
       "all": "全部"
     },
-    "PostIdPage": {
+    "ArticleIdPage": {
+      "sorryNotFound": "抱歉，此文章未找到",
+      "toHome": "首页",
       "articleDetails": "文章详情",
       "lastUpdated": "最后更新",
-      "notLoggedInPrompt": "还未登录，是否进行登录?",
+      "notLogged": "还未登录",
+      "likeArticleErr": "点赞失败",
+      "cancelLikeErr": "取消失败",
       "replyContentEmptyError": "回复内容不能为空",
       "replyCompleted": "回复完成",
       "contentUpdatedTime": "内容更新时间",
@@ -95,8 +100,6 @@
       "alreadyBookmarked": "已收藏",
       "bookmark": "收藏",
       "bookmarkCount": "收藏数",
-      "currentFloorNumber": "当前楼层号",
-      "anonymousHero": "无名大侠",
       "auditRecords": "审核记录",
       "auditStatus": "审核状态",
       "auditReason": "审核理由",

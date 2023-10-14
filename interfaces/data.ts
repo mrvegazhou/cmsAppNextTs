@@ -50,8 +50,8 @@ export interface IToken {
 }
 
 export interface IData<T> {
-  code: number;
-  msg: string;
+  status: number;
+  message: string;
   data: T;
 }
 

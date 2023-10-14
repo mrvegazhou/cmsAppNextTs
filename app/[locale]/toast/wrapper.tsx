@@ -10,7 +10,7 @@ import {
   useContext,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
 import { ToastContext } from '@/contexts/toast';
 import type Bootstrap from 'bootstrap';
@@ -23,7 +23,7 @@ import { useTranslations } from 'use-intl';
 import { IToastsProps, IToastProps } from '@/interfaces';
 
 
-export default function ToastWrapper(
+function ToastWrapper(
     this: any,
     { children }: { children: ReactNode },
   ) {
@@ -118,6 +118,7 @@ export default function ToastWrapper(
       </ToastContext.Provider>
     );
 }
+export default ToastWrapper;
 
 
 const Toasts = ({

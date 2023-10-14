@@ -12,14 +12,17 @@ import { useRouter, useParams } from "next/navigation";
 import RegisterNav from '@/app/[locale]/register/registerNav';
 import LoginForgetNav from '@/app/[locale]/login/loginForgetNav';
 import Captcha from '@/components/captcha/Captcha';
-import { USER_TOKEN } from '@/lib/constant/cookie';
+import { USER_TOKEN, TOKEN_SECRET } from '@/lib/constant';
 import { REFRESH_TOKEN_BUFFER } from '@/lib/constant/app';
 import { decodeJwtExpToSeconds } from '@/lib/tool';
 import { refreshToken } from '@/services/api';
 import type { IData } from '@/interfaces';
 import useLogin from '@/hooks/useLogin';
+import { aesDecryptStr } from '@/lib/tool';
 
 const LoginNav = () => {
+
+
     const params = useParams()
     // 显示忘记密码
     const [showForgetPwd, setShowForgetPwd] = useState(false);
@@ -33,7 +36,7 @@ const LoginNav = () => {
         disableLogin,
         email, setEmail,
         password, setPassword, 
-        strength,
+        strength, setStrength,
         showCaptcha,
         loginByEmailMutation,
         captchaRef,
@@ -42,7 +45,7 @@ const LoginNav = () => {
         jToken,
         handleChange,
         onSubmit
-    } = useLogin();
+    } = useLogin(()=>{ onClickCloseModal(); });
 
     const router = useRouter();
     const loginModalRef = useRef<HTMLDivElement>(null);
@@ -58,12 +61,12 @@ const LoginNav = () => {
 
     // refresh token
     const validateTokens = useCallback(
-        async (retoken: string) => {
-            if (retoken) {
+        async (reToken: string) => {
+            if (reToken) {
                 const res = await refreshToken({
-                    data: {retoken: retoken}
+                    data: {refreshToken: reToken}
                 }) as IData<any>;
-                if (res.code!=200) {
+                if (res.status!=200) {
                     const locale = params.locale;
                     let path = '/login';
                     if (locale!='undefined' && locale!="") {
@@ -80,11 +83,10 @@ const LoginNav = () => {
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
         const JWT = USER_TOKEN.get();
-
         const token = JWT.token;
         const retoken = JWT.refreshToken;
-        if ((token!='undefined' && retoken!='undefined' ) && (token && retoken)) { 
-            const tokenSeconds = decodeJwtExpToSeconds(token as string);
+        if ((token!='undefined' && retoken!='undefined') && (token && retoken)) { 
+            const tokenSeconds = decodeJwtExpToSeconds(token);
             if (!tokenSeconds || tokenSeconds <= 0) {
                 validateTokens(retoken);
             } else {
@@ -114,6 +116,7 @@ const LoginNav = () => {
         setShowLoginForm(true);
         setShowRegister(false);
         setShowForgetPwd(false);
+        setStrength(0);
     }
 
     function showForgetPwdModal() {
@@ -200,7 +203,7 @@ const LoginNav = () => {
                         </small>
                     </div>
                     <div className='form-row text-center mt-4'>
-                        <button disabled={loginByEmailMutation.isLoading || disableLogin} type="button" className="btn btn-outline-primary" onClick={onSubmit}>
+                        <button disabled={disableLogin} type="button" className="btn btn-outline-primary" onClick={onSubmit}>
                             {t('login')}
                         </button>
                     </div>

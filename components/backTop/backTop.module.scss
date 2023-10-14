@@ -1,0 +1,20 @@
+.wBackTop {
+    position: fixed;
+    bottom: 50px;
+    right: 100px;
+    cursor: pointer;
+    z-index: 1006;
+    transition: all 1s;
+}
+.noFixed {
+    cursor: auto;
+    position: static;
+}
+.wBackTopHide {
+    transition: all 1s;
+    opacity: 0;
+    height: 0px;
+}
+.wBackTopShow {
+    opacity: 1;
+}

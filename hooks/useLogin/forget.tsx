@@ -58,7 +58,7 @@ const useLoginForget = (email: string) => {
                 throw t('enterValidEmail');
             }
             let sendRes = await sendEmailCodeMutation.mutateAsync({data: {email:email4Forget, codeType:1}}) as IData<any>;
-            if( sendRes.code!=200 ) {
+            if( sendRes.status!=200 ) {
                 if (sendRes.data.captchaVerify != undefined && sendRes.data.captchaVerify == true) {
                     await setModeType(SEND_EMAIL_CODE_MODE);
                     await setShowCaptcha(true);
@@ -66,7 +66,7 @@ const useLoginForget = (email: string) => {
                     captchaRef.current?.verify();
                     return;
                 }
-                throw sendRes.msg;
+                throw sendRes.message;
             }
             setShowVerifyCode(true);
             setShowEmailInput(false);
@@ -85,18 +85,14 @@ const useLoginForget = (email: string) => {
         }
     }
 
-    const queryPasswordPublicKeyMutation = useMutation(async () => {
-        return (await getPasswordPublicKey()) as IData<string>;
-    });
-
     async function getEncryptedPassword(password: string, publicKeyStr: string) {
         try {
             let publicKey;
             if (publicKeyStr!="") {
                 publicKey = publicKeyStr;
             } else {
-                const res = await queryPasswordPublicKeyMutation.mutateAsync();
-                if( res.code!=200 ) {
+                const res = await await getPasswordPublicKey() as IData<string>;
+                if( res.status!=200 ) {
                     throw t('encryptPasswordFailed');
                 }
                 publicKey = res.data;
@@ -113,7 +109,6 @@ const useLoginForget = (email: string) => {
             }
             return encryptedData;
         } catch (e) {
-            queryPasswordPublicKeyMutation.reset();
             show({
                 type: 'DANGER',
                 message: t('encryptPasswordFailed'),
@@ -147,8 +142,8 @@ const useLoginForget = (email: string) => {
                 newConfirmPassword: encryptedNewConfirmPassword
             } as any;
             let verifyRes = await changeNewPwdByEmailCodeMutation.mutateAsync({data: body}) as IData<any>;
-            if( verifyRes.code!=200 ) {
-                throw verifyRes.msg;
+            if( verifyRes.status!=200 ) {
+                throw verifyRes.message;
             }
             if (verifyRes.data.captchaVerify != undefined && verifyRes.data.captchaVerify == true) {
                 await setModeType(CHANAGE_PWD_BY_EMAIL_CODE);

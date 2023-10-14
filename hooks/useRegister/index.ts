@@ -57,7 +57,7 @@ const useRegister = () => {
         try {
             const jsEncrypt = await getJsEncrypt(jsEncryptRef);
             const res = await getPasswordPublicKey() as IData<string>;
-            if (res.code != 200) {
+            if (res.status != 200) {
                 throw t('encryptPasswordFailed');
             }
             let publicKeyStr = res.data;
@@ -115,8 +115,8 @@ const useRegister = () => {
                 confirmPassword: encryptedRegConfirmPassword
             } as IRegisterByEmailBody;
             let res = await registerByEmailMutation.mutateAsync({data: body}) as IData<IRegisterByEmailBody>;
-            if( res.code!=200 ) {
-                throw res.msg;
+            if( res.status!=200 ) {
+                throw res.message;
             }
             show({
                 type: 'SUCCESS',
@@ -150,14 +150,14 @@ const useRegister = () => {
                 throw t('enterValidEmail');
             }
             let sendRes = await sendEmailCodeMutation.mutateAsync({data: {email: regEmail, codeType:2}}) as IData<any>;
-            if( sendRes.code!=200 ) {
+            if( sendRes.status!=200 ) {
                 if (sendRes.data.captchaVerify != undefined && sendRes.data.captchaVerify == true) {
                     setShowCaptcha(true);
                     // @ts-ignore
                     captchaRef.current?.verify();
                     return;
                 }
-                throw sendRes.msg;
+                throw sendRes.message;
             }
             show({
                 type: 'SUCCESS',

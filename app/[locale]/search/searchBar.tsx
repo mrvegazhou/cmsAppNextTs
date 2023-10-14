@@ -15,7 +15,7 @@ import { searchTrendingToday } from "@/services/api";
 import type { TBody } from '@/types';
 import type {
     IData
-  } from '@/interfaces';
+} from '@/interfaces';
 
 const SearchBar = forwardRef((props, ref) => {
     const t = useTranslations('Navbar');
@@ -77,7 +77,7 @@ const SearchBar = forwardRef((props, ref) => {
                         </div>
                         <div className={classNames(styles.list, styles.borderBottom)}>
                             <i className="iconfont icon-remen fs-4"></i>
-                            <div className="d-flex flex-column ml-3">
+                            <div className="d- flex-column ml-3">
                                 <span>Client communication policy</span>
                                 <small>#politics - may - @max</small>
                             </div>
@@ -102,5 +102,5 @@ const SearchBar = forwardRef((props, ref) => {
         </>
     );
 });
-
+SearchBar.displayName = "SearchBar";
 export default memo(SearchBar);

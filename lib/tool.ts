@@ -26,7 +26,7 @@ export const jwtExpToSeconds = (
     if (!exp) {
         return;
     }
-    return dayjs.unix(exp).diff(dayjs(), 'seconds');
+    return dayjs(exp).diff(dayjs(), 'seconds');
 };
 
 export const isNull = (value: string | undefined | null) => {
@@ -103,10 +103,10 @@ export const getMetadata = (
     return _metadata;
 };
 
-export const customException = (code = 500, msg = '未知错误'): IError => {
+export const customException = (status = 500, message = '未知错误'): IError => {
     return {
-      code,
-      msg,
+      status,
+      message,
     };
 };
 
@@ -202,3 +202,7 @@ export async function getJsEncrypt(jsEncryptRef: MutableRefObject<any | undefine
   }
   return jsEncrypt;
 }
+
+export const toRelativeTime = (time: string) => {
+  return dayjs().utc().local().to(dayjs(time).utc());
+};

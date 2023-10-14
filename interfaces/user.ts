@@ -8,7 +8,7 @@ import type {
 
 
 export interface IUser extends IBase {
-  username: string;
+  nickname: string;
   phone: string;
   email: string;
   avatarUrl?: string;

@@ -52,13 +52,13 @@ const Captcha: FC<CaptchaProps> = forwardRef(({
           clientUid: localStorage.getItem(vr.name),
           ts: Date.now(),
         }}) as IData<any>;
-        const msg = res.msg || '请刷新页面再试';
-        if (res.code ==200) {
+        const message = res.message || '请刷新页面再试';
+        if (res.status ==200) {
           setError('')
           setCaptcha(vr.data(res.data));
         } else {
-          setError(msg);
-          onFail(msg);
+          setError(message);
+          onFail(message);
         }
     };
 
@@ -100,13 +100,13 @@ const Captcha: FC<CaptchaProps> = forwardRef(({
           check4Captcha({data:data})
             .then((res) => {
                 res = res as IData<any>;
-                const validate: boolean = res.code === 200;
+                const validate: boolean = res.status === 200;
                 if (validate) {
                     success(second);
                 } else {
                     show({
                         type: 'DANGER',
-                        message: res.msg,
+                        message: res.message,
                     });
                     fail();
                 }
@@ -161,5 +161,5 @@ const Captcha: FC<CaptchaProps> = forwardRef(({
         </div>
       );
 });
-
+Captcha.displayName = "Captcha";
 export default Captcha;

@@ -17,14 +17,17 @@ import {
     useRef,
 } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { querySiteConfig } from '@/services/api';
 import type { TMetadata } from '@/types';
 import useToast from '@/hooks/useToast';
 import Avatar from '@/app/[locale]/login/avatar';
 import LoginNav from '@/app/[locale]/login/loginNav';
 import SearchBar from '@/app/[locale]/search/searchBar';
 import { IData, ISiteConfig, ISiteInfo } from '@/interfaces';
+import { useRecoilValue } from "recoil";
+import { userDataContext } from "@/store/userData";
 
+import { useRecoilState } from "recoil";
+import { currentArticleDataContext } from '@/store/articleData';
 
 export const NavbarPage = ({
     metadata
@@ -39,20 +42,21 @@ const Navbar = ({
 }: {
   metadata: TMetadata;
 }) => {
+  const userData = useRecoilValue(userDataContext);
 
   const t = useTranslations('Navbar');
   
   const [siteInfo, setSiteInfo] = useState<ISiteConfig>();
   const navRef = useRef(null);
   const searchRef = useRef()
-
-  useQuery(["siteInfo"], querySiteConfig, {
-    onSuccess: ({ data }: { data: IData<any>}) => {
-      setSiteInfo(data.data);
-    },
-    cacheTime: Infinity,
-    staleTime: Infinity,
-  });
+  
+  // useQuery(["siteInfo"], getSiteConfig, {
+  //   onSuccess: ({ data }: { data: IData<any>}) => {
+  //     setSiteInfo(data.data);
+  //   },
+  //   cacheTime: Infinity,
+  //   staleTime: Infinity,
+  // });
   // const queryClient = useQueryClient();
   // function test() {
   //   let data = queryClient.getQueryData(["siteInfo"])
@@ -75,12 +79,13 @@ const Navbar = ({
       // @ts-ignore
       document.removeEventListener("click", clickCallback, false);
     };
+
   }, []);
 
   return (
     <nav className={classNames('navbar navbar-expand nav-bg')} style={{maxHeight:"60px"}} ref={navRef}>
       <div className="container-fluid bg-green-800">
-        <Logo metadata={metadata} />
+        {/* <Logo metadata={metadata} /> */}
         <div className="d-flex flex-grow-1 align-items-center gap-4 justify-content-between d-none d-md-flex">
           <ul className="navbar-nav">
             <LinkNavItem href="#" name={t('homePage')} />
@@ -95,7 +100,7 @@ const Navbar = ({
           </ul>
 
           <div className="d-flex align-items-center justify-content-center justify-content-between me-3" style={{width:"120px"}}>
-            { siteInfo?.userInfo==null ? (<LoginNav />) : (<Avatar />)}
+            { userData==null ? (<LoginNav />) : (<Avatar />)}
             <ColorModeItem />
             <TranslateItem />
           </div>

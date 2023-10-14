@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import type JSEncrypt from 'jsencrypt';
 import { useTranslations } from 'use-intl';
 import useSyncState from '@/hooks/useState';
-import { USER_TOKEN } from '@/lib/constant/cookie';
+import { USER_TOKEN } from '@/lib/constant';
 import { isEmail, isPassword, isPasswordLen, getJsEncrypt } from '@/lib/tool';
 import {
     loginByEmail,
@@ -19,9 +19,13 @@ import type {
 } from '@/interfaces';
 import useToast from '@/hooks/useToast';
 import type { TBody } from '@/types';
+import { useSetRecoilState } from "recoil";
+import { userDataContext } from "@/store/userData";
 
-const useLogin = () => {
+const useLogin = (close: (()=>void) | null = null) => {
     const t = useTranslations('LoginPage');
+    const setUserData = useSetRecoilState(userDataContext);
+
     const [disableLogin, setDisableLogin] = useState(false);
     const [email, setEmail] = useSyncState("");
     const [password, setPassword] = useSyncState("");
@@ -70,20 +74,17 @@ const useLogin = () => {
       }
     );
   
-    const queryPasswordPublicKeyMutation = useMutation(async () => {
-      return (await getPasswordPublicKey()) as IData<string>;
-    });
-  
     async function getEncryptedPassword(password: string) {
       try {
-        const res = await queryPasswordPublicKeyMutation.mutateAsync();
-        if( res.code!=200 ) {
+        const res = await getPasswordPublicKey() as IData<string>;
+        if( res.status!=200 ) {
           throw t('encryptPasswordFailed');
         }
         let publicKey = res.data;
         if (!publicKey) {
           throw t('encryptPasswordFailed');
         }
+
         const jsEncrypt = await getJsEncrypt(jsEncryptRef);
         jsEncrypt.setPublicKey(publicKey);
         const encryptedData = jsEncrypt.encrypt(password);
@@ -92,7 +93,6 @@ const useLogin = () => {
         }
         return encryptedData;
       } catch (e) {
-        queryPasswordPublicKeyMutation.reset();
         show({
           type: 'DANGER',
           message: t('encryptPasswordFailed'),
@@ -103,13 +103,15 @@ const useLogin = () => {
     async function onSubmit() {
       try {
         checkForm();
-
+        setDisableLogin(true);
         // 加密password
         let encryptedPassword = await getEncryptedPassword(password);
+
         const body = {
           email,
           password: encryptedPassword,
         } as any;
+
         if (!Object.keys(body).length) {
           show({
             type: 'DANGER',
@@ -117,10 +119,9 @@ const useLogin = () => {
           });
           return;
         }
-  
         let loginRes = await loginByEmailMutation.mutateAsync({data: body}) as IData<any>;
-        setDisableLogin(true);
-        if (loginRes.code != 200) {
+        
+        if (loginRes.status != 200) {
             if (loginRes.data.captchaVerify != undefined && loginRes.data.captchaVerify == true) {
                 setShowCaptcha(true);
                 // @ts-ignore
@@ -128,7 +129,7 @@ const useLogin = () => {
             } else {
                 show({
                     type: 'DANGER',
-                    message: loginRes.msg,
+                    message: loginRes.message,
                 });
             }
             return;
@@ -139,9 +140,10 @@ const useLogin = () => {
           type: 'SUCCESS',
         });
         setShowCaptcha(false);
-        USER_TOKEN.set({token: loginRes.data.Jtoken, refreshToken: loginRes.data.Retoken});
-        setJToken(loginRes.data.Jtoken);
-
+        USER_TOKEN.set({token: loginRes.data.token as string, refreshToken: loginRes.data.refreshToken as string});
+        setJToken(loginRes.data.token);
+        setUserData(loginRes.data.userInfo);
+        setDisableLogin(false);
       } catch (e: any) {
         loginByEmailMutation.reset();
         setDisableLogin(false);
@@ -152,6 +154,9 @@ const useLogin = () => {
         });
       } finally {
         setDisableLogin(false);
+        if(close) {
+          close();
+        }
       }
     }
 
@@ -160,7 +165,7 @@ const useLogin = () => {
         disableLogin,
         email, setEmail,
         password, setPassword,
-        strength,
+        strength, setStrength,
         showCaptcha,
         loginByEmailMutation,
         captchaRef,

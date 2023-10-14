@@ -9,7 +9,7 @@ import { useTranslations } from 'use-intl';
 import { useMutation } from '@tanstack/react-query';
 
 const DEFAULT_INFO = {
-    msg: 'Unknown error',
+    message: 'Unknown error',
     status: 500,
     code: 0,
 };
@@ -36,9 +36,9 @@ export default function ResetPage({ error }: { error?: any }) {
      
       if (typeof error === 'object') {
         
-        if ('msg' in error) {
-          const { msg, status, code } = error;
-          newInfo = { msg, status, code };
+        if ('message' in error) {
+          const { message, status, code } = error;
+          newInfo = { message, status, code };
   
         //   if (status === UNAUTHORIZED_STATUS && code === UNAUTHORIZED_CODE1) {
         //     clientClearTokenMutation.mutateAsync({});
@@ -52,16 +52,16 @@ export default function ResetPage({ error }: { error?: any }) {
             code === UNAUTHORIZED_CODE0
         } else if ('cause' in error) {
           const { cause, status, code } = error;
-          newInfo.msg = `${cause.address} ${cause.port} ${cause.code} ${cause.errno}`;
+          newInfo.message = `${cause.address} ${cause.port} ${cause.code} ${cause.errno}`;
           newInfo.status = status;
           newInfo.code = code;
         } else {
-          newInfo.msg = error + '';
+          newInfo.message = error + '';
         }
       } else if (typeof error === 'string') {
-        newInfo.msg = error;
+        newInfo.message = error;
       } else {
-        newInfo.msg = error + '';
+        newInfo.message = error + '';
       }
   
       setInfo(newInfo);
@@ -94,7 +94,7 @@ const DefaultPage = ({
   }: {
     loadingErrorDetails: boolean;
     info: {
-      msg: string;
+      message: string;
       status: number;
       code: number;
     };
@@ -125,7 +125,7 @@ const DefaultPage = ({
                   </div>
                 ) : (
                   <p className="text-danger">
-                    {t('details')}：{info.msg}
+                    {t('details')}：{info.message}
                   </p>
                 )}
   

@@ -32,7 +32,8 @@
       "auto": "Auto",
       "dark": "Dark",
       "light": "Light",
-      "trendingToday": "TRENDING TODAY"
+      "trendingToday": "TRENDING TODAY",
+      "logoutCompleted": "Logout completed"
     },
     "OtherPage": {
       "sorryAuthRequired": "Sorry, accessing this resource requires authentication",
@@ -72,10 +73,14 @@
       "time": "Time",
       "all": "All"
     },
-    "PostIdPage": {
+    "ArticleIdPage": {
+      "sorryNotFound": "Sorry, this article was not found",
+      "toHome": "Home",
       "articleDetails": "Article Details",
       "lastUpdated": "Last Updated",
-      "notLoggedInPrompt": "Not logged in, do you want to log in?",
+      "notLogged": "Not logged in",
+      "likeArticleErr": "Like failed",
+      "cancelLikeErr": "cancel like failed",
       "replyContentEmptyError": "Reply content cannot be empty",
       "replyCompleted": "Reply completed",
       "contentUpdatedTime": "Content updated time",
@@ -95,8 +100,6 @@
       "alreadyBookmarked": "Already bookmarked",
       "bookmark": "Bookmark",
       "bookmarkCount": "Bookmark count",
-      "currentFloorNumber": "Current floor number",
-      "anonymousHero": "Anonymous hero",
       "auditRecords": "Audit Records",
       "auditStatus": "Audit Status",
       "auditReason": "Audit Reason",

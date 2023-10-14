@@ -35,7 +35,7 @@ const Login = ({ pageInfo, metadata }: { pageInfo: IPageInfo | null; metadata: T
     disableLogin,
     email, setEmail,
     password, setPassword, 
-    strength,
+    strength, setStrength,
     showCaptcha,
     loginByEmailMutation,
     captchaRef,
@@ -44,7 +44,7 @@ const Login = ({ pageInfo, metadata }: { pageInfo: IPageInfo | null; metadata: T
     jToken,
     handleChange,
     onSubmit
-  } = useLogin();
+  } = useLogin(null);
 
   function jump2Reg() {
     const locale = params.locale;
@@ -67,12 +67,8 @@ const Login = ({ pageInfo, metadata }: { pageInfo: IPageInfo | null; metadata: T
             </div>
           </div>
           <div className="col-auto px-5">
-            <div className="card border-0 h-100">
-              <div className="card-body d-flex align-items-center position-relative py-0">
-                <div className="d-flex position-absolute start-0 end-0 top-0 h-100 py-5 justify-content-center">
-                  <div className="vr text-secondary text-opacity-75"></div>
-                </div>
-              </div>
+            <div className="d-flex h-100">
+              <div className="vr text-opacity-75"></div>
             </div>
           </div>
           <div className="col ps-0 pe-3">
@@ -128,7 +124,7 @@ const Login = ({ pageInfo, metadata }: { pageInfo: IPageInfo | null; metadata: T
                     ></Captcha>
                 )}
                 <div className="col-sm-10 text-center">
-                  <button onClick={onSubmit} type="button" disabled={loginByEmailMutation.isLoading || disableLogin} className="btn btn-outline-primary mt-4 mb-3 w-50"><span>{t("logInNow")}</span></button>
+                  <button onClick={onSubmit} type="button" disabled={disableLogin} className="btn btn-outline-primary mt-4 mb-3 w-50"><span>{t("logInNow")}</span></button>
                 </div>
               </form>
             )}

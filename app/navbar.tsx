@@ -17,7 +17,7 @@ import {
     useRef,
 } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { querySiteConfig } from '@/services/api';
+import { getSiteConfig } from '@/services/api';
 import type { TMetadata } from '@/types';
 import useToast from '@/hooks/useToast';
 import Avatar from '@/app/[locale]/login/avatar';
@@ -46,13 +46,13 @@ const Navbar = ({
   const navRef = useRef(null);
   const searchRef = useRef()
 
-  useQuery(["siteInfo"], querySiteConfig, {
-    onSuccess: ({ data }: { data: IData<any>}) => {
-      setSiteInfo(data.data);
-    },
-    cacheTime: Infinity,
-    staleTime: Infinity,
-  });
+  // useQuery(["siteInfo"], getSiteConfig, {
+  //   onSuccess: ({ data }: { data: IData<any>}) => {
+  //     setSiteInfo(data.data);
+  //   },
+  //   cacheTime: Infinity,
+  //   staleTime: Infinity,
+  // });
   // const queryClient = useQueryClient();
   // function test() {
   //   let data = queryClient.getQueryData(["siteInfo"])

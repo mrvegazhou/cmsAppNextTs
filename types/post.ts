@@ -1,4 +1,4 @@
-export type TPostState = 'SHOW' | 'HIDE' | 'LOCK' | 'CLOSE';
+export type TArticleState = 'SHOW' | 'HIDE' | 'LOCK' | 'CLOSE';
 
 export type TPostReviewState = 'APPROVED' | 'DENIED' | 'PENDING' | 'CLOSE';
 

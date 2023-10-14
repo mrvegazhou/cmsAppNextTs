@@ -29,10 +29,11 @@ export async function generateMetadata({
 }
 
 const getLoginPageInfo = async () => {
-  const pageInfoRes = await getPageInfo({
+  const pageInfo = await getPageInfo({
     data: {type: SITE_LOGIN_PAGE_INFO_TYPE}
-  }) as IData<IPageInfo>;
-  if( pageInfoRes?.code==200 ) {
+  }) as Response;
+  let pageInfoRes = await pageInfo.json() as IData<IPageInfo>
+  if( pageInfoRes?.status==200 ) {
     return pageInfoRes.data;
   }
   return null;

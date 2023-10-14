@@ -1,5 +1,5 @@
 import type { TBody } from '@/types';
-import { setConfig, handleReqMiddleware } from '@/lib/api';
+import { createConfig, handleReqMiddleware } from '@/lib/api';
 import type { IData } from '@/interfaces';
 
 import { 
@@ -12,7 +12,7 @@ export const getPageInfo = (
         type: string
     }>
   ): Promise<Response | IData<any>> => {
-    let config = setConfig(params);
+    let config = createConfig(params, {method: "POST"});
     const url = config.baseURL + PAGE_INFO;
     return fetch(url, config).then(
       handleReqMiddleware

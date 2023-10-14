@@ -4,11 +4,6 @@ export interface ILoginByEmailBody {
     code?: string;
 }
 
-export interface ISendEmailCode {
-    email: string;
-    codeType: number;
-}
-
 export interface IChangeNewPwdByEmailCode {
     code: string;
     email: string;
