@@ -5,17 +5,17 @@ import type {
 export interface IArticle extends IBase {
   id: number;
   title: string;
-  authorId: number;
-  content?: string;
-  description?: string;
+  authorId?: number;
+  content: string;
+  description: string;
   coverUrl?: string;
-  viewCount: number;
-  commentCount: number;
-  collectionCount: number;
-  likeCount: number;
+  viewCount?: number;
+  commentCount?: number;
+  collectionCount?: number;
+  likeCount?: number;
   shareCount?: number;
-  createTime: string;
-  updateTime: string;
+  createTime?: string;
+  updateTime?: string;
 }
 
 export interface IArticleFavorites {

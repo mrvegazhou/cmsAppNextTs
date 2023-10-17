@@ -10,3 +10,16 @@ export const articleToolBarContext = atom<IArticleToolBarData>({
     key: "articleToolBarData",
     default: {} as IArticleToolBarData,
 });
+
+export const writeArticleInitValue = {
+    title: "",
+    content: "",
+    tags: [] as number[],
+    coverUrl: null as null | string,
+    description: null as null | string,
+};
+  
+export const writeArticleContext = atom({
+    key: "writeArticleData",
+    default: writeArticleInitValue,
+});

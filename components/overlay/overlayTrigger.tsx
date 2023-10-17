@@ -173,7 +173,7 @@ const contains = (() => {
         }
       : fallback;
 })();
-
+  
 const OverLayTriggerComp =  React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((props, ref) => {
     const {
       className,
@@ -187,7 +187,6 @@ const OverLayTriggerComp =  React.forwardRef<OverlayTriggerRef, OverlayTriggerPr
       trigger = 'hover',
       placement = 'top',
 
-  
       autoAdjustOverflow,
       transitionName,
   
@@ -200,12 +199,13 @@ const OverLayTriggerComp =  React.forwardRef<OverlayTriggerRef, OverlayTriggerPr
 
     let css = cssOutput(position);
   
-    const zIndex = useRef<number>(999);
+    const zIndex = useRef<number>(9990);
     const triggerRef = useRef<HTMLElement>();
     const popupRef = useRef<HTMLElement>();
     const timeoutRef = useRef<number[]>([]);
     const hoverStateRef = useRef<'show' | 'hide' | null>(null);
     const [isOpen, setIsOpen] = useState(!!props.isOpen);
+
     const [overlayStyl, setOverlayStyl] = useState<OverlayStyl>({
       placement,
       top: 0,
@@ -389,6 +389,7 @@ const OverLayTriggerComp =  React.forwardRef<OverlayTriggerRef, OverlayTriggerPr
         const { onClick } = getChildProps() as any;
         isOpen ? hide() : show();
         if (onClick) onClick(e, !isOpen);
+        console.log(isOpen, "-----s----")
       };
     }
     if (trigger === 'focus' && !disabled) {

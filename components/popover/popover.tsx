@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import OverLayTriggerComp, { OverlayTriggerProps, cssOutput } from '../overlay/overlayTrigger';
 
 const overlayTriggerCss = cssOutput();
@@ -109,6 +109,7 @@ interface Confirm {
     confirmText?: string;
     title?: React.ReactNode;
     cancelText?: string;
+    id:string;
 }
   
 export function ConfirmComp(props: Confirm) {
@@ -180,6 +181,14 @@ export default function PopoverComp(props: PopoverProps) {
         ...other
     } = props;
 
+    const [isOpen, setIsOpen] = useState(!!props.isOpen);
+
+    useEffect(() => {
+        if (props.isOpen !== isOpen) {
+            setIsOpen(!!props.isOpen);
+        }
+    }, [props.isOpen]);
+
     const renderArrow = () => {
         return (
             <div className={`${prefixCls}-arrow`}>
@@ -204,7 +213,7 @@ export default function PopoverComp(props: PopoverProps) {
             <style jsx>{css}</style>
             <OverLayTriggerComp
                 {...other}
-                isOpen
+                isOpen={isOpen}
                 placement={placement}
                 overlay={
                     <div className={cls}>

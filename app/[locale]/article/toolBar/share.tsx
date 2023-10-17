@@ -26,7 +26,7 @@ const Share = () => {
 
   return (
       <>
-        <PopoverComp trigger="click" placement="right" content={content}>
+        <PopoverComp trigger="click" placement="right" content={content} id='333'>
           <DivDom className={classNames([itemClassName, "text-center border"])}>
             <i className={classNames([iconClassName, "icon-fenxiangcopy"])}></i>
           </DivDom>

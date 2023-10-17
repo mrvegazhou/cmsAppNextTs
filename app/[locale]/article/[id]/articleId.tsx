@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from "recoil";
 import { currentArticleDataContext, articleToolBarContext } from '@/store/articleData';
 import useToast from '@/hooks/useToast';
@@ -13,8 +13,7 @@ import BackTopPage from '../../common/backTop';
 import ToolBar from '../toolBar';
 import { IArticle, IArticleToolBarData } from '@/interfaces';
 import Sidebar from '@/app/[locale]/article/sideBar/sideBar';
-import PopoverComp from '@/components/popover/popover';
-import ConfirmComp from '@/components/popover/confirm';
+
 
 
 export default function ArticleIdPage({ metadata, articleInfo, toolBarData }: { metadata: TMetadata; articleInfo:IArticle; toolBarData: IArticleToolBarData }) {
@@ -43,10 +42,9 @@ const ArticleId = ({ metadata }: { metadata: TMetadata }) => {
 
     const navContent = useRef<HTMLDivElement>(null);
 
-
     return (
         <>
-            <main className="col px-0 pt-3 w-100 d-flex justify-content-center">
+            <main className="col px-0 pt-3 w-100 d-flex justify-content-center" style={{marginTop:"50px"}}>
                 <ToolBar />
                 <div className="w-100 px-3" style={{backgroundColor:'#eee',maxWidth:'910px'}}>
                     <article className=''>
@@ -68,17 +66,11 @@ const ArticleId = ({ metadata }: { metadata: TMetadata }) => {
                         </div>
                         <div className={classNames(styles.contentBody)} ref={navContent}>
 
-<div className="w-25 bg-dark">
-<ConfirmComp title="Are you sure delete this?">
-    <div style={{width:"50px", backgroundColor:'red'}}>tt</div>
-</ConfirmComp>
-</div>
-
 
 <h1>(H1标题)</h1>
 <h2>(H2标题)</h2>
 xxxxxx
-<div style={{height:"300px"}}></div>
+<div style={{height:"1900px"}}></div>
 xxxxxx
 <h3>(H3标题)</h3>
 xxxxxx

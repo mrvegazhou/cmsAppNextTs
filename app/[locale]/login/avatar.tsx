@@ -41,6 +41,7 @@ const Avatar = () => {
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="dropdownLoginLink" style={{left:"auto", right: 0}}>
                     <li><a className="dropdown-item" href="#"><i className="iconfont icon-gerenzhongxin fs-6 pe-2" />{t('profile')}</a></li>
+                    <li><hr className="dropdown-divider opacity-50 mx-2" /></li>
                     <li><a className="dropdown-item" href="#" onClick={logoutOnClick}><i className="iconfont icon-tuichu fs-6 pe-2" />{t('logout')}</a></li>
                 </ul>
             </div>

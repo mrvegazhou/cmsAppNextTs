@@ -30,21 +30,50 @@ import { useRecoilState } from "recoil";
 import { currentArticleDataContext } from '@/store/articleData';
 
 export const NavbarPage = ({
-    metadata
+    metadata,
+    fixedTop = true,
 }: {
     metadata: TMetadata;
+    fixedTop?: boolean;
 }) => {
-    return <Navbar metadata={metadata} />;
+    return <Navbar metadata={metadata} fixedTop={fixedTop} />;
 };
 
 const Navbar = ({
-  metadata
+  metadata,
+  fixedTop = true,
 }: {
   metadata: TMetadata;
+  fixedTop?: boolean;
 }) => {
   const userData = useRecoilValue(userDataContext);
 
   const t = useTranslations('Navbar');
+
+  useEffect(() => {
+    let lastScrollTop = 0;
+    let autoEle = document.querySelector('.autohide');
+    const scrollSwitch = () => {
+      let scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+      if (autoEle) {
+        // 向上
+        if(scrollY < lastScrollTop) {
+          autoEle.classList.remove('scrolledDown');
+          autoEle.classList.add('scrolledUp');
+        }
+        // 向下
+        if (scrollY > 350 && scrollY > lastScrollTop) {
+          autoEle.classList.remove('scrolledUp');
+          autoEle.classList.add('scrolledDown');
+        }
+        lastScrollTop = scrollY;
+      }
+    };
+    window.addEventListener("scroll", scrollSwitch);
+    return () => {
+      window.removeEventListener("scroll", scrollSwitch);
+    };
+  }, []);
   
   const [siteInfo, setSiteInfo] = useState<ISiteConfig>();
   const navRef = useRef(null);
@@ -83,30 +112,38 @@ const Navbar = ({
   }, []);
 
   return (
-    <nav className={classNames('navbar navbar-expand nav-bg')} style={{maxHeight:"60px"}} ref={navRef}>
-      <div className="container-fluid bg-green-800">
-        {/* <Logo metadata={metadata} /> */}
-        <div className="d-flex flex-grow-1 align-items-center gap-4 justify-content-between d-none d-md-flex">
-          <ul className="navbar-nav">
-            <LinkNavItem href="#" name={t('homePage')} />
-            <MessageNavItem metadata={metadata} />
-            <FollowMessageNavItem
-              metadata={metadata}
-            />
-            <MoreNavItem
-              metadata={metadata}
-            />
-            <SearchBar ref={searchRef}/>
-          </ul>
+    <>
+      <style jsx>{`
+        .scrolledDown{
+          transform:translateY(-100%); transition: all 0.3s ease-in-out;
+        }
+        .scrolledUp{
+          transform:translateY(0); transition: all 0.3s ease-in-out;
+        }
+      `}</style>
+    
+      <nav className={classNames('autohide navbar navbar-expand nav-bg', (fixedTop && 'fixed-top'))} style={{maxHeight:"60px"}} ref={navRef}>
+        <div className="container-fluid">
+          {/* <Logo metadata={metadata} /> */}
+          <div className="d-flex flex-grow-1 align-items-center gap-4 justify-content-between d-none d-md-flex">
+            <ul className="navbar-nav">
+              <LinkNavItem href="#" name={t('homePage')} />
+              <MessageNavItem metadata={metadata} />
+              <FollowMessageNavItem
+                metadata={metadata}
+              />
+              <SearchBar ref={searchRef}/>
+            </ul>
 
-          <div className="d-flex align-items-center justify-content-center justify-content-between me-3" style={{width:"120px"}}>
-            { userData==null ? (<LoginNav />) : (<Avatar />)}
-            <ColorModeItem />
-            <TranslateItem />
+            <div className="d-flex align-items-center justify-content-center justify-content-between me-3" style={{width:"120px"}}>
+              { userData==null ? (<LoginNav />) : (<Avatar />)}
+              <ColorModeItem />
+              <TranslateItem />
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 };
 
@@ -381,94 +418,4 @@ const MessageNavItem = ({
     );
 };
 
-
-const MoreNavItem = ({
-    metadata,
-  }: {
-    metadata: TMetadata;
-  }) => {
-    const t = useTranslations('Navbar');
   
-    return (
-      <li className="nav-item dropdown">
-        <a
-          className="nav-link dropdown-toggle"
-          id="navbarDropdown"
-          role="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          {t('more')}
-        </a>
-        <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-            <>
-              <LinkDropdownItem href="/posts/new" name="create post" />
-              <DropdownDivider />
-  
-              <LinkDropdownItem href={`/users/1`} name={t('profile')} />
-              <LinkDropdownItem href="/admin" name="dashboard" />
-              <SearchDropdownItem metadata={metadata} />
-              <DropdownDivider />
-  
-              <LogoutDropdownItem />
-            </>
-  
-            <>
-              <DropdownDivider />
-              <LinkDropdownItem href='' name="help" />
-              <LinkDropdownItem
-                  href=''
-                  name="feedback"
-                />
-              <LinkDropdownItem
-                  href=''
-                  name="report"
-                />
-            </>
-        </ul>
-      </li>
-    );
-  };
-  
-const DropdownDivider = () => {
-  return (
-    <li>
-      <hr className="dropdown-divider" />
-    </li>
-  );
-};
-  
-const LinkDropdownItem = ({ href, name }: { href: string; name: string }) => {
-  return (
-    <li>
-      <Link href={href} className="dropdown-item">
-        {name}
-      </Link>
-    </li>
-  );
-};
-  
-const LogoutDropdownItem = () => {
-  const t = useTranslations('Navbar');
-  const { show } = useToast();
-
-  return (
-    <li>
-      <a className="dropdown-item cursor-pointer">
-        {t('logout')}
-      </a>
-    </li>
-  );
-};
-  
-const SearchDropdownItem = ({ metadata }: { metadata: TMetadata }) => {
-  const t = useTranslations('Navbar');
-
-  return (
-    <li>
-      <a className="dropdown-item cursor-pointer">
-        {t('search')}
-      </a>
-    </li>
-  );
-};
