@@ -161,7 +161,7 @@ export const apiResponse = ({
     headers: _headers,
     status:
       typeof data === 'object' && 'status' in data
-        ? data.status
+        ? (data.status>599 ? 599 : data.status)
         : status ?? (e ? 500 : 200),
   });
 };

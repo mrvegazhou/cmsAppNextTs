@@ -206,3 +206,66 @@ export async function getJsEncrypt(jsEncryptRef: MutableRefObject<any | undefine
 export const toRelativeTime = (time: string) => {
   return dayjs().utc().local().to(dayjs(time).utc());
 };
+
+function isValidKey(
+  key: string | number | symbol,
+  object: object
+): key is keyof typeof object {
+  return key in object;
+}
+
+export function forEach(obj: Object, callback: Function) {
+  if (obj) {
+    for (const key in obj) { // eslint-disable-line no-restricted-syntax
+      if ({}.hasOwnProperty.call(obj, key)) {
+        if(isValidKey(key, obj)) {
+          callback(key, obj[key]);
+        }
+      }
+    }
+  }
+}
+
+export function isMap(obj: any) {
+  return Object.prototype.toString.call(obj) === '[object Object]';
+}
+
+export const mergeRecursive = (obj1: any, obj2: any) => {
+  if (obj1 && obj2 === undefined) {
+    return obj1;
+  }
+  const mergedValue: Record<string | number, any> = {};
+  forEach(obj1, (key:string | number, value:any) => {
+    if (isMap(value)) {
+      mergedValue[key] = mergeRecursive(value, obj2[key]);
+    } else {
+      mergedValue[key] = obj2[key] !== undefined ? obj2[key] : value;
+    }
+  });
+  return mergedValue;
+};
+
+export const isURL = (URL: string) => {
+  var str=URL;
+  //判断URL地址的正则表达式为:http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?
+  //下面的代码中应用了转义字符"\"输出一个字符"/"
+  var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+  var objExp = new RegExp(Expression);
+  if(objExp.test(str)==true) {
+       return true;
+  } else {
+       return false;
+  }
+};
+
+export const loadImage = (src: string): Promise<HTMLImageElement> => {
+  return new Promise(function(resolve, reject){
+      var img = new Image();
+      img.src = src;
+      /* 加载完成时执行一下代码 */
+      img.onload = function(){
+          /* 执行resolve回调函数，传入参数img对象 */
+          resolve(img)
+      }
+  })
+}

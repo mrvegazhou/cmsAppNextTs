@@ -331,7 +331,7 @@ const FollowMessageNavItem = ({
           <li className="nav-item">
             <Link
               href="/follow"
-              className="nav-link cursor-pointer d-flex align-items-center"
+              className="nav-link cursor- d-flex align-items-center"
             >
               <span className="position-relative">
                 {t('message')}

@@ -1,11 +1,12 @@
 import type { TBody } from '@/types';
 import { createConfig, handleReqMiddleware } from '@/lib/api';
-import type { IData, IArticleId } from '@/interfaces';
+import type { IData, IArticleId, IArticleUploadImages, IUploadArticleContent } from '@/interfaces';
 import { 
     CURRENT_ARTICLE_INFO,
     ARTICLE_LIKE,
     ARTICLE_UNLIKE,
-    ARTICLE_TOOLBAR_DATA
+    ARTICLE_TOOLBAR_DATA,
+    ARTICLE_UPLOAD_IMAGE
 } from '@/lib/constant'
 
 export const getCurrentArticleInfo = (
@@ -58,3 +59,16 @@ export const getArticleToolBarData = (
   );
 };
 
+export const uploadArticleImages = (
+  params: TBody<IArticleUploadImages>
+): Promise<Response | IData<any>> => {
+  const { formData } = params.data as any;
+  const config = createConfig(params, {
+    method: 'POST',
+    body: formData,
+  });
+  const url = config.baseURL + ARTICLE_UPLOAD_IMAGE;
+  return fetch(url, config).then(
+    handleReqMiddleware
+  );
+};

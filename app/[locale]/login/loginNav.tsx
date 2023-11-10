@@ -18,7 +18,7 @@ import { decodeJwtExpToSeconds } from '@/lib/tool';
 import { refreshToken } from '@/services/api';
 import type { IData } from '@/interfaces';
 import useLogin from '@/hooks/useLogin';
-import { aesDecryptStr } from '@/lib/tool';
+
 
 const LoginNav = () => {
 
@@ -148,69 +148,69 @@ const LoginNav = () => {
         </a>
         <div ref={loginModalRef} className="modal fade" id="loginModel" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered" style={{maxWidth:"590px"}}>
-            <div className="modal-content">
-                <div className="d-flex flex-row justify-content-end">
-                <a href="#" onClick={onClickCloseModal} className="close text-dark text-decoration-none px-2"  data-dismiss="modal" aria-hidden="true">
-                    <i className='iconfont icon-close fs-4'></i>
-                </a>
-                </div>
-                <div className="modal-body">
-                { showRegister && (
-                    <RegisterNav goBack={goBack} />
-                )}
-                { showForgetPwd && (
-                    <LoginForgetNav email={email} goBack={goBack} />
-                )}
-                { showLoginForm && (
-                    <form>
-                    <div className="form-group row">
-                        <label className="col-sm-3 col-form-label">{t('email')}</label>
-                        <div className="col-sm-8">
-                        <input name="email" ref={emailInputRef} value={email} className="form-control" onChange={handleChange}/>
-                        </div>
+                <div className="modal-content">
+                    <div className="d-flex flex-row justify-content-end">
+                    <a href="#" onClick={onClickCloseModal} className="close text-dark text-decoration-none px-2"  data-dismiss="modal" aria-hidden="true">
+                        <i className='iconfont icon-close fs-4'></i>
+                    </a>
                     </div>
-                    <div className="form-group row mt-4">
-                        <label className="col-sm-3 col-form-label">{t('password')}</label>
-                        <div className="col-sm-8">
-                        <input name="password" ref={passwordInputRef}  value={password} type="password" className="form-control col-sm-10" onChange={handleChange}/>
-                        {strength>0 && (
-                            <div className="row" style={{margin:"10px 0 0 3px"}}>
-                                {strength==1 && <div className='w-15 border border-2 border-secondary'></div>}
-                                {strength==2 && (<><div className='w-15 border border-2 border-secondary'></div><div className='w-15 border border-2 border-warning mx-1'></div></>)}
-                                {strength==3 && (<><div className='w-15 border border-2 border-secondary'></div><div className='w-15 border border-2 border-warning mx-1'></div><div className='w-15 border border-2 border-danger'></div></>)}
-                            </div>
-                        )}
-                        </div>
-                    </div>
-                    { showCaptcha && (
-                        <Captcha
-                            onSuccess={(data) => onSubmit()}
-                            type='auto'
-                            mode='login'
-                            email={email}
-                            popup="force"
-                            ref={captchaRef}
-                        ></Captcha>
+                    <div className="modal-body">
+                    { showRegister && (
+                        <RegisterNav goBack={goBack} />
                     )}
-                    <div className="form-group form-row mt-4" style={{marginLeft: "30%"}}>
-                        <small className="form-text text-muted">
-                        {t('loginForgot')} <a href='#' onClick={showForgetPwdModal}>{t('password')}</a>?
-                        </small>
+                    { showForgetPwd && (
+                        <LoginForgetNav email={email} goBack={goBack} />
+                    )}
+                    { showLoginForm && (
+                        <form>
+                        <div className="form-group row">
+                            <label className="col-sm-3 col-form-label">{t('email')}</label>
+                            <div className="col-sm-8">
+                            <input name="email" ref={emailInputRef} value={email} className="form-control" onChange={handleChange}/>
+                            </div>
+                        </div>
+                        <div className="form-group row mt-4">
+                            <label className="col-sm-3 col-form-label">{t('password')}</label>
+                            <div className="col-sm-8">
+                            <input name="password" ref={passwordInputRef}  value={password} type="password" className="form-control col-sm-10" onChange={handleChange}/>
+                            {strength>0 && (
+                                <div className="row" style={{margin:"10px 0 0 3px"}}>
+                                    {strength==1 && <div className='w-15 border border-2 border-secondary'></div>}
+                                    {strength==2 && (<><div className='w-15 border border-2 border-secondary'></div><div className='w-15 border border-2 border-warning mx-1'></div></>)}
+                                    {strength==3 && (<><div className='w-15 border border-2 border-secondary'></div><div className='w-15 border border-2 border-warning mx-1'></div><div className='w-15 border border-2 border-danger'></div></>)}
+                                </div>
+                            )}
+                            </div>
+                        </div>
+                        { showCaptcha && (
+                            <Captcha
+                                onSuccess={(data) => onSubmit()}
+                                type='auto'
+                                mode='login'
+                                email={email}
+                                popup="force"
+                                ref={captchaRef}
+                            ></Captcha>
+                        )}
+                        <div className="form-group form-row mt-4" style={{marginLeft: "30%"}}>
+                            <small className="form-text text-muted">
+                            {t('loginForgot')} <a href='#' onClick={showForgetPwdModal}>{t('password')}</a>?
+                            </small>
+                        </div>
+                        <div className="form-group form-row mt-1" style={{marginLeft: "30%"}}>
+                            <small className="form-text text-muted">
+                            {t('notRegistered')} <a href='#' onClick={showRegisterModal}>{t('quickRegister')}</a>
+                            </small>
+                        </div>
+                        <div className='form-row text-center mt-4'>
+                            <button disabled={disableLogin} type="button" className="btn btn-outline-primary" onClick={onSubmit}>
+                                {t('login')}
+                            </button>
+                        </div>
+                        </form>
+                    )}
                     </div>
-                    <div className="form-group form-row mt-1" style={{marginLeft: "30%"}}>
-                        <small className="form-text text-muted">
-                        {t('notRegistered')} <a href='#' onClick={showRegisterModal}>{t('quickRegister')}</a>
-                        </small>
-                    </div>
-                    <div className='form-row text-center mt-4'>
-                        <button disabled={disableLogin} type="button" className="btn btn-outline-primary" onClick={onSubmit}>
-                            {t('login')}
-                        </button>
-                    </div>
-                    </form>
-                )}
                 </div>
-            </div>
             </div>
         </div>
       </>

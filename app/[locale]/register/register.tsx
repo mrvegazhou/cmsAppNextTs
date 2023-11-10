@@ -71,12 +71,8 @@ const Register = ({ pageInfo, metadata }: { pageInfo: IPageInfo | null; metadata
                 </div>
             </div>
             <div className="col-auto px-5">
-                <div className="card border-0 h-100">
-                <div className="card-body d-flex align-items-center position-relative py-0">
-                    <div className="d-flex position-absolute start-0 end-0 top-0 h-100 py-5 justify-content-center">
-                    <div className="vr text-secondary text-opacity-75"></div>
-                    </div>
-                </div>
+                <div className="d-flex h-100">
+                <div className="vr text-opacity-75"></div>
                 </div>
             </div>
             <div className="col ps-0 pe-3">

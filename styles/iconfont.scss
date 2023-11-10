@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4212255 */
-  src: url('//at.alicdn.com/t/c/font_4212255_5g0upm2b3kr.woff2?t=1697297967822') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4212255_5g0upm2b3kr.woff?t=1697297967822') format('woff'),
-       url('//at.alicdn.com/t/c/font_4212255_5g0upm2b3kr.ttf?t=1697297967822') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4212255_b68ynba1qy8.woff2?t=1699549601463') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4212255_b68ynba1qy8.woff?t=1699549601463') format('woff'),
+       url('//at.alicdn.com/t/c/font_4212255_b68ynba1qy8.ttf?t=1699549601463') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,126 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-zuoyouduiqi:before {
+  content: "\ec88";
+}
+
+.icon-juzhongduiqi:before {
+  content: "\ec80";
+}
+
+.icon-youduiqi:before {
+  content: "\ec82";
+}
+
+.icon-zuoduiqi:before {
+  content: "\ec87";
+}
+
+.icon-biaoshilei_shipin:before {
+  content: "\e615";
+}
+
+.icon-ic_image_upload:before {
+  content: "\e60a";
+}
+
+.icon-formatindentdecrease:before {
+  content: "\e86a";
+}
+
+.icon-format-indent-increase:before {
+  content: "\e761";
+}
+
+.icon-henggang:before {
+  content: "\e628";
+}
+
+.icon-chexiao:before {
+  content: "\e602";
+}
+
+.icon-zhongzuo:before {
+  content: "\e603";
+}
+
+.icon-qingchu:before {
+  content: "\e688";
+}
+
+.icon-zitixiahuaxian:before {
+  content: "\ec86";
+}
+
+.icon-daima:before {
+  content: "\e6b9";
+}
+
+.icon-quxiaolianjie1:before {
+  content: "\ec81";
+}
+
+.icon-h32:before {
+  content: "\e627";
+}
+
+.icon-h:before {
+  content: "\e61a";
+}
+
+.icon-h12:before {
+  content: "\e61b";
+}
+
+.icon-h22:before {
+  content: "\e625";
+}
+
+.icon-zitixieti:before {
+  content: "\ec85";
+}
+
+.icon-charulianjie:before {
+  content: "\ec7f";
+}
+
+.icon-youxuliebiao:before {
+  content: "\e611";
+}
+
+.icon-zu:before {
+  content: "\e614";
+}
+
+.icon-unorderedList:before {
+  content: "\e622";
+}
+
+.icon-quxiaolianjie:before {
+  content: "\e63d";
+}
+
+.icon-cuti:before {
+  content: "\e6e3";
+}
+
+.icon-qiehuan:before {
+  content: "\e621";
+}
+
+.icon-xiangxia:before {
+  content: "\e600";
+}
+
+.icon-xiangshang:before {
+  content: "\e601";
+}
+
+.icon-shouye:before {
+  content: "\e64f";
 }
 
 .icon-information:before {

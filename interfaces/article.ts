@@ -8,6 +8,7 @@ export interface IArticle extends IBase {
   authorId?: number;
   content: string;
   description: string;
+  tags: number[];
   coverUrl?: string;
   viewCount?: number;
   commentCount?: number;
@@ -35,4 +36,19 @@ export interface IArticleId {
   articleId: number;
 }
 
+export interface IArticleUploadImage {
+  file?: string | Blob;
+  formData?: FormData;
+}
+
+export interface IArticleUploadImages {
+  files?: string[] | Blob[];
+  formData?: FormData;
+}
+
+export interface IUploadArticleContent {
+  urls: {
+    default: string;
+  };
+}
 

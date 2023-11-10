@@ -1,12 +1,16 @@
-import { type MouseEvent } from 'react';
+import { type MouseEvent, FC } from 'react';
 import { useTranslations } from 'use-intl';
+import classNames from 'classnames';
 import { useMutation } from '@tanstack/react-query';
 import useToast from '@/hooks/useToast';
 import { logout } from '@/services/api';
 import { useRecoilState } from "recoil";
 import { userDataContext } from "@/store/userData";
 
-const Avatar = () => {
+interface propsType {
+    class?: string;
+}
+const Avatar: FC<propsType> = props => {
     let [userData, setUserData] = useRecoilState(userDataContext);
 
     const t = useTranslations('Navbar');
@@ -35,7 +39,7 @@ const Avatar = () => {
     }
     return (
         <>
-            <div className="dropdown">
+            <div className={classNames(props.class, "dropdown")}>
                 <a href="#" role="button" id="dropdownLoginLink" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src={userData?.avatarUrl} loading="lazy" className="bg-info rounded-circle shadow-4" style={{ width: "35px"}} />
                 </a>
