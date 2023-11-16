@@ -1,4 +1,16 @@
-
+.richEditorRoot {
+    /* height: 500px; */
+    padding-bottom: 10px;
+    overflow: auto;
+    font-size: 16px;
+}
+.richEditorRoot img {
+    user-select: none;
+}
+  
+.richEditorRoot * {
+    line-height: initial;
+}  
 .richEditorEditor {
     border-top: 1px solid #ddd;
     cursor: text;
@@ -16,6 +28,15 @@
     position: relative;
     width: 100%;
     height: 800px;
+}
+.richEditorReadOnly .richEditorControl {
+    pointer-events: none;
+}
+.richEditorReadOnly .richEditor-image img:hover {
+    outline: none;
+}
+.richEditorReadOnly .richEditorHr {
+    pointer-events: none;
 }
 .richEditorBlockquote {
     border-left: 5px solid #eee;

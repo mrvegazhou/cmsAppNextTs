@@ -258,14 +258,31 @@ export const isURL = (URL: string) => {
   }
 };
 
-export const loadImage = (src: string): Promise<HTMLImageElement> => {
+export const loadImage = (src: string, getBase64?: boolean): Promise<[HTMLImageElement, string?]> => {
   return new Promise(function(resolve, reject){
       var img = new Image();
       img.src = src;
-      /* 加载完成时执行一下代码 */
-      img.onload = function(){
+      if (getBase64) {
+        let canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        img.onload = function(){
+          canvas.height = img.height;
+          canvas.width = img.width;
+          ctx!.drawImage(img, 0, 0, img.width, img.height);
+          const dataURL = canvas.toDataURL("image/jpeg", 1); 
+          resolve([img, dataURL])
+        }
+      } else {
+        /* 加载完成时执行一下代码 */
+        img.onload = function(){
           /* 执行resolve回调函数，传入参数img对象 */
-          resolve(img)
-      }
+          resolve([img])
+        }
+      }  
   })
+}
+
+export const handleDrop = (event: React.ChangeEvent<Element> | React.KeyboardEvent<Element> | React.MouseEvent<Element>) => {
+  event.preventDefault();
+  event.stopPropagation();
 }

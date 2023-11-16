@@ -13,7 +13,7 @@ type DividerBlockProps = {
 }
 const DividerBlock = (props: DividerBlockProps) => {
     return (
-        <hr className="hr" style={{width:'70%', marginLeft:'auto', marginRight:'auto'}}/>
+        <hr className="hr richEditorHr" style={{width:'70%', marginLeft:'auto', marginRight:'auto'}}/>
     );
 };
 export default DividerBlock;

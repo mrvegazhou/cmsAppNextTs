@@ -21,29 +21,45 @@ import {
     DraftHandleValue
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
-import { SyntheticKeyboardEvent, MyDraftEditorProps, OnChangeType } from './interfaces';
+import { SyntheticKeyboardEvent, MyDraftEditorProps } from './interfaces';
 import { flow } from 'lodash';
 import LinkToolBar from "./components/link/link";
 import { ImageToolBar, deleteImage } from "./components/image/image";
 import { TextIndentToolBar } from "./components/textIndent/textIndent";
 import { increaseSelectionIndent } from "./utils/content";
 import { keyCommandHandlers, returnHandlers } from "./utils/handles";
-import MediaBlock from "./components/mediaBlock/mediaBlock";
 import TextAlignToolBar from "./components/textAlign/textAlign";
 import { DividerToolBar } from "./components/divider/divider";
 import "./richEditor.css";
-import { getCustomStyleFn, getBlockStyleFn } from "./renderers";
+import { getCustomStyleFn, getBlockStyleFn, getBlockRendererFn } from "./renderers";
 
 import { removeEntities, removeBlockTypes, removeInlineStyles } from "./utils/remove";
 import { getDecorators } from "./renderers";
+import { handleDrop } from "@/lib/tool";
 import PopoverToolBar from "../textSelectionPopover/popover";
 
 
 
 const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
     (props: MyDraftEditorProps, ref) => {
-    let { id = 'draft-editor', classNames, style, ...rest } = props;
+    let { id = 'draft-editor', style, ...rest } = props;
     const editorRef = useRef<Editor | null>(null);
+    const rootRef = useRef(null);
+    const [target, setTarget] = useState<Element>()
+    const refs = useCallback((el: any) => {
+      if (el != null) {
+        setTarget(el)
+      } else {
+        setTarget(undefined)
+      }
+    }, [])
+
+    const [readOnly, setReadOnly] = useState(false);
+    const handleReadOnly = (flag: boolean) => {
+        setReadOnly(flag);
+        console.log(readOnly)
+    };
+
     const popoverRef = useRef(null);
 
     const decorator = getDecorators();
@@ -98,8 +114,24 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
           textDecoration: 'none',
           borderBottom: '1px solid',
         },
+        SUBSCRIPT: { fontSize: '0.6em', verticalAlign: 'sub' },
+        SUPERSCRIPT: { fontSize: '0.6em', verticalAlign: 'super' }
     };
 
+    // 媒体
+    const blockRendererFn = (contentBlock: ContentBlock) => {
+        // @ts-ignore
+        let containerNode = rootRef.current;
+        // @ts-ignore
+        return getBlockRendererFn({contentBlock, containerNode, 
+            blockProps: {
+                handleReadOnly: handleReadOnly, 
+                onChange: onChange,
+                forceRender: forceRender,
+                editorState: editorState
+            }});
+    };
+    
     const customStyleFn = getCustomStyleFn({}, {
         customStyleFn: props.customStyleFn,
     });
@@ -115,15 +147,6 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
     const requestFocus = () => {
         setTimeout(() => editorRef?.current?.focus(), 0);
     };
-
-    const [target, setTarget] = useState<HTMLElement>()
-    const refs = useCallback((el: any) => {
-      if (el != null) {
-        setTarget(el)
-      } else {
-        setTarget(undefined)
-      }
-    }, [])
 
     const cancePopover = useMemo(()=>
     () => {
@@ -168,6 +191,12 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         return getDefaultKeyBinding(event);
     };
 
+    const forceRender = () => {
+        const selectionState = editorState.getSelection();
+        let newEditorState = EditorState.set(editorState, { decorator: decorator });
+        setEditorState(EditorState.forceSelection(newEditorState, selectionState));
+    };
+
     const undo = () => {
         setEditorState(EditorState.undo(editorState));
     };
@@ -175,24 +204,9 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         setEditorState(EditorState.redo(editorState));
     };
 
-    // 图片
-    const myMediaBlockRenderer = (block: ContentBlock, {deleteImage}:{deleteImage:(block: ContentBlock)=>void}) => {
-        if (block.getType() === 'atomic') {
-          return {
-            component: MediaBlock,
-            editable: false,
-            props: {
-                deleteImage
-            },
-          };
-        }
-      
-        return null;
-    }
-    
     return (
         <>
-            <div className="richEditorRoot">
+            <div className={classNames("richEditorRoot", {"richEditorReadOnly": readOnly})} ref={rootRef}>
                 <div className="richEditorControl">
                     <div className="d-flex align-items-center justify-content-left">
                         <SpanDom onToggle={undo}>
@@ -222,21 +236,20 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
 
                     </div>
                 </div>
-                <div className={cls} onClick={focus} ref={refs}>
+                <div className={classNames([cls, "richEditorContent"])} onClick={focus} ref={refs}>
                     <Editor 
                         ref={editorRef}
                         editorState={editorState} 
                         onChange={setEditorState} 
                         blockStyleFn={blockStyleFn}
-                        blockRendererFn={(block) => myMediaBlockRenderer(block, { 
-                            deleteImage: (block: ContentBlock) => { deleteImage(editorState, onChange, block) }
-                        })}
+                        blockRendererFn={blockRendererFn}
                         customStyleMap={styleMap}
                         customStyleFn={customStyleFn}
                         keyBindingFn={myKeyBindingFn}
                         stripPastedStyles={true}
                         handleKeyCommand={handleKeyCommand}
                         handleReturn={handleReturn}
+                        readOnly={readOnly}
                     />
                     {/* <PopoverToolBar target={target} ref={popoverRef} /> */}
                 </div>
@@ -339,12 +352,28 @@ const InlineStyleDoms = (props: InlineStyleDomsProps) => {
         {label: <i className="iconfont icon-cuti fs-4"></i>, style: 'BOLD'},
         {label: <i className="iconfont icon-zitixieti fs-4"></i>, style: 'ITALIC'},
         {label: <i className="iconfont icon-zitixiahuaxian fs-4"></i>, style: 'UNDERLINE'},
-        // {label: '删除线', style: 'STRIKETHROUGH'},
-        // {label: '等宽字体', style: 'CODE'},
+        {label: <i className="iconfont icon-subscript2 fs-4"></i>, style: 'SUBSCRIPT'},
+        {label: <i className="iconfont icon-superscript2 fs-4"></i>, style: 'SUPERSCRIPT'}
     ];
     var currentStyle = props.editorState.getCurrentInlineStyle();
     
+    const exclusiveInlineStyles = {
+        SUPERSCRIPT: 'SUBSCRIPT',
+        SUBSCRIPT: 'SUPERSCRIPT',
+    };
     const onToggleInlineStyle = (inlineStyle: string) => {
+        // @ts-ignore
+        const exclusiveInlineStyle = exclusiveInlineStyles[inlineStyle];
+        let editorState = props.editorState;
+        if (
+            exclusiveInlineStyle &&
+            currentStyle.has(exclusiveInlineStyle)
+        ) {
+            editorState = RichUtils.toggleInlineStyle(
+                editorState,
+                exclusiveInlineStyle
+            );
+        }
         props.setEditorState(RichUtils.toggleInlineStyle(
             props.editorState,
             inlineStyle

@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4212255 */
-  src: url('//at.alicdn.com/t/c/font_4212255_b68ynba1qy8.woff2?t=1699549601463') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4212255_b68ynba1qy8.woff?t=1699549601463') format('woff'),
-       url('//at.alicdn.com/t/c/font_4212255_b68ynba1qy8.ttf?t=1699549601463') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4212255_xb9kistavmp.woff2?t=1699976015233') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4212255_xb9kistavmp.woff?t=1699976015233') format('woff'),
+       url('//at.alicdn.com/t/c/font_4212255_xb9kistavmp.ttf?t=1699976015233') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,30 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-size:before {
+  content: "\e665";
+}
+
+.icon-subscript2:before {
+  content: "\e87c";
+}
+
+.icon-superscript2:before {
+  content: "\e804";
+}
+
+.icon-delete1:before {
+  content: "\e617";
+}
+
+.icon-format-float-left:before {
+  content: "\e75a";
+}
+
+.icon-format-float-right:before {
+  content: "\e75b";
 }
 
 .icon-zuoyouduiqi:before {

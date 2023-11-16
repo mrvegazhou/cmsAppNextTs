@@ -13,7 +13,9 @@ export const removeInlineStyles = (editorState: EditorState, styleName: string) 
         'ITALIC',
         'UNDERLINE',
         'STRIKETHROUGH',
-        'CODE'
+        'CODE',
+        'SUBSCRIPT',
+        'SUPERSCRIPT'
     ];
     const contentState = editorState.getCurrentContent();
     let contentWithoutStyles;
@@ -45,6 +47,23 @@ export const removeInlineStyles = (editorState: EditorState, styleName: string) 
   
     return newEditorState;
 };
+
+export const removeBlock = (editorState: EditorState, block: ContentBlock, lastSelection = null) => {
+  let nextContentState, nextEditorState
+  const blockKey = block.getKey()
+
+  nextContentState = Modifier.removeRange(editorState.getCurrentContent(), new SelectionState({
+    anchorKey: blockKey,
+    anchorOffset: 0,
+    focusKey: blockKey,
+    focusOffset: block.getLength()
+  }), 'backward')
+
+  nextContentState = Modifier.setBlockType(nextContentState, nextContentState.getSelectionAfter(), 'unstyled')
+  nextEditorState = EditorState.push(editorState, nextContentState, 'remove-range')
+  return EditorState.forceSelection(nextEditorState, lastSelection || nextContentState.getSelectionAfter())
+
+}
 
 export const removeBlockTypes = (editorState: EditorState) => {
     const contentState = editorState.getCurrentContent();

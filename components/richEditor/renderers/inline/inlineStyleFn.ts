@@ -40,7 +40,6 @@ const InlineStyle = (props: Props, options: Options) => (styles: DraftInlineStyl
     
     output = customStyleFn ? customStyleFn(styles, block, output) : {};
     styles.forEach((style: string | undefined) => {
-        console.log(style, "---style----")
         if (style) {
             if (style!.indexOf('COLOR-') === 0) {
                 output.color = `#${getStyleValue(style)}`;

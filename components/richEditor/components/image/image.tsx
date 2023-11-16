@@ -82,6 +82,7 @@ input[type='text']::placeholder {
 `;
 
 type ImageProps = {
+    dataURL?: string;
     url: string;
     fileName: string;
     width?: number;
@@ -89,7 +90,13 @@ type ImageProps = {
     height?: number;
     deleteImage?: ()=>void;
 };
-
+interface AddImageProps {
+    src: string;
+    description: string;
+    dataURL: string;
+    width: number;
+    height: number;
+}
 export interface imageToolBarProps {
     setEditorState: (editorState: EditorState) => void;
     editorState: EditorState;
@@ -118,9 +125,9 @@ export const ImageToolBar = (props: imageToolBarProps) => {
         }
     };
 
-    const addImage = (editorState: EditorState, data: {src: string, description: string}) => {
+    const addImage = (editorState: EditorState, data: AddImageProps) => {
         const contentState = editorState.getCurrentContent();
-        const contentStateWithEntity = contentState.createEntity('image', 'IMMUTABLE', data);
+        const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE', data);
         const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
         const newEditorState = EditorState.set(editorState, { currentContent: contentStateWithEntity });
         return AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
@@ -130,6 +137,7 @@ export const ImageToolBar = (props: imageToolBarProps) => {
         e.preventDefault();
         if(img!=undefined && img!=null) {
             const data = {
+                dataURL: img.dataURL,
                 src: img.url,
                 description: img.description,
                 fileName: img.fileName,
@@ -235,7 +243,7 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
         
         let arrImgs = await Promise.all(files.map(async (file) => {
             const url = window.URL.createObjectURL(file);
-            let img = await loadImage(url);
+            let [img, dataURL] = await loadImage(url, true);
             let radio = img.height / pHeight;
             let newHeight = img.height;
             let newWidth = img.width;
@@ -249,6 +257,7 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
                 }
             }
             return {
+                dataURL: dataURL,
                 url: url,
                 fileName: file.name,
                 height: newHeight,
@@ -290,6 +299,7 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
                         if(image.fileName==res.data.fileName) {
                             let url = BASE_URL + IMAGE_URL + res.data.imageName;
                             return {
+                                dataURL: image.dataURL,
                                 url: url,
                                 fileName: image.fileName,
                                 width: image.width,
@@ -430,12 +440,6 @@ export const ImageBlock = (props: ImageProps) => {
                 </div>
                 <figcaption>{props.description}</figcaption>
                 <div className="blockData">
-                    {/* <BlockInput
-                        placeholder="Caption"
-                        value={data.caption}
-                        onChange={handleCaptionChange}
-                        readOnly={readOnly}
-                    /> */}
                 </div>
             </ImageBox>
         );
@@ -461,20 +465,4 @@ export const deleteImage = (editorState:EditorState, onChange: OnChangeType, blo
     const newEditorState =  EditorState.push(editorStateWithoutEntity, contentStateWithoutBlock, 'remove-range',);
     onChange(newEditorState, undefined);
 };
-
-type BlockInputProps = {
-    placeholder: string;
-    value: string;
-    onChange: ()=>void;
-    readOnly: boolean;
-}
-const BlockInput = (props: BlockInputProps) => {
-    const renderError = (error: string) => {
-        if (!error) {
-          return;
-        }
-        return <div className="block__input__error-text">{error}</div>;
-    }
-    
-}
 

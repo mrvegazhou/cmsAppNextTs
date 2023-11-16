@@ -6,7 +6,9 @@ import {
     EditorChangeType, 
     DraftEntityMutability,
     DraftInlineStyle,
-    SelectionState
+    SelectionState,
+    AtomicBlockUtils,
+    ContentBlock
 } from 'draft-js'
 import Immutable from 'immutable'
 import { getSelectionEntity } from './inline'
@@ -27,7 +29,6 @@ export const getSelectionBlockData = (editorState: EditorState, name: string) =>
 export const setSelectionBlockData = (editorState: EditorState, blockData: Immutable.Map<any, any>, override?: boolean) => {
 
     let newBlockData = override ? blockData : Object.assign({}, getSelectionBlockData(editorState, "").toJS(), blockData.toJS())
-  
     Object.keys(newBlockData).forEach(key => {
       if (newBlockData.hasOwnProperty(key) && newBlockData[key] === undefined) {
         delete newBlockData[key]
@@ -236,8 +237,75 @@ export const getSelectionText = (editorState: EditorState) => {
 
 // 文本布局
 export const toggleSelectionAlignment = (editorState: EditorState, alignment: string) => {
-  console.log(alignment, "---alignment---")
     return setSelectionBlockData(editorState,  Immutable.Map({
       textAlign: getSelectionBlockData(editorState, 'textAlign') !== alignment ? alignment : undefined
     }))
+}
+
+export const insertMedias = (editorState: EditorState, medias: any = []) => {
+  if (!medias.length) {
+    return editorState
+  }
+  return medias.reduce((editorState: EditorState, media: any) => {
+    const { url, link, link_target, name, type, width, height, meta } = media
+    return insertAtomicBlock(editorState, type, true, { url, link, link_target, name, type, width, height, meta })
+  }, editorState)
+}
+
+
+export const insertAtomicBlock = (editorState: EditorState, type: string, immutable = true, data = {}): EditorState => {
+
+  if (selectionContainsStrictBlock(editorState)) {
+    return insertAtomicBlock(selectNextBlock(editorState, getSelectionBlock(editorState)), type, immutable, data)
+  }
+
+  const selectionState = editorState.getSelection()
+  const contentState = editorState.getCurrentContent()
+
+  if (!selectionState.isCollapsed() || getSelectionBlockType(editorState) === 'atomic') {
+    return editorState
+  }
+
+  const contentStateWithEntity = contentState.createEntity(type, immutable ? 'IMMUTABLE' : 'MUTABLE', data)
+  const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+  const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ')
+
+  return newEditorState
+}
+
+export const selectNextBlock = (editorState: EditorState, block: ContentBlock) => {
+  const nextBlock = editorState.getCurrentContent().getBlockAfter(block.getKey())
+  return nextBlock ? selectBlock(editorState, nextBlock) : editorState
+}
+
+export const selectBlock = (editorState: EditorState, block: ContentBlock) => {
+
+  const blockKey = block.getKey()
+
+  return EditorState.forceSelection(editorState, new SelectionState({
+    anchorKey: blockKey,
+    anchorOffset: 0,
+    focusKey: blockKey,
+    focusOffset: block.getLength()
+  }))
+}
+
+export const setMediaPosition = (editorState: EditorState, mediaBlock: ContentBlock, position: {float?: string; alignment?: string}) => {
+
+  let newPosition = Immutable.Map({float: position.float, alignment: position.alignment});
+  const { float, alignment } = position
+
+  if (typeof float !== 'undefined') {
+    newPosition.set('float', mediaBlock.getData().get('float') === float ? undefined : float); 
+  }
+
+  if (typeof alignment !== 'undefined') {
+    newPosition.set('alignment', mediaBlock.getData().get('alignment') === alignment ? undefined : alignment); 
+  }
+
+  return setSelectionBlockData(selectBlock(editorState, mediaBlock), newPosition)
+}
+
+export const setMediaData = (editorState: EditorState, entityKey: string, data: {}) => {
+  return EditorState.push(editorState, editorState.getCurrentContent().mergeEntityData(entityKey, data), 'change-block-data')
 }
