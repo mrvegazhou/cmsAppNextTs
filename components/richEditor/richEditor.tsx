@@ -29,9 +29,10 @@ import { TextIndentToolBar } from "./components/textIndent/textIndent";
 import { increaseSelectionIndent } from "./utils/content";
 import { keyCommandHandlers, returnHandlers } from "./utils/handles";
 import TextAlignToolBar from "./components/textAlign/textAlign";
+import EmojiToolBar from "./components/emoji";
 import { DividerToolBar } from "./components/divider/divider";
 import "./richEditor.css";
-import { getCustomStyleFn, getBlockStyleFn, getBlockRendererFn } from "./renderers";
+import { getCustomStyleFn, getBlockStyleFn, getBlockRendererFn, getBlockRenderMap } from "./renderers";
 
 import { removeEntities, removeBlockTypes, removeInlineStyles } from "./utils/remove";
 import { getDecorators } from "./renderers";
@@ -117,6 +118,8 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         SUBSCRIPT: { fontSize: '0.6em', verticalAlign: 'sub' },
         SUPERSCRIPT: { fontSize: '0.6em', verticalAlign: 'super' }
     };
+
+    const blockRenderMap = getBlockRenderMap({});
 
     // 媒体
     const blockRendererFn = (contentBlock: ContentBlock) => {
@@ -232,6 +235,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                         />
                         <TextIndentToolBar onChange={onChange} editorState={editorState} />
                         <DividerToolBar setEditorState={setEditorState} editorState={editorState} />
+                        <EmojiToolBar onChange={onChange} editorState={editorState} />
                         <ImageToolBar setEditorState={setEditorState} editorState={editorState} />
 
                     </div>
@@ -242,6 +246,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                         editorState={editorState} 
                         onChange={setEditorState} 
                         blockStyleFn={blockStyleFn}
+                        blockRenderMap={blockRenderMap}
                         blockRendererFn={blockRendererFn}
                         customStyleMap={styleMap}
                         customStyleFn={customStyleFn}

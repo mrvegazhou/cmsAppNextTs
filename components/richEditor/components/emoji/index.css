@@ -1,0 +1,29 @@
+.richEditor-emojis {
+    box-sizing: content-box;
+    width: 220px;
+    height: 195px;
+    list-style: none;
+    margin: 0;
+    padding: 15px 15px 20px 15px;
+    overflow: auto;
+}
+.richEditor-emojis li {
+    display: block;
+    float: left;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    border-radius: 2px;
+    font-family: "Apple Color Emoji", "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 25px;
+    line-height: 35px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: transform .2s;
+}
+.richEditor-emojis li:hover {
+    transform: scale(1.5);
+}

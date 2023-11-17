@@ -191,7 +191,7 @@ type entityType = {
     data: { href: string, target: string, description: string };
     mutability: DraftEntityMutability;
 }
-export const insertText = (editorState: EditorState, text: string, inlineStyle: DraftInlineStyle|undefined, entity: entityType|undefined) => {
+export const insertText = (editorState: EditorState, text: string, inlineStyle?: DraftInlineStyle, entity?: entityType) => {
     const selectionState = editorState.getSelection()
     const currentSelectedBlockType = getSelectionBlockType(editorState)
   

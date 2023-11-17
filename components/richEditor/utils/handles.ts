@@ -26,7 +26,7 @@ export const keyCommandHandlers = (command: string, editorState: EditorState, ed
         }
         const blockType = getSelectionBlockType(editorState);
         if (cursorIsAtFirst && blockType !== 'code-block') {
-            let [newEditorState ,_] = decreaseSelectionIndent(editorState)
+            let [newEditorState, _] = decreaseSelectionIndent(editorState)
             onChange(newEditorState);
         }
     }
