@@ -183,7 +183,6 @@ const OverLayTriggerComp =  React.forwardRef<OverlayTriggerRef, OverlayTriggerPr
       isOutside = false,
       isClickOutside = true,
       disabled = false,
-      isOpen: _ = false,
       trigger = 'hover',
       placement = 'top',
 
@@ -246,7 +245,7 @@ const OverLayTriggerComp =  React.forwardRef<OverlayTriggerRef, OverlayTriggerPr
         window.removeEventListener('resize', handleResize);
       };
     }, [isOpen]);
-  
+
     useEffect(() => {
       if (props.isOpen !== isOpen) {
         setIsOpen(!!props.isOpen);
@@ -383,13 +382,12 @@ const OverLayTriggerComp =  React.forwardRef<OverlayTriggerRef, OverlayTriggerPr
       });
       setOverlayStyl({ ...styls, zIndex: zIndex.current });
     }
-  
+
     if (trigger === 'click' && !disabled) {
       triggerProps.onClick = (e) => {
         const { onClick } = getChildProps() as any;
         isOpen ? hide() : show();
         if (onClick) onClick(e, !isOpen);
-        console.log(isOpen, "-----s----")
       };
     }
     if (trigger === 'focus' && !disabled) {

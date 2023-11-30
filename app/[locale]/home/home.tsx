@@ -5,8 +5,7 @@ import type {
   IPagination,
 //   IPost,
   IQueryParams,
-  ISectionClient,
-  ISectionDetails,
+
 //   ISectionGroup,
 //   ITag,
 } from '@/interfaces';

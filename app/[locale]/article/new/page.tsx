@@ -14,6 +14,7 @@ export default async function Page({
     try {
         const token = authMiddleware(cookies());
         const metadata = new Metadata();
+        metadata.setReferer('origin');
         return searchParams.v === 'h5' ? (
             <NewArticlePage metadata={metadata.toString()} />
         ) : (

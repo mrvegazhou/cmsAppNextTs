@@ -1,10 +1,28 @@
 import { 
+    Editor,
     EditorState,
-    RichUtils
+    RichUtils,
+    Modifier
 } from 'draft-js';
+// @ts-expect-error
+import editOnCopy from "draft-js/lib/editOnCopy";
+// @ts-expect-error
+import editOnCut from "draft-js/lib/editOnCut";
 import { MyDraftEditorProps, OnChangeType, SyntheticKeyboardEvent } from '../interfaces';
-import { toggleSelectionBlockType, getSelectionBlock, getSelectionBlockType, increaseSelectionIndent, decreaseSelectionIndent, insertText } from './content';
+import { 
+    getDraftEditorPastedContent, 
+    insertImage, 
+    draftEditorCopyCutListener, 
+    toggleSelectionBlockType, 
+    getSelectionBlock, 
+    getSelectionBlockType, 
+    increaseSelectionIndent, 
+    decreaseSelectionIndent, 
+    insertText,
+    getSelectionEntityData
+} from './content';
 import { handleNewLine } from './keyPress';
+import { UploadImage } from '../components/image/image';
 
 export const keyCommandHandlers = (command: string, editorState: EditorState, editorProps: MyDraftEditorProps, onChange: OnChangeType, event: SyntheticKeyboardEvent) => {
     if (command === 'richEditor-save') {
@@ -18,10 +36,7 @@ export const keyCommandHandlers = (command: string, editorState: EditorState, ed
     const cursorEnd = editorState.getSelection().getEndOffset();
     const cursorIsAtFirst = cursorStart === 0 && cursorEnd === 0;
     if (command === 'backspace') {
-        if (
-            editorProps.onDelete &&
-            editorProps.onDelete(editorState) === false
-        ) {
+        if (editorProps.onDelete && editorProps.onDelete(editorState) === false) {
             return 'handled';
         }
         const blockType = getSelectionBlockType(editorState);
@@ -133,3 +148,89 @@ export const returnHandlers = (e: SyntheticKeyboardEvent, editorState: EditorSta
 
     return 'not-handled';
 }
+
+type EditorProps = {
+    pasteImage?: boolean;
+    imagePasteLimit?: number;
+    pasteImageValidateFn?: Function;
+    editorState: EditorState;
+    onChange: Function;
+    isLiving?: boolean;
+}
+export const handleFiles = (files: File[], editorProps: EditorProps) => {
+    const pasteImage = editorProps.pasteImage ?? true;
+    const imagePasteLimit = editorProps.imagePasteLimit ?? 1;
+    const pasteImageValidateFn = editorProps.pasteImageValidateFn;
+    const isLiving = editorProps.isLiving ?? true;
+    if (pasteImage) {
+        files.slice(0, imagePasteLimit).forEach(async (file) => {
+            if (file && file.type.indexOf('image') > -1) {
+                const validateResult = pasteImageValidateFn ? pasteImageValidateFn(file) : true;
+                if (validateResult instanceof Promise) {
+                    validateResult.then(async () => {
+                        const imgs = await UploadImage([file])
+                        if (isLiving && imgs.length>0) {
+                            editorProps.onChange(
+                                insertImage(editorProps.editorState, imgs[0]),
+                            );
+                        }
+                    });
+                } else if (validateResult) {
+                    const imgs = await UploadImage([file])
+                    if (isLiving && imgs.length>0) {
+                        editorProps.onChange(
+                            insertImage(editorProps.editorState, imgs[0]),
+                        );
+                    }
+                }
+            }
+        });
+    }
+
+    if (files[0] && files[0].type.indexOf('image') > -1 && pasteImage) {
+        return 'handled';
+    }
+    return 'not-handled';
+};
+
+export const copyHandlers = (editor: Editor, event: React.ClipboardEvent<HTMLElement>) => {
+    // @ts-ignore
+    draftEditorCopyCutListener(editor, event);
+    editOnCopy(editor, event);
+};
+
+export const cutHandlers = (editor: Editor, event: React.ClipboardEvent<HTMLElement>,) => {
+    // @ts-expect-error
+    draftEditorCopyCutListener(editor, event);
+    editOnCut(editor, event);
+};
+
+/**
+ * Handles pastes coming from Draft.js editors set up to serialise
+ * their Draft.js content within the HTML.
+ * This SHOULD NOT be used for stripPastedStyles editor.
+ */
+export const handlePastedText = (
+    html: string | undefined,
+    editorState: EditorState,
+    onChange: Function
+  ) => {
+    const pastedContent = getDraftEditorPastedContent(html);
+  
+    if (pastedContent) {
+        const fragment = pastedContent.getBlockMap();
+
+        const content = Modifier.replaceWithFragment(
+            editorState.getCurrentContent(),
+            editorState.getSelection(),
+            fragment,
+        );
+        let newState = EditorState.push(editorState, content, "insert-fragment");
+        if (newState) {
+            onChange(newState);
+            return "handled";
+        }
+        return "not-handled";
+    }
+    return "not-handled";
+  };

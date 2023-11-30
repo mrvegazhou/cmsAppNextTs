@@ -5,20 +5,24 @@ import { useEffect, useRef, useState } from 'react';
  * @param state
  * @returns
  */
-const useSyncState: any = (state: any) => {
+const useSyncState =  <T extends object>(state: T = {} as T): [T, Function] => {
   const cbRef: { current: any } = useRef();
-  const [data, setData] = useState(state);
+  const [data, setData] = useState<T>(state);
  
   useEffect(() => {
     cbRef.current && cbRef.current(data);
   }, [data]);
- 
+  
+  const setDataAndCallback = (newValue: T, callback: Function) => {
+    cbRef.current = callback;
+    setData(prev=>{
+      return newValue;
+    });
+  };
+
   return [
     data,
-    (val: any, callback: any) => {
-      cbRef.current = callback;
-      setData(val);
-    },
+    setDataAndCallback
   ];
 };
  

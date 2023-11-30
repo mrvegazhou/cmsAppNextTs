@@ -25,7 +25,6 @@ export default async function RootLayout({
       <body
         className={classNames(
           inter.className,
-          'yw-bg',
           'row',
           'mx-0',
         )}

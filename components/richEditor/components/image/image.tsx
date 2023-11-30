@@ -9,15 +9,13 @@ import React,
     ChangeEvent
 } from 'react';
 import Image from 'next/image'
-import styled from 'styled-components';
 import { useMutation } from '@tanstack/react-query';
 import { 
-    AtomicBlockUtils, 
     EditorState,
     ContentBlock,
     Modifier
 } from 'draft-js'
-import { OnChangeType } from '../../interfaces';
+import { AddImageProps, OnChangeType } from '../../interfaces';
 import classNames from 'classnames';
 import useToast from '@/hooks/useToast';
 import useSyncState from '@/hooks/useState';
@@ -26,60 +24,14 @@ import type {
     IArticleUploadImages
 } from '@/interfaces';
 import type { TBody } from '@/types';
-import { loadImage } from '@/lib/tool';
+import { handleDrop, loadImage } from '@/lib/tool';
 import LoaderComp from '@/components/loader/loader';
 import type { IData } from '@/interfaces';
-import { BASE_URL, IMAGE_URL } from '@/lib/constant';
-
-const css = `
-input[type='text']::placeholder {
-    opacity: 0.6;
-    color: #6c757d !important;
-}
-.imagesWrapper {
-    display: flex;
-    max-width: 100%;
-    padding: 0 15px;
-    justify-content: center;
-    align-items: center;
-}
-.imageBox {
-    position: relative;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    margin-top: 20px;
-}
-.uploadBtn {
-    display: inline-block;
-    background-color: rgb(111, 178, 255);
-    color: #fff;
-    border-radius: 4px;
-    padding: 5px 20px;
-    margin-bottom: 20px;
-    cursor: pointer;
-    transition: all 300ms ease-in-out;
-}
-.uploadImage {
-    box-sizing: border-box;
-    min-width: 0px;
-    line-height: 32px;
-    font-size: 12px;
-    color: rgb(132, 147, 165);
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-    vertical-align: top;
-    display: inline-flex;
-    cursor: pointer;
-    border-radius: 8px;
-    width: 104px;
-    height: 104px;
-    border: 1px dashed rgb(211, 211, 211);
-    margin: 0px;
-    background: transparent;
-}
-`;
+import { BASE_URL, IMAGE_URL, MAX_FILE_SIZE_IN_KB } from '@/lib/constant';
+import { convertBytesToKB } from '@/lib/tool';
+import { insertImage } from '../../utils/content';
+import OverlayComp from '@/components/overlay/overlay';
+import "./image.css";
 
 type ImageProps = {
     dataURL?: string;
@@ -90,13 +42,6 @@ type ImageProps = {
     height?: number;
     deleteImage?: ()=>void;
 };
-interface AddImageProps {
-    src: string;
-    description: string;
-    dataURL: string;
-    width: number;
-    height: number;
-}
 export interface imageToolBarProps {
     setEditorState: (editorState: EditorState) => void;
     editorState: EditorState;
@@ -106,74 +51,53 @@ export interface imageToolBarProps {
 }
 export const ImageToolBar = (props: imageToolBarProps) => {
     const imageModalRef = useRef<HTMLDivElement>(null);
-    const [linkVal, setLinkVal] = useSyncState("");
-    const [descVal, setDescVal] = useSyncState("");
-    const { show } = useToast();
-    const [active, setActive] = useState("");
     const imageUploaderRef = useRef(null)
-    
+    const [isOpen, setOpen] = useState(false);
 
     const showImageModal = () => {
+        setOpen(true);
         // @ts-ignore
         imageUploaderRef.current && imageUploaderRef.current.removeImages();
+        props.onClick && props.onClick();
     };
 
     const onClickCloseModal = () => {
-        const current = imageModalRef.current;
-        if (current) {
-            window.bootstrap.Modal.getOrCreateInstance(current).hide();
-        }
-    };
-
-    const addImage = (editorState: EditorState, data: AddImageProps) => {
-        const contentState = editorState.getCurrentContent();
-        const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE', data);
-        const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-        const newEditorState = EditorState.set(editorState, { currentContent: contentStateWithEntity });
-        return AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
+        setOpen(false);
     };
 
     const onToggle = (e: MouseEvent<HTMLSpanElement>, img: ImageProps) => {
         e.preventDefault();
         if(img!=undefined && img!=null) {
+            let imgH = img.height!;
             const data = {
                 dataURL: img.dataURL,
                 src: img.url,
                 description: img.description,
                 fileName: img.fileName,
                 width: img.width,
-                height: img.height
+                height: imgH
             }
             // @ts-ignore
-            props.setEditorState(addImage(props.editorState, data));
+            props.setEditorState(insertImage(props.editorState, data));
         }
     };
 
     return (
         <>
-            <span onClick={props.onClick} className={classNames("cursor-pointer", props.classNames, active)} onMouseDown={(e) => e.preventDefault()}>
-                <a
-                    data-bs-toggle="modal"
-                    data-bs-target="#imageModel"
-                    onClick={showImageModal}
-                >
-                    <i className='iconfont icon-ic_image_upload fs-4 text-black-50'></i>
-                </a>
+            <span onClick={showImageModal} className={classNames("cursor-pointer me-4", props.classNames)} onMouseDown={(e) => e.preventDefault()}>
+                <i className='iconfont icon-ic_image_upload fs-4 text-black-50'></i>
             </span>
-            <div ref={imageModalRef} className="modal fade" id="imageModel" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered" style={{maxWidth:"590px"}}>
-                    <div className="modal-content">
-                        <div className="d-flex flex-row justify-content-end">
-                            <a href="#" onClick={onClickCloseModal} className="close text-dark text-decoration-none px-2" data-dismiss="modal" aria-hidden="true">
-                                <i className='iconfont icon-close fs-4'></i>
-                            </a>
-                        </div>
-                        <div className="modal-body">
-                            <ImageUploader multi={false} ref={imageUploaderRef} onClose={onClickCloseModal} onToggle={onToggle}/>
-                        </div>
+
+            <OverlayComp usePortal={false} isOpen={isOpen} className='d-flex justify-content-center align-items-center'>
+                <div className="bg-white mt-5 rounded-2" style={{width:"590px"}}>
+                    <div className="d-flex flex-row justify-content-end">
+                        <a href="#" onClick={onClickCloseModal} className="close text-dark text-decoration-none px-2">
+                            <i className='iconfont icon-close fs-4'></i>
+                        </a>
                     </div>
+                    <ImageUploader multi={false} ref={imageUploaderRef} onClose={onClickCloseModal} onToggle={onToggle}/>
                 </div>
-            </div>
+            </OverlayComp>
         </>
     );
 };
@@ -209,6 +133,7 @@ export type State = {
      */
     uploaded: boolean;
 };
+const IMAGE_HEIGHT = 300;
 // 弹出框里添加图片信息
 export const ImageUploader = forwardRef((props: Props, ref) => {
     let initState = {
@@ -218,8 +143,10 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
         err: null,
         uploaded: false,
     } as State;
+
+    const [drop, setDrop] = useState(false);
     const fileUploadRef = useRef<HTMLInputElement | null>(null);
-    const pHeight = props.height ?? 300;
+    const pHeight = props.height ?? IMAGE_HEIGHT;
     const { show } = useToast();
 
     const [imgState, setImgState] = useState<State>(initState);
@@ -229,15 +156,41 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
         setDescription("");
     }, []);
 
-    const onFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
+    const _uploadFileByDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        return Array.from(e.dataTransfer.files || []);
+    };
+    const _uploadFileByClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+        return Array.from(e.target.files || []);
+    };
+
+    const onFileUpload = async (e: React.SyntheticEvent<Element>, drop?: boolean) => {
+        if (imgState.loading) return;
+        handleDrop(e);
+
+        setDrop(false);
+
+        let files;
+        if (drop && e.type=='drop') {
+            files = _uploadFileByDrop(e as React.DragEvent<HTMLDivElement>);
+        } else {
+            files = _uploadFileByClick(e as React.ChangeEvent<HTMLInputElement>);
+        }
+
         setImgState((prev) => ({
             ...prev,
             loading: true
         }));
-        const files = Array.from(e.target.files || []);
+
         const fd = new FormData();
         files.forEach((file: File, i: number) => {
+            // 判断上传文件大小
+            if ( convertBytesToKB(file.size) > MAX_FILE_SIZE_IN_KB ) {
+                show({
+                    type: 'DANGER',
+                    message: "图片大小限制在" + MAX_FILE_SIZE_IN_KB + "KB",
+                });
+                return;
+            }
             fd.append("file"+i, file);
         });
         
@@ -272,7 +225,12 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
             formData: fd,
             loading: false
         }));
-        e.target.value = "";
+
+        // @ts-ignore
+        fileUploadRef.current.value = '';
+        // @ts-ignore
+        e.type == "change" && (e.target.reset && e.target.reset());
+        
     };
 
     const uploadArticleImageMutation = useMutation(
@@ -348,7 +306,6 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
     }))
 
     const uploadFileOnchange = () => {
-        console.log(fileUploadRef.current)
         fileUploadRef.current?.click();
     };
 
@@ -359,10 +316,28 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
         }
     };
 
+    // 拖拽上传
+    const dragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+        handleDrop(e);
+        setDrop(true);
+        if (imgState.loading) {
+            return;
+        }
+    };
+
+    const dragLeave =  (e: React.DragEvent<HTMLDivElement>) => {
+        handleDrop(e);
+        setDrop(false);
+    };
+
     return (
-        <>
-            <style jsx>{css}</style>
-            <div className="form-group row">
+        <div className='richEditorImageUploader'>
+            <div className={classNames("form-group row uploadImageBlock", {"draggable": drop})}
+                onDragOver={(e) => { handleDrop(e); }}
+                onDragLeave={(e) => dragLeave(e)}
+                onDragEnter={(e) => dragEnter(e)}
+                onDrop={(e) => onFileUpload(e, true)}
+            >
                 <input
                     style={{display: 'none'}} 
                     id="image-uploader"
@@ -401,51 +376,15 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
                 <input type='text' name="description" placeholder='可选填' value={description} className="form-control" onChange={handleChange}/>
                 </div>
             </div>
-            <div className='form-row text-center mt-4'>
+            <div className='form-row text-center mt-4 mb-3'>
                 <button disabled={imgState.loading} type="button" className="btn btn-outline-primary" onClick={onFileSubmit}>
                     上传
                 </button>
             </div>
-        </>
+        </div>
     );
 });
 ImageUploader.displayName = "ImageUploader";
-
-// 图片在编辑框里的样式
-const ImageBox = styled.div`
-  position: relative;
-  img.imgMedia {
-    max-width: 100%;
-  }
-  .closeIcon {
-    width: 50px;
-    height: 50px;
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-  .blockData {
-    padding: 16px;
-    padding-top: 8px;
-    background-color: $white;
-  }
-`;
-export const ImageBlock = (props: ImageProps) => {
-    if(!!props.url && !!props.width) {
-        return (
-            <ImageBox style={{width:props.width}}>
-                <Image src={props.url} alt={props.fileName} className="imgMedia" width={props.width} height={props.height}/>
-                <div className="closeIcon" onClick={props.deleteImage}>
-                    <i className='iconfont icon-close cursor-pointer fs-2 text-danger position-absolute translate-middle-y top-0 end-0'></i>
-                </div>
-                <figcaption>{props.description}</figcaption>
-                <div className="blockData">
-                </div>
-            </ImageBox>
-        );
-    }
-    return null;
-};
 
 // 删除图片block
 export const deleteImage = (editorState:EditorState, onChange: OnChangeType, block: ContentBlock) => {
@@ -466,3 +405,33 @@ export const deleteImage = (editorState:EditorState, onChange: OnChangeType, blo
     onChange(newEditorState, undefined);
 };
 
+export const UploadImage = async (files: File[]) => {
+    return await Promise.all(files.map(async (file) => {
+        // 判断上传文件大小
+        if ( convertBytesToKB(file.size) > MAX_FILE_SIZE_IN_KB ) {
+            return;
+        }
+        const url = window.URL.createObjectURL(file);
+        let [img, dataURL] = await loadImage(url, true);
+        let radio = img.height / IMAGE_HEIGHT;
+        let newHeight = img.height;
+        let newWidth = img.width;
+        if(radio>1) {
+            newWidth = Math.floor(newWidth / radio);
+            newHeight = Math.floor(newHeight / radio);
+        } else {
+            if(newWidth<100) {
+                newWidth = 50;
+                newHeight = Math.floor(newHeight / (img.width / newWidth));
+            }
+        }
+        return {
+            dataURL: dataURL,
+            url: '',
+            fileName: file.name,
+            height: newHeight,
+            width: newWidth,
+            description: ''
+        };
+    })) as Array<AddImageProps>;
+};

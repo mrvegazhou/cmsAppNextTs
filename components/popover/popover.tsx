@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import OverLayTriggerComp, { OverlayTriggerProps, cssOutput } from '../overlay/overlayTrigger';
 
 const overlayTriggerCss = cssOutput();
@@ -167,10 +167,16 @@ export function ConfirmComp(props: Confirm) {
 export interface PopoverProps extends OverlayTriggerProps {
   content?: React.ReactNode;
   visibleArrow?: boolean;
+  onClick?: Function;
 }
 
-export default function PopoverComp(props: PopoverProps) {
 
+export type PopoverRef = {
+    hide: () => void;
+    show: () => void;
+};
+const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
+    const overLayRef = useRef(null);
     const {
         prefixCls = 'w-popover',
         placement = 'top',
@@ -182,12 +188,19 @@ export default function PopoverComp(props: PopoverProps) {
     } = props;
 
     const [isOpen, setIsOpen] = useState(!!props.isOpen);
-
+    
     useEffect(() => {
         if (props.isOpen !== isOpen) {
             setIsOpen(!!props.isOpen);
         }
     }, [props.isOpen]);
+
+    React.useImperativeHandle(ref, () => ({
+        // @ts-ignore
+        hide: () => overLayRef.current.hide(),
+        // @ts-ignore
+        show: () => overLayRef.current.show()
+    }));
 
     const renderArrow = () => {
         return (
@@ -212,6 +225,7 @@ export default function PopoverComp(props: PopoverProps) {
         <>
             <style jsx>{css}</style>
             <OverLayTriggerComp
+                ref={overLayRef}
                 {...other}
                 isOpen={isOpen}
                 placement={placement}
@@ -231,4 +245,7 @@ export default function PopoverComp(props: PopoverProps) {
         </>
         
     );
-}
+});
+
+PopoverComp.displayName = "PopoverComp";
+export default PopoverComp;

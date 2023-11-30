@@ -2,6 +2,8 @@ import {
     DraftInlineStyle,
     ContentBlock
 } from 'draft-js';
+import { fontFamilies } from '../../components/fontFamily/fontFamily';
+import { parseColorString, toRgbaString } from '@/lib/colorTool';
 
 type Props = {
     editorId?: string;
@@ -11,40 +13,24 @@ type Options = {
 }
 const getStyleValue = (style: string) => style.split('-')[1];
 const unitExportFn = (value: string, type: string) => type === 'line-height' ? value : `${value}px`;
-const fontFamilies = [
-    {
-      name: 'Araial',
-      family: 'Arial, Helvetica, sans-serif',
-    },
-    {
-      name: 'Georgia',
-      family: 'Georgia, serif',
-    },
-    {
-      name: 'Impact',
-      family: 'Impact, serif',
-    },
-    {
-      name: 'Monospace',
-      family: '"Courier New", Courier, monospace',
-    },
-    {
-      name: 'Tahoma',
-      family: 'tahoma, arial, "Hiragino Sans GB", 宋体, sans-serif',
-    },
-];
+
 
 const InlineStyle = (props: Props, options: Options) => (styles: DraftInlineStyle, block: ContentBlock) => {
     let output: React.CSSProperties = {};
     const { customStyleFn } = options;
     
     output = customStyleFn ? customStyleFn(styles, block, output) : {};
+    output.lineHeight = 2;
     styles.forEach((style: string | undefined) => {
         if (style) {
             if (style!.indexOf('COLOR-') === 0) {
                 output.color = `#${getStyleValue(style)}`;
             } else if (style!.indexOf('BGCOLOR-') === 0) {
-                output.backgroundColor = `#${getStyleValue(style)}`;
+                const color = `#${getStyleValue(style)}`
+                let rgba = parseColorString(color);
+                rgba.a = 0.3;
+                output.backgroundColor = toRgbaString(rgba);
+                output.padding = "1px";
             } else if (style!.indexOf('FONTSIZE-') === 0) {
                 output.fontSize = unitExportFn(
                     getStyleValue(style),
@@ -55,7 +41,7 @@ const InlineStyle = (props: Props, options: Options) => (styles: DraftInlineStyl
                   getStyleValue(style),
                   'line-height'
                 );
-            } else if (style.indexOf('LETTERSPACING-') === 0) {
+            } else if (style.indexOf('WORDSPACE-') === 0) {
                 output.letterSpacing = unitExportFn(
                   getStyleValue(style),
                   'letter-spacing'

@@ -18,6 +18,9 @@ export const X_POWERED_BY_HEADER = {
   [X_POWERED_BY]: 'www.baidu.com',
 };
 
+// 上传图片限制
+export const MAX_FILE_SIZE_IN_KB = 10000;
+
 export const REFRESH_TOKEN_BUFFER = 10;
 
 export const COOKIE_EXPIRES = 365;

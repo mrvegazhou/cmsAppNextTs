@@ -1,4 +1,6 @@
+import React, { ElementRef } from "react";
 import { 
+    Editor,
     Modifier, 
     EditorState,
     DraftBlockType, 
@@ -8,10 +10,19 @@ import {
     DraftInlineStyle,
     SelectionState,
     AtomicBlockUtils,
-    ContentBlock
+    ContentBlock,
+    ContentState,
+    convertToRaw,
+    convertFromRaw,
+    CharacterMetadata
 } from 'draft-js'
+// @ts-expect-error
+import getContentStateFragment from "draft-js/lib/getContentStateFragment";
+// @ts-expect-error
+import getDraftEditorSelection from "draft-js/lib/getDraftEditorSelection";
 import Immutable from 'immutable'
 import { getSelectionEntity } from './inline'
+import { AddImageProps, AddMediaProps } from '../interfaces'
 
 
 const strictBlockTypes = ['atomic']
@@ -110,13 +121,135 @@ export const toggleSelectionBlockType = (editorState: EditorState, blockType: Dr
     return RichUtils.toggleBlockType(editorState, blockType)
 }
 
-// 插入link
+
+export const updateEachCharacterOfSelection = (editorState: EditorState, callback: Function) => {
+
+  const selectionState = editorState.getSelection()
+  const contentState = editorState.getCurrentContent()
+  const contentBlocks = contentState.getBlockMap()
+  const selectedBlocks = getSelectedBlocks(editorState)
+
+  if (selectedBlocks.length === 0) {
+    return editorState
+  }
+
+  const startKey = selectionState.getStartKey()
+  const startOffset = selectionState.getStartOffset()
+  const endKey = selectionState.getEndKey()
+  const endOffset = selectionState.getEndOffset()
+
+  const nextContentBlocks = contentBlocks.map((block) => {
+    if (typeof block==='undefined') { return; }
+
+    if (selectedBlocks.indexOf(block) === -1) {
+      return block
+    }
+
+    const blockKey = block.getKey()
+    const charactersList = block.getCharacterList()
+    let nextCharactersList = null
+
+    if (blockKey === startKey && blockKey === endKey) {
+      nextCharactersList = charactersList.map((character, index) => {
+        // @ts-ignore
+        if (index >= startOffset && index < endOffset) {
+          return callback(character)
+        }
+        return character
+      })
+    } else if (blockKey === startKey) {
+      nextCharactersList = charactersList.map((character, index) => {
+        // @ts-ignore
+        if (index >= startOffset) {
+          return callback(character)
+        }
+        return character
+      })
+    } else if (blockKey === endKey) {
+      nextCharactersList = charactersList.map((character, index) => {
+        // @ts-ignore
+        if (index < endOffset) {
+          return callback(character)
+        }
+        return character
+      })
+    } else {
+      nextCharactersList = charactersList.map((character) => {
+        return callback(character)
+      })
+    }
+
+    return block.merge({
+      'characterList': nextCharactersList
+    })
+
+  })
+
+  return EditorState.push(editorState, contentState.merge({
+    blockMap: nextContentBlocks,
+    selectionBefore: selectionState,
+    selectionAfter: selectionState
+  }) as ContentState, 'update-selection-character-list' as EditorChangeType)
+
+}
+
+export const toggleSelectionInlineStyle = (editorState: EditorState, style: string, prefix: string = '') => {
+  let nextEditorState = editorState
+  style = prefix + style.toUpperCase()
+
+  if (prefix) {
+
+    nextEditorState = updateEachCharacterOfSelection(nextEditorState, (characterMetadata: CharacterMetadata) => {
+
+      // @ts-ignore
+      return characterMetadata.toJS().style.reduce((characterMetadata, characterStyle) => {
+        if (characterStyle.indexOf(prefix) === 0 && style !== characterStyle) {
+          return CharacterMetadata.removeStyle(characterMetadata, characterStyle)
+        } else {
+          return characterMetadata
+        }
+      }, characterMetadata)
+
+    })
+
+  }
+
+  return RichUtils.toggleInlineStyle(nextEditorState, style)
+}
+
+export const toggleSelectionColor = (editorState: EditorState, color: string) => {
+  return toggleSelectionInlineStyle(editorState, color.replace('#', ''), 'COLOR-')
+}
+
+export const toggleSelectionFontSize = (editorState: EditorState, fontSize: string) => {
+  return toggleSelectionInlineStyle(editorState, fontSize, 'FONTSIZE-')
+}
+
+export const toggleSelectionBackgroundColor = (editorState: EditorState, color: string) => {
+  return toggleSelectionInlineStyle(editorState, color.replace('#', ''), 'BGCOLOR-')
+}
+
+export const toggleSelectionFontFamily = (editorState: EditorState, fontFamily: string) => {
+  return toggleSelectionInlineStyle(editorState, fontFamily, 'FONTFAMILY-')
+}
+
+export const toggleSelectionWordSpace = (editorState: EditorState, wordSpace: string) => {
+  return toggleSelectionInlineStyle(editorState, wordSpace, 'WORDSPACE-')
+}
+
+export const toggleSelectionLineHeight = (editorState: EditorState, lineHeight: string) => {
+  return toggleSelectionInlineStyle(editorState,  lineHeight, 'LINEHEIGHT-')
+}
+
+export const selectionHasInlineStyle = (editorState: EditorState, style: string) => {
+  return editorState.getCurrentInlineStyle().has(style.toUpperCase())
+}
+
 export const getSelectionEntityData = (editorState: EditorState, type: string) => {
 
     const entityKey = getSelectionEntity(editorState)
-  
     if (entityKey) {
-      const entity = editorState.getCurrentContent().getEntity(entityKey)
+      const entity = editorState.getCurrentContent().getEntity(entityKey);
       if (entity && entity.getType() === type) {
         return entity.getData()
       } else {
@@ -242,18 +375,18 @@ export const toggleSelectionAlignment = (editorState: EditorState, alignment: st
     }))
 }
 
-export const insertMedias = (editorState: EditorState, medias: any = []) => {
+export const insertMedias = (editorState: EditorState, medias: AddMediaProps[]) => {
   if (!medias.length) {
     return editorState
   }
   return medias.reduce((editorState: EditorState, media: any) => {
-    const { url, link, link_target, name, type, width, height, meta } = media
-    return insertAtomicBlock(editorState, type, true, { url, link, link_target, name, type, width, height, meta })
+    const { url, linkTarget, type, width, height, description } = media
+    return insertAtomicBlock(editorState, type, true, { url, linkTarget, type, width, height, description })
   }, editorState)
 }
 
 
-export const insertAtomicBlock = (editorState: EditorState, type: string, immutable = true, data = {}): EditorState => {
+export const insertAtomicBlock = (editorState: EditorState, type: string, immutable:boolean = true, data:AddMediaProps): EditorState => {
 
   if (selectionContainsStrictBlock(editorState)) {
     return insertAtomicBlock(selectNextBlock(editorState, getSelectionBlock(editorState)), type, immutable, data)
@@ -309,3 +442,139 @@ export const setMediaPosition = (editorState: EditorState, mediaBlock: ContentBl
 export const setMediaData = (editorState: EditorState, entityKey: string, data: {}) => {
   return EditorState.push(editorState, editorState.getCurrentContent().mergeEntityData(entityKey, data), 'change-block-data')
 }
+
+export const insertImage = (editorState: EditorState, data: AddImageProps) => {
+  const contentState = editorState.getCurrentContent();
+  const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE', data);
+  const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+  const newEditorState = EditorState.set(editorState, { currentContent: contentStateWithEntity });
+  return AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
+};
+
+// Get clipboard content from the selection like Draft.js would.
+export const getSelectedContent = (
+  editorState: EditorState,
+  editorRoot: HTMLElement,
+) => {
+  const { selectionState } = getDraftEditorSelection(editorState, editorRoot);
+
+  const fragment = getContentStateFragment(
+    editorState.getCurrentContent(),
+    selectionState,
+  );
+
+  // If the selection contains no content (according to Draft.js), use the default browser behavior.
+  // This happens when selecting text that's within contenteditable=false blocks in Draft.js.
+  // See https://github.com/thibaudcolas/draftjs-conductor/issues/12.
+  const isEmpty = fragment.every((block: ContentBlock) => {
+    return block.getText().length === 0;
+  });
+
+  return isEmpty ? null : fragment;
+};
+
+// Overrides the default copy/cut behavior, adding the serialised Draft.js content to the clipboard data.
+// See also https://github.com/basecamp/trix/blob/62145978f352b8d971cf009882ba06ca91a16292/src/trix/controllers/input_controller.coffee#L415-L422
+// We serialise the editor content within HTML, not as a separate mime type, because Draft.js only allows access
+// to HTML in its paste event handler.
+const FRAGMENT_ATTR = "data-draftjs-conductor-fragment";
+export const draftEditorCopyCutListener = (
+  // @ts-expect-error
+  ref: ElementRef<Editor>,
+  e: React.ClipboardEvent,
+) => {
+  const selection = window.getSelection() as Selection;
+
+  // Completely skip event handling if clipboardData is not supported (IE11 is out).
+  // Also skip if there is no selection ranges.
+  // Or if the selection is fully within a decorator.
+  if (
+    !e.clipboardData ||
+    selection.rangeCount === 0 ||
+    isSelectionInDecorator(selection)
+  ) {
+    return;
+  }
+  // @ts-expect-error
+  const fragment = getSelectedContent(ref._latestEditorState, ref.editor);
+
+  // Override the default behavior if there is selected content.
+  if (fragment) {
+    const content = ContentState.createFromBlockArray(fragment.toArray());
+    const serialisedContent = JSON.stringify(convertToRaw(content));
+
+    // Create a temporary element to store the selection’s HTML.
+    // See also Rangy's implementation: https://github.com/timdown/rangy/blob/1e55169d2e4d1d9458c2a87119addf47a8265276/src/core/domrange.js#L515-L520.
+    const fragmentElt = document.createElement("div");
+    // Modern browsers only support a single range.
+    fragmentElt.appendChild(selection.getRangeAt(0).cloneContents());
+    fragmentElt.setAttribute(FRAGMENT_ATTR, serialisedContent);
+    // We set the style property to replicate the browser's behavior of inline styles in rich text copy-paste.
+    // In Draft.js, this is important for line breaks to be interpreted correctly when pasted into another word processor.
+    // See https://github.com/facebook/draft-js/blob/a1f4593d8fa949954053e5d5840d33ce1d1082c6/src/component/base/DraftEditor.react.js#L328.
+    fragmentElt.setAttribute("style", "white-space: pre-wrap;");
+
+    e.clipboardData.setData("text/plain", selection.toString());
+    e.clipboardData.setData("text/html", fragmentElt.outerHTML);
+
+    e.preventDefault();
+  }
+};
+
+// Checks whether the selection is inside a decorator or not.
+// This is important to change the copy-cut behavior accordingly.
+const DRAFT_DECORATOR = '[data-contents="true"] [contenteditable="false"]';
+const isSelectionInDecorator = (selection: Selection) => {
+  const { anchorNode, focusNode } = selection;
+  if (!anchorNode || !focusNode) {
+    return false;
+  }
+
+  const anchor =
+    anchorNode instanceof Element ? anchorNode : anchorNode.parentElement;
+  const focus =
+    focusNode instanceof Element ? focusNode : focusNode.parentElement;
+
+  const anchorDecorator = anchor && anchor.closest(DRAFT_DECORATOR);
+  const focusDecorator = focus && focus.closest(DRAFT_DECORATOR);
+
+  return (
+    anchorDecorator &&
+    focusDecorator &&
+    (anchorDecorator.contains(focusDecorator) ||
+      focusDecorator.contains(anchorDecorator))
+  );
+};
+
+/**
+ * Returns pasted content coming from Draft.js editors set up to serialise
+ * their Draft.js content within the HTML.
+ */
+export const getDraftEditorPastedContent = (html: string | undefined) => {
+  // Plain-text pastes are better handled by Draft.js.
+  if (html === "" || typeof html === "undefined" || html === null) {
+    return null;
+  }
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const fragmentElt = doc.querySelector(`[${FRAGMENT_ATTR}]`);
+
+  // Handle the paste if it comes from draftjs-conductor.
+  if (fragmentElt) {
+    const fragmentAttr = fragmentElt.getAttribute(FRAGMENT_ATTR);
+    let rawContent;
+
+    try {
+      // If JSON parsing fails, leave paste handling to Draft.js.
+      // There is no reason for this to happen, unless the clipboard was altered somehow.
+      // @ts-expect-error
+      rawContent = JSON.parse(fragmentAttr);
+    } catch (error) {
+      return null;
+    }
+
+    return convertFromRaw(rawContent);
+  }
+
+  return null;
+};

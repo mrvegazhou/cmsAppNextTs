@@ -1,5 +1,5 @@
 import React from 'react';
-import ImageRenderer from '../atomics/image';
+import ImageRenderer from '../../components/image/imageRender';
 import DividerBlock from '../../components/divider/divider';
 import { ContentBlock, ContentState, EditorState } from 'draft-js';
 

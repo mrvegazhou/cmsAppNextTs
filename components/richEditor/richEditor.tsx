@@ -2,11 +2,11 @@ import {
     forwardRef, 
     useState, 
     useEffect, 
-    useRef, 
-    useCallback, 
+    useRef,
     MouseEvent, 
     ReactNode,
-    useMemo
+    useMemo,
+    useCallback
 } from "react";
 import classNames from 'classnames';
 import { 
@@ -18,16 +18,31 @@ import {
     RichUtils,
     getDefaultKeyBinding,
     KeyBindingUtil,
-    DraftHandleValue
+    DraftHandleValue,
+    SelectionState
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import { SyntheticKeyboardEvent, MyDraftEditorProps } from './interfaces';
 import { flow } from 'lodash';
 import LinkToolBar from "./components/link/link";
-import { ImageToolBar, deleteImage } from "./components/image/image";
+import { ImageToolBar } from "./components/image/image";
 import { TextIndentToolBar } from "./components/textIndent/textIndent";
+import TextColortToolbar from "./components/textColor/textColor";
+import TextBgColortToolbar from "./components/textBgColor/textBgColor";
+import FontFamilyToolBar from "./components/fontFamily/fontFamily";
+import FontSizeToolBar from "./components/fontSize/fontSize";
+import WordSpaceToolBar from "./components/wordSpace/wordSpace";
+import LineHeightToolBar from "./components/lineHeight/lineHeight";
+import TableToolBar from "./components/table/table";
 import { increaseSelectionIndent } from "./utils/content";
-import { keyCommandHandlers, returnHandlers } from "./utils/handles";
+import { 
+    keyCommandHandlers, 
+    returnHandlers, 
+    handleFiles, 
+    copyHandlers, 
+    cutHandlers,
+    handlePastedText
+} from "./utils/handles";
 import TextAlignToolBar from "./components/textAlign/textAlign";
 import EmojiToolBar from "./components/emoji";
 import { DividerToolBar } from "./components/divider/divider";
@@ -36,9 +51,9 @@ import { getCustomStyleFn, getBlockStyleFn, getBlockRendererFn, getBlockRenderMa
 
 import { removeEntities, removeBlockTypes, removeInlineStyles } from "./utils/remove";
 import { getDecorators } from "./renderers";
-import { handleDrop } from "@/lib/tool";
 import PopoverToolBar from "../textSelectionPopover/popover";
-
+import Image from 'next/image';
+import Head from 'next/head'
 
 
 const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
@@ -58,12 +73,19 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
     const [readOnly, setReadOnly] = useState(false);
     const handleReadOnly = (flag: boolean) => {
         setReadOnly(flag);
-        console.log(readOnly)
     };
 
     const popoverRef = useRef(null);
 
     const decorator = getDecorators();
+
+    let isLiving: boolean = true;
+    useEffect(()=>{
+        isLiving = true;
+        return ()=>{
+            isLiving = false;
+        }
+    },[]);
 
     const sampleMarkup = '<a href="http://www.facebook.com">Example link</a>';
     const blocksFromHTML = convertFromHTML(sampleMarkup);
@@ -76,7 +98,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         () => EditorState.createWithContent(state, decorator)
     );
 
-    const onChange = (es: EditorState, callback?: (editorState: EditorState)=>void) => {
+    const onChange = useCallback((es: EditorState, callback?: (editorState: EditorState)=>void) => {
         let newEditorState = es;
 
         if (!(editorState instanceof EditorState)) {
@@ -89,7 +111,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         if (callback) {
             callback(es);
         }
-    };
+    }, [EditorState]);
     
     const [cls, setCls] = useState("richEditorEditor");
     useEffect(() => {
@@ -103,6 +125,18 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
             }
         }
     }, []);
+
+    const focus = () => {
+        editorRef?.current?.focus();
+    };
+
+    const requestFocus =  useCallback(() => {
+        setTimeout(() => editorRef?.current?.focus(), 0);
+    }, []);
+
+    const requestBlur = () => {
+        setTimeout(() => editorRef?.current?.blur(), 0);
+    };
 
     const styleMap = {
         CODE: {
@@ -119,7 +153,12 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         SUPERSCRIPT: { fontSize: '0.6em', verticalAlign: 'super' }
     };
 
-    const blockRenderMap = getBlockRenderMap({});
+    const blockRenderMap = getBlockRenderMap({
+        editorState: editorState,
+        readOnly: readOnly,
+        onChange: onChange,
+        requestBlur: requestBlur,
+    });
 
     // 媒体
     const blockRendererFn = (contentBlock: ContentBlock) => {
@@ -141,14 +180,6 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
 
     const blockStyleFn = (contentBlock: ContentBlock) => {
         return getBlockStyleFn(contentBlock);
-    };
-
-    const focus = () => {
-        editorRef?.current?.focus();
-    };
-
-    const requestFocus = () => {
-        setTimeout(() => editorRef?.current?.focus(), 0);
     };
 
     const cancePopover = useMemo(()=>
@@ -180,6 +211,35 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
     };
 
     const handleReturn = (event: SyntheticKeyboardEvent, editorState: EditorState) => returnHandlers(event, editorState, props, onChange);
+    
+    // 复制上传图片
+    const handleDroppedFiles = (selectionState: SelectionState, files: File[]) => {
+        return handleFiles(files, {
+            editorState: editorState,
+            onChange: onChange,
+            isLiving: isLiving
+        });
+    };
+
+    const handlePastedFiles = (files: File[]) => {
+        return handleFiles(files, {
+            editorState: editorState,
+            onChange: onChange,
+            isLiving: isLiving
+        });
+    };
+
+    const handleCopyContent = (editor: Editor, event: React.ClipboardEvent<HTMLElement>) => {
+        copyHandlers(editor, event);
+    };
+
+    const handleCutContent = (editor: Editor, event: React.ClipboardEvent<HTMLElement>) => {
+        cutHandlers(editor, event);
+    };
+
+    const handlePastedContent = ( _: string, html: string | undefined, editorState: EditorState) => {
+        return handlePastedText(html, editorState, onChange);
+    };
 
     // 映射自定义的键盘快捷键
     const myKeyBindingFn = (event: SyntheticKeyboardEvent) => {
@@ -210,7 +270,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
     return (
         <>
             <div className={classNames("richEditorRoot", {"richEditorReadOnly": readOnly})} ref={rootRef}>
-                <div className="richEditorControl">
+                <div className="richEditorControl" onClick={requestFocus}>
                     <div className="d-flex align-items-center justify-content-left">
                         <SpanDom onToggle={undo}>
                             <i className="iconfont icon-chexiao fs-5 text-black-75 opacity-75"></i>
@@ -222,7 +282,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                             <i className="iconfont icon-qingchu fs-4 text-black-75 opacity-75"></i>
                         </SpanDom>
                         <LinkToolBar onClick={cancePopover} onChange={onChange} editorState={editorState} classNames="me-4" />
-                        <TextAlignToolBar requestFocus={requestFocus}  onChange={onChange} editorState={editorState} classNames="me-4" />
+                        <TextAlignToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState} classNames="me-4" />
                         <InlineStyleDoms 
                             editorState={editorState}
                             setEditorState={setEditorState}
@@ -237,7 +297,13 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                         <DividerToolBar setEditorState={setEditorState} editorState={editorState} />
                         <EmojiToolBar onChange={onChange} editorState={editorState} />
                         <ImageToolBar setEditorState={setEditorState} editorState={editorState} />
-
+                        <TextColortToolbar onChange={onChange} editorState={editorState}/>
+                        <TextBgColortToolbar onChange={onChange} editorState={editorState}/>
+                        <FontFamilyToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
+                        <FontSizeToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
+                        <WordSpaceToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
+                        <LineHeightToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
+                        <TableToolBar onChange={onChange} editorState={editorState} />
                     </div>
                 </div>
                 <div className={classNames([cls, "richEditorContent"])} onClick={focus} ref={refs}>
@@ -254,6 +320,11 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                         stripPastedStyles={true}
                         handleKeyCommand={handleKeyCommand}
                         handleReturn={handleReturn}
+                        handleDroppedFiles={handleDroppedFiles}
+                        handlePastedFiles={handlePastedFiles}
+                        onCopy={handleCopyContent}
+                        onCut={handleCutContent}
+                        handlePastedText={handlePastedContent}
                         readOnly={readOnly}
                     />
                     {/* <PopoverToolBar target={target} ref={popoverRef} /> */}
@@ -311,7 +382,7 @@ const BlockStyleDoms = (props: BlockStyleDomsProps) => {
         {label: <i className="iconfont icon-h22 fs-4"></i>, style: 'header-two'},
         {label: <i className="iconfont icon-h32 fs-4"></i>, style: 'header-three'},
         
-        {label: <i className="iconfont icon-zu fs-4"></i>, style: 'blockquote'},
+        {label: <i className="iconfont icon-quote fs-4"></i>, style: 'blockquote'},
         {label: <i className="iconfont icon-unorderedList fs-4"></i>, style: 'unordered-list-item'},
         {label: <i className="iconfont icon-youxuliebiao fs-4"></i>, style: 'ordered-list-item'},
         {label: <i className="iconfont icon-daima fs-4"></i>, style: 'code-block'},
@@ -321,7 +392,7 @@ const BlockStyleDoms = (props: BlockStyleDomsProps) => {
         .getCurrentContent()
         .getBlockForKey(selection.getStartKey())
         .getType();
-    
+
     const toggleBlockType = (blockStyle: string) => {
         setEditorState(RichUtils.toggleBlockType(
             editorState,

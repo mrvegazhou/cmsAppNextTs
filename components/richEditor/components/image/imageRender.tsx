@@ -1,12 +1,12 @@
 import { ContentBlock, EditorState } from "draft-js";
 import classNames from 'classnames';
-import { CSSProperties, useState, MouseEvent, useRef, useEffect } from "react";
-import "./index.css"
+import { CSSProperties, useState, MouseEvent, useRef } from "react";
 import Image from "next/image";
 import { setMediaPosition, setMediaData } from "@/components/richEditor/utils/content";
 import { removeBlock } from "@/components/richEditor/utils/remove";
 import { handleDrop, isHttpOrHttps } from "@/lib/tool";
 import useToast from '@/hooks/useToast';
+import "./imageRender.css"
 
 interface Item{
     text: React.ReactElement;

@@ -1,9 +1,13 @@
 import React from 'react';
-import { DefaultDraftBlockRenderMap } from 'draft-js';
+import { DefaultDraftBlockRenderMap, EditorState } from 'draft-js';
 import { Map } from 'immutable';
+import TableRenderer from '../../components/table/tableRender';
 
 interface BlockRenderMapProps {
-    
+  editorState: EditorState;
+  readOnly?: boolean;
+  onChange: Function;
+  requestBlur?: Function;
 }
 const BlockRenderMap = (props: BlockRenderMapProps, blockRenderMap?: Function) => {
     let customBlockRenderMap = Map({
@@ -14,6 +18,10 @@ const BlockRenderMap = (props: BlockRenderMapProps, blockRenderMap?: Function) =
           element: 'code',
           wrapper: <pre className="richEditor-code-pre" />
         },
+        'table-cell': {
+          element: 'td',
+          wrapper: <TableRenderer columnResizable={true} readOnly={props.readOnly ?? true} requestBlur={props.requestBlur} editorState={props.editorState} onChange={props.onChange} />
+        }
     });
 
     if (blockRenderMap) {
@@ -21,6 +29,8 @@ const BlockRenderMap = (props: BlockRenderMapProps, blockRenderMap?: Function) =
           customBlockRenderMap = customBlockRenderMap.merge(
             blockRenderMap(props),
           );
+        } else {
+          customBlockRenderMap = customBlockRenderMap.merge(blockRenderMap);
         }
     }
     customBlockRenderMap = DefaultDraftBlockRenderMap.merge(

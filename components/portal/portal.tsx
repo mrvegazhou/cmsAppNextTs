@@ -20,7 +20,7 @@ export default function Portal(props: PortalProps) {
     useEffect(() => {
         return () => {
             if (defaultNode.current && containerRef.current) {
-                containerRef.current.removeChild(defaultNode.current);
+                containerRef.current.removeChild && containerRef.current.removeChild(defaultNode.current);
                 defaultNode.current = undefined;
             }
         };

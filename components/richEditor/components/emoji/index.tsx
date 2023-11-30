@@ -1,9 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { 
-    EditorState,
-    ContentBlock,
-    Entity
+    EditorState
 } from 'draft-js'
 import PopoverComp from '@/components/popover/popover';
 import { insertText } from '../../utils/content';

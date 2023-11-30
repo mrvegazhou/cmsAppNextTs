@@ -7,6 +7,7 @@ const customBlockStyleFn = (contentBlock: ContentBlock) => {
     const blockAlignment = contentBlock.getData() && contentBlock.getData().get('textAlign');
     const blockIndent = contentBlock.getData() && contentBlock.getData().get('textIndent');
     const blockFloat = contentBlock.getData() && contentBlock.getData().get('float');
+    const blockquote = contentBlock.getType();
 
     let result = '';
 
@@ -20,6 +21,10 @@ const customBlockStyleFn = (contentBlock: ContentBlock) => {
 
     if (blockFloat) {
         result += ` richEditor-${blockFloat}`;
+    }
+
+    if (blockquote=='blockquote') {
+        result += ` richEditorBlockquote`;
     }
 
     return result;

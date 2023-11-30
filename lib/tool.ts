@@ -282,7 +282,10 @@ export const loadImage = (src: string, getBase64?: boolean): Promise<[HTMLImageE
   })
 }
 
-export const handleDrop = (event: React.ChangeEvent<Element> | React.KeyboardEvent<Element> | React.MouseEvent<Element>) => {
+export const handleDrop = (event: React.SyntheticEvent<Element> | React.DragEvent<HTMLDivElement> | React.ChangeEvent<Element> | React.KeyboardEvent<Element> | React.MouseEvent<Element>) => {
   event.preventDefault();
   event.stopPropagation();
 }
+
+const pow1024 = (num: number) => Math.pow(1024, num);
+export const convertBytesToKB = (bytes: number) => Math.round(bytes / pow1024(1) * 100) / 100;

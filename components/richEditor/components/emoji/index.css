@@ -6,18 +6,21 @@
     margin: 0;
     padding: 15px 15px 20px 15px;
     overflow: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
 }
 .richEditor-emojis li {
-    display: block;
-    float: left;
-    width: 36px;
-    height: 36px;
+    width: 35px;
+    height: 35px;
     margin: 0;
     padding: 0;
     color: #fff;
     border-radius: 2px;
     font-family: "Apple Color Emoji", "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-size: 25px;
+    font-size: 23px;
     line-height: 35px;
     text-align: center;
     cursor: pointer;
