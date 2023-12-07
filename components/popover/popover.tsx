@@ -1,104 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import OverLayTriggerComp, { OverlayTriggerProps, cssOutput } from '../overlay/overlayTrigger';
-
-const overlayTriggerCss = cssOutput();
-const css = `
-${overlayTriggerCss}
-
-.w-popover {
-    position: relative;
-    display: inline-block;
-    outline: 0;
-}
-.w-popover-arrow {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    border-color: transparent;
-    z-index: 21;
-}
-.w-popover-inner {
-    display: block;
-    text-align: left;
-    text-decoration: none;
-    background-color: #fff;
-    border-radius: 4px;
-    min-height: 23px;
-    box-shadow: rgba(16, 22, 26, 0.1) 0px 0px 0px 1px, rgba(16, 22, 26, 0.2) 0px 0px 1px, rgba(16, 22, 26, 0.2) 0px 0px 1px;
-}
-.w-popover.right .w-popover-arrow,
-.w-popover.rightTop .w-popover-arrow,
-.w-popover.rightBottom .w-popover-arrow {
-    left: 2px;
-    margin-top: -15px;
-    top: 50%;
-}
-.w-popover.left .w-popover-arrow,
-.w-popover.leftTop .w-popover-arrow,
-.w-popover.leftBottom .w-popover-arrow {
-    transform: rotate(180deg);
-    margin-top: -15px;
-    right: 2px;
-    top: 50%;
-}
-.w-popover.leftTop .w-popover-arrow,
-.w-popover.rightTop .w-popover-arrow {
-    top: 15px;
-}
-.w-popover.leftBottom .w-popover-arrow,
-.w-popover.rightBottom .w-popover-arrow {
-    bottom: 0;
-    top: auto;
-}
-.w-popover.top .w-popover-arrow,
-.w-popover.topLeft .w-popover-arrow,
-.w-popover.topRight .w-popover-arrow {
-    transform: rotate(-90deg);
-    bottom: 2px;
-    left: 50%;
-    margin-left: -15px;
-}
-.w-popover.bottom .w-popover-arrow,
-.w-popover.bottomLeft .w-popover-arrow,
-.w-popover.bottomRight .w-popover-arrow {
-    transform: rotate(90deg);
-    left: 50%;
-    margin-left: -15px;
-    top: 2px;
-}
-.w-popover.bottomLeft .w-popover-arrow,
-.w-popover.topLeft .w-popover-arrow {
-    left: 15px;
-}
-.w-popover.bottomRight .w-popover-arrow,
-.w-popover.topRight .w-popover-arrow {
-    right: 0;
-    left: auto;
-}
-.w-popover.top,
-.w-popover.topLeft,
-.w-popover.topRight {
-    padding-bottom: 13px;
-}
-.w-popover.bottom,
-.w-popover.bottomLeft,
-.w-popover.bottomRight {
-    padding-top: 13px;
-}
-.w-popover.right,
-.w-popover.rightTop,
-.w-popover.rightBottom {
-    padding-left: 13px;
-}
-.w-popover.left,
-.w-popover.leftTop,
-.w-popover.leftBottom {
-    padding-right: 13px;
-}
-.w-popover.no-arrow {
-    padding: 0 !important;
-}
-`;
+import OverLayTriggerComp, { OverlayTriggerProps } from '../overlay/overlayTrigger';
+import './popover.css';
 
 interface Confirm {
     trigger?: PopoverProps['trigger'];
@@ -163,7 +65,6 @@ export function ConfirmComp(props: Confirm) {
     );
 }
 
-
 export interface PopoverProps extends OverlayTriggerProps {
   content?: React.ReactNode;
   visibleArrow?: boolean;
@@ -223,7 +124,6 @@ const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
 
     return (
         <>
-            <style jsx>{css}</style>
             <OverLayTriggerComp
                 ref={overLayRef}
                 {...other}

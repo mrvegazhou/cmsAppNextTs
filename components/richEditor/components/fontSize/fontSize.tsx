@@ -7,7 +7,7 @@ import PopoverComp from '@/components/popover/popover';
 import OverLayTriggerComp from '@/components/overlay/overlayTrigger';
 import './fontSize.css';
 
-const fontSizes = [
+export const fontSizes = [
     12,
     14,
     16,
@@ -36,7 +36,7 @@ type FontSizeProps = {
 const FontSizeToolBar = (props: FontSizeProps) => {
     const t = useTranslations('RichEditor');
     const popoverCompRef = useRef(null);
-    const overLayRef = useRef(null);
+    
     const [currentFontSize, setCurrentFontSize] = useState<number>();
     const toggleFontSize = (fontSize: number) => {
         props.onChange(
@@ -73,15 +73,10 @@ const FontSizeToolBar = (props: FontSizeProps) => {
         </div>
     );
 
-    const hidePop = ()=>{
-        // @ts-ignore
-        overLayRef.current && overLayRef.current.hide();
-    }
-
     return (
         <PopoverComp ref={popoverCompRef} trigger="click" placement="bottom" content={content}>
-            <span onClick={hidePop} className={classNames("cursor-pointer me-4", props.classNames)} onMouseDown={(e) => e.preventDefault()}>
-                <OverLayTriggerComp ref={overLayRef} placement="top" overlay={<small className='p-1'>{t('fontSize')}</small>}>
+            <span className={classNames("cursor-pointer me-4", props.classNames)} onMouseDown={(e) => e.preventDefault()}>
+                <OverLayTriggerComp placement="top" overlay={<small className='p-1'>{t('fontSize')}</small>}>
                     <i className='iconfont icon-zitidaxiao1 fs-3 opacity-50'></i>
                 </OverLayTriggerComp>
             </span>

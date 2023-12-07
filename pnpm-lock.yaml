@@ -116,6 +116,9 @@ dependencies:
   postcss:
     specifier: 8.4.27
     version: registry.npmmirror.com/postcss@8.4.27
+  prismjs:
+    specifier: ^1.29.0
+    version: registry.npmmirror.com/prismjs@1.29.0
   react:
     specifier: 18.2.0
     version: registry.npmmirror.com/react@18.2.0
@@ -163,6 +166,9 @@ devDependencies:
   '@types/lz-string':
     specifier: ^1.5.0
     version: registry.npmmirror.com/@types/lz-string@1.5.0
+  '@types/prismjs':
+    specifier: ^1.26.3
+    version: registry.npmmirror.com/@types/prismjs@1.26.3
   '@types/sanitize-html':
     specifier: ^2.9.1
     version: registry.npmmirror.com/@types/sanitize-html@2.9.1
@@ -2505,6 +2511,12 @@ packages:
     resolution: {integrity: sha512-lqa4UEhhv/2sjjIQgjX8B+RBjj47eo0mzGasklVJ78UKGQY1r0VpB9XHDaZZO9qzEFDdy4MrXLuEaSmPrPSe/A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/normalize-package-data/-/normalize-package-data-2.4.2.tgz}
     name: '@types/normalize-package-data'
     version: 2.4.2
+    dev: true
+
+  registry.npmmirror.com/@types/prismjs@1.26.3:
+    resolution: {integrity: sha512-A0D0aTXvjlqJ5ZILMz3rNfDBOx9hHxLZYv2by47Sm/pqW35zzjusrZTryatjN/Rf8Us2gZrJD+KeHbUSTux1Cw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/prismjs/-/prismjs-1.26.3.tgz}
+    name: '@types/prismjs'
+    version: 1.26.3
     dev: true
 
   registry.npmmirror.com/@types/prop-types@15.7.8:
@@ -6991,6 +7003,13 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
     dev: true
+
+  registry.npmmirror.com/prismjs@1.29.0:
+    resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/prismjs/-/prismjs-1.29.0.tgz}
+    name: prismjs
+    version: 1.29.0
+    engines: {node: '>=6'}
+    dev: false
 
   registry.npmmirror.com/promise@7.3.1:
     resolution: {integrity: sha512-nolQXZ/4L+bP/UGlkfaIujX9BKxGwmQ9OT4mOt5yvy8iK1h3wqTEJCijzGANTCCl9nWjY41juyAn2K3Q1hLLTg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/promise/-/promise-7.3.1.tgz}

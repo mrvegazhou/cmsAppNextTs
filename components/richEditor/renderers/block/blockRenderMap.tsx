@@ -2,6 +2,8 @@ import React from 'react';
 import { DefaultDraftBlockRenderMap, EditorState } from 'draft-js';
 import { Map } from 'immutable';
 import TableRenderer from '../../components/table/tableRender';
+// 代码块
+// import { CodeBlockWrapper, syntaxs } from '../../components/codeHighLighter';
 
 interface BlockRenderMapProps {
   editorState: EditorState;
@@ -18,6 +20,11 @@ const BlockRenderMap = (props: BlockRenderMapProps, blockRenderMap?: Function) =
           element: 'code',
           wrapper: <pre className="richEditor-code-pre" />
         },
+        // 代码
+        // 'code-block': {
+        //   element: 'code',
+        //   wrapper: <CodeBlockWrapper syntaxs={syntaxs} editorState={props.editorState} onChange={props.onChange} showLineNumber={true} />,
+        // },
         'table-cell': {
           element: 'td',
           wrapper: <TableRenderer columnResizable={true} readOnly={props.readOnly ?? true} requestBlur={props.requestBlur} editorState={props.editorState} onChange={props.onChange} />

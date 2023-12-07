@@ -61,7 +61,7 @@
       top: 0;
       right: 0;
       left: 10px;
-      height: 8px;
+      height: 14px;
       line-height: 0;
       white-space: nowrap;
       &.resizing {
@@ -83,7 +83,7 @@
       top: 10px;
       bottom: 10px;
       left: 0;
-      width: 8px;
+      width: 14px;
     }
   
     .richEditor-col-tool-handler,
@@ -112,7 +112,7 @@
   
     .richEditor-col-tool-handler{
       display: inline-block;
-      height: 8px;
+      height: 14px;
       line-height: 0;
       font-size: 0;
       border-left: 1px solid #e1e5e9;
@@ -134,7 +134,7 @@
       top: 0;
       left: -2px;
       width: 4px;
-      height: 8px;
+      height: 14px;
       cursor: col-resize;
       &:hover{
         background-color: #07a9fe;
@@ -160,7 +160,7 @@
       float: left;
       position: relative;
       width: 50%;
-      height: 8px;
+      height: 14px;
       &:hover{
         .richEditor-insert-col-before,
         .richEditor-insert-col-after{
@@ -215,8 +215,8 @@
       }
       i{
         display: block;
-        width: 20px;
-        height: 20px;
+        width: 26px;
+        height: 26px;
         color: inherit;
         background-color: currentColor;
         border-radius: 3px;
@@ -224,11 +224,11 @@
         pointer-events: none;
         &::before{
           display: block;
-          width: 20px;
-          height: 20px;
+          width: 26px;
+          height: 26px;
           color: #fff;
-          font-size: 14px;
-          line-height: 20px;
+          font-size: 15px;
+          line-height: 26px;
           text-align: center;
         }
       }
@@ -238,10 +238,11 @@
     .richEditor-insert-col-after,
     .richEditor-remove-col{
       bottom: -25px;
-      padding-top: 5px;
+      padding-top: 6px;
       &::before{
-        left: 6px;
+        left: 9px;
         top: -1px;
+        z-index: 10;
         border-bottom-color: currentColor;
       }
     }
@@ -250,19 +251,19 @@
     .richEditor-insert-row-after,
     .richEditor-remove-row{
       right: -25px;
-      padding-left: 5px;
+      padding-left: 6px;
       &::before{
-        top: 6px;
+        top: 9px;
         left: -1px;
         border-right-color: currentColor;
       }
     }
   
     .richEditor-insert-col-before{
-      left: -10px;
+      left: -13px;
     }
     .richEditor-insert-col-after{
-      right: -10px;
+      right: -13px;
     }
     .richEditor-remove-col{
       left: 50%;
@@ -368,6 +369,10 @@
           &>div{
             padding: 10px 15px;
           }
+        }
+        .richEditor-table-cell-bg {
+          background-color: rgba(33, 37, 41, 0.3) !important;
+          border: 1px solid #fff !important;
         }
       }
     }

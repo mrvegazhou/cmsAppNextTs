@@ -18,12 +18,12 @@ import {
 import { AddImageProps, OnChangeType } from '../../interfaces';
 import classNames from 'classnames';
 import useToast from '@/hooks/useToast';
-import useSyncState from '@/hooks/useState';
 import { uploadArticleImages } from '@/services/api';
 import type {
     IArticleUploadImages
 } from '@/interfaces';
 import type { TBody } from '@/types';
+import { useTranslations } from 'use-intl';
 import { handleDrop, loadImage } from '@/lib/tool';
 import LoaderComp from '@/components/loader/loader';
 import type { IData } from '@/interfaces';
@@ -31,6 +31,7 @@ import { BASE_URL, IMAGE_URL, MAX_FILE_SIZE_IN_KB } from '@/lib/constant';
 import { convertBytesToKB } from '@/lib/tool';
 import { insertImage } from '../../utils/content';
 import OverlayComp from '@/components/overlay/overlay';
+import OverLayTriggerComp from '@/components/overlay/overlayTrigger';
 import "./image.css";
 
 type ImageProps = {
@@ -48,21 +49,27 @@ export interface imageToolBarProps {
     active?: boolean;
     classNames?: string;
     onClick?: () => void;
+    requestFocus: Function;
+    requestBlur: Function;
 }
 export const ImageToolBar = (props: imageToolBarProps) => {
-    const imageModalRef = useRef<HTMLDivElement>(null);
+    const t = useTranslations('RichEditor');
     const imageUploaderRef = useRef(null)
+    const overLayRef = useRef(null);
     const [isOpen, setOpen] = useState(false);
 
     const showImageModal = () => {
+        hidePop();
         setOpen(true);
         // @ts-ignore
         imageUploaderRef.current && imageUploaderRef.current.removeImages();
         props.onClick && props.onClick();
+        props.requestBlur && props.requestBlur();
     };
 
     const onClickCloseModal = () => {
         setOpen(false);
+        props.requestFocus && props.requestFocus();
     };
 
     const onToggle = (e: MouseEvent<HTMLSpanElement>, img: ImageProps) => {
@@ -82,20 +89,27 @@ export const ImageToolBar = (props: imageToolBarProps) => {
         }
     };
 
+    const hidePop = ()=>{
+        // @ts-ignore
+        overLayRef.current && overLayRef.current.hide();
+    }
+
     return (
         <>
             <span onClick={showImageModal} className={classNames("cursor-pointer me-4", props.classNames)} onMouseDown={(e) => e.preventDefault()}>
-                <i className='iconfont icon-ic_image_upload fs-4 text-black-50'></i>
+                <OverLayTriggerComp ref={overLayRef} placement="top" overlay={<small className='p-1'>{t('imageUpload')}</small>}>
+                    <i className='iconfont icon-ic_image_upload fs-4 text-black-50'></i>
+                </OverLayTriggerComp>
             </span>
 
-            <OverlayComp usePortal={false} isOpen={isOpen} className='d-flex justify-content-center align-items-center'>
-                <div className="bg-white mt-5 rounded-2" style={{width:"590px"}}>
+            <OverlayComp usePortal={false} onClose={()=>{setOpen(false)}} isOpen={isOpen} className='d-flex justify-content-center align-items-center'>
+                <div className="bg-white mt-5 rounded-2" style={{width:"590px", top: "-200px"}}>
                     <div className="d-flex flex-row justify-content-end">
                         <a href="#" onClick={onClickCloseModal} className="close text-dark text-decoration-none px-2">
                             <i className='iconfont icon-close fs-4'></i>
                         </a>
                     </div>
-                    <ImageUploader multi={false} ref={imageUploaderRef} onClose={onClickCloseModal} onToggle={onToggle}/>
+                    <ImageUploader multi={false} ref={imageUploaderRef} onClose={onClickCloseModal} onToggle={onToggle} requestFocus={props.requestFocus}/>
                 </div>
             </OverlayComp>
         </>
@@ -110,6 +124,7 @@ export type Props = {
     height?: number;
     onClose: () => void;
     onToggle: (e: MouseEvent<HTMLSpanElement>, img: ImageProps) => void;
+    requestFocus: Function;
 };
 export type State = {
     /**
@@ -136,6 +151,7 @@ export type State = {
 const IMAGE_HEIGHT = 300;
 // 弹出框里添加图片信息
 export const ImageUploader = forwardRef((props: Props, ref) => {
+    const t = useTranslations('RichEditor');
     let initState = {
         loading: false,
         images: [],
@@ -187,7 +203,7 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
             if ( convertBytesToKB(file.size) > MAX_FILE_SIZE_IN_KB ) {
                 show({
                     type: 'DANGER',
-                    message: "图片大小限制在" + MAX_FILE_SIZE_IN_KB + "KB",
+                    message: t('imageUploadLimit') + MAX_FILE_SIZE_IN_KB + "KB",
                 });
                 return;
             }
@@ -273,17 +289,18 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
                 } else {
                     show({
                         type: 'DANGER',
-                        message: "上传失败",
+                        message: t('imageUploadErr')
                     });
                 }
             }).catch(err => {
                 show({
                     type: 'DANGER',
-                    message: '上传失败',
+                    message: t('imageUploadErr')
                 });
             });
         }
         props.onClose();
+        props.requestFocus && props.requestFocus();
     };
 
     const removeImage = (fileName: string | undefined) => {
@@ -371,14 +388,14 @@ export const ImageUploader = forwardRef((props: Props, ref) => {
                 </LoaderComp>
             </div>
             <div className="form-group row mt-3">
-                <label className="col-sm-3 col-form-label text-end">图片描述</label>
+                <label className="col-sm-3 col-form-label text-end">{t('imageDesc')}</label>
                 <div className="col-sm-8">
-                <input type='text' name="description" placeholder='可选填' value={description} className="form-control" onChange={handleChange}/>
+                <input type='text' name="description" placeholder={t('optional')} value={description} className="form-control" onChange={handleChange}/>
                 </div>
             </div>
             <div className='form-row text-center mt-4 mb-3'>
                 <button disabled={imgState.loading} type="button" className="btn btn-outline-primary" onClick={onFileSubmit}>
-                    上传
+                    {t('upload')}
                 </button>
             </div>
         </div>

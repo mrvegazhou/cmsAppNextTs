@@ -1,12 +1,24 @@
 import { EditorState } from 'draft-js';
 import React from 'react'
-import { getCellsInsideRect, mergeCells, splitCell, removeTable, insertColumn, removeColumn, insertRow, removeRow } from './utils';
+import { 
+    getCellsInsideRect, 
+    mergeCells, 
+    splitCell, 
+    removeTable, 
+    insertColumn, 
+    removeColumn, 
+    insertRow, 
+    removeRow,
+    updateAllTableBlocks,
+    updateCellBg
+} from './utils';
 import "./tableRender.scss";
 import { createEditorState, toRAW } from '../../utils/convert';
 
+type ColToolHandlersType = React.DetailedHTMLProps<React.ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>[];
 interface TableInfoState {
-    tableRows: React.ReactNode[];
-    colToolHandlers: React.DetailedHTMLProps<React.ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>[];
+    tableRows: React.ReactNode[][];
+    colToolHandlers: ColToolHandlersType;
     rowToolHandlers: any[];
     defaultColWidth: number;
     colResizing: boolean;
@@ -292,7 +304,7 @@ class TableRenderer extends React.Component<TableRenderProps, TableInfoState> {
         const { editorState, children } = props
         // @ts-ignore
         const tableWidth = this.__tableRef.current.getBoundingClientRect().width
-console.log(tableWidth, "----tableWidth---")
+
         if (children && children.length>0) {
             this.__startCellKey = children[0].key;
             this.__endCellKey = children[children.length - 1]!.key;
@@ -306,7 +318,7 @@ console.log(tableWidth, "----tableWidth---")
                 const rowIndex = cellBlockData.get('rowIndex') * 1
                 const colSpan = cellBlockData.get('colSpan')
                 const rowSpan = cellBlockData.get('rowSpan')
-            
+
                 this.tableKey = tableKey
                 if (rowIndex === 0) {
                     const colgroupData = cellBlockData.get('colgroupData') || []
@@ -334,7 +346,7 @@ console.log(tableWidth, "----tableWidth---")
                     'data-cell-index': cellIndex,
                     'data-cell-key': cell.key,
                     'data-table-key': tableKey,
-                    className: `richEditor-table-cell ${cell.props.className}`,
+                    className: `richEditor-table-cell ${cell.props.className} `,
                     colSpan: colSpan,
                     rowSpan: rowSpan,
                     onClick: this.selectCell,
@@ -348,7 +360,7 @@ console.log(tableWidth, "----tableWidth---")
                     rowToolHandlers[jj] = { key: cell.key, height: 0 }
                     tableRows[jj] = tableRows[jj] || []
                 }
-                
+
                 if (!tableRows[rowIndex]) {
                     tableRows[rowIndex] = [newCell]
                 } else {
@@ -356,17 +368,27 @@ console.log(tableWidth, "----tableWidth---")
                 }
             });
         }
-    
+        
+        // 设置表格的列宽
         const defaultColWidth = tableWidth / this.colLength
+        for (let i in colToolHandlers) {
+            if (colToolHandlers[i].width==0) {
+                colToolHandlers[i].width = defaultColWidth;
+            }
+        }
         this.setState({ tableRows, colToolHandlers, rowToolHandlers, defaultColWidth }, this.adjustToolbarHandlers)
     }
     ////////////////////////////////////---end cell---/////////////////////////////////////////////////////////
 
 
     ////////////////////////////////////---begin table---/////////////////////////////////////////////////////////
-
     handleTableMouseDown = (event: React.MouseEvent<HTMLTableElement>) => {
-        this.showContextMenu = false;
+        console.log(event.button)
+        if (event.button == 2){
+            this.showContextMenu = true;
+        } else {
+            this.showContextMenu = false;
+        }  
     };
     hanldeTableMouseUp = (event: React.MouseEvent<HTMLTableElement>) => {
         // event.preventDefault();
@@ -436,7 +458,6 @@ console.log(tableWidth, "----tableWidth---")
     ////////////////////////////////////---begin createContextMenu---/////////////////////////////////////////////////////////
     handleContextMenuContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
-        this.showContextMenu = !this.showContextMenu;
     }
     mergeCells = () => {
         const { selectedCells, cellsMergeable } = this.state
@@ -452,6 +473,7 @@ console.log(tableWidth, "----tableWidth---")
                 this.props.onChange(mergeCells(this.props.editorState, this.tableKey, selectedCells))
             })
         }
+        this.showContextMenu = false;
     };
     splitCell = () => {
         const { selectedCells, cellSplittable } = this.state
@@ -465,11 +487,27 @@ console.log(tableWidth, "----tableWidth---")
                 this.props.onChange(splitCell(this.props.editorState, this.tableKey, selectedCells[0]))
             })
         }
+        this.showContextMenu = false;
     };
     removeTable = () => {
         this.props.onChange(removeTable(this.props.editorState, this.tableKey))
     };
-
+    changeCellBg = (event: React.MouseEvent<HTMLDivElement>) => {
+        let extraData: any = [];
+        for (let row in this.__rowRefs) {
+            let nodes = this.__rowRefs[row].childNodes
+            let keys = this.state.selectedCells
+            nodes.forEach((node: any) => {
+                if (keys.includes(node.getAttribute('data-cell-key'))) {
+                    extraData.push({rowIndex: node.getAttribute('data-row-index'), colIndex: node.getAttribute('data-col-index')});
+                    let cls = node.getAttribute('class');
+                    node.setAttribute("class", cls+" richEditor-table-cell-bg");
+                }
+            })
+        }
+        this.showContextMenu = false;
+        this.props.onChange(updateCellBg(this.props.editorState, this.tableKey, extraData))
+    };
     createContextMenu = () => {
         const { cellsMergeable, cellSplittable, contextMenuPosition } = this.state;
         if (!contextMenuPosition) {
@@ -479,6 +517,7 @@ console.log(tableWidth, "----tableWidth---")
             <div className="richEditor-table-context-menu" onContextMenu={this.handleContextMenuContextMenu} contentEditable={false} style={contextMenuPosition}>
                 <div className="context-menu-item" onMouseDown={this.mergeCells} data-disabled={!cellsMergeable}>合并单元格</div>
                 <div className="context-menu-item" onMouseDown={this.splitCell} data-disabled={!cellSplittable}>拆分单元格</div>
+                <div className="context-menu-item" onMouseDown={this.changeCellBg}>填充背景色</div>
                 <div className="context-menu-item" onMouseDown={this.removeTable}>删除表格</div>
             </div>
         );
@@ -537,8 +576,38 @@ console.log(tableWidth, "----tableWidth---")
     handleColResizerMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
         this.__colResizeIndex = Number(event.currentTarget.dataset.index) * 1
         this.__colResizeStartAt = event.clientX
-        console.log(this.__colResizeIndex, this.__colResizeStartAt, '--x--')
         this.setState({ colResizing: true })
+    }
+
+    handleColResizerMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (this.state.colResizing) {
+
+        }
+        let colToolHandlers = this.state.colToolHandlers;
+        let offSet = this.state.colResizeOffset;
+        let add1 = Number(colToolHandlers[this.__colResizeIndex-1].width) + offSet;
+        let add2 = Number(colToolHandlers[this.__colResizeIndex].width) - offSet;
+
+        if (add1<0 || add2<0) {
+            
+        } else {
+            colToolHandlers[this.__colResizeIndex-1].width = add1;
+            colToolHandlers[this.__colResizeIndex].width = add2;
+        }
+
+        this.__colResizeIndex = 0
+        this.__colResizeStartAt = 0
+        
+        this.setState({ 
+            contextMenuPosition: null,
+            colResizeOffset: 0,
+            colResizing: false, 
+            colToolHandlers 
+        }, () => {
+            let blockData = { colgroupData: colToolHandlers.map(item => ({ width: item.width })) }
+            this.props.onChange(updateAllTableBlocks(this.props.editorState, this.tableKey, blockData))
+        })
+
     }
 
     insertColumn = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -613,6 +682,7 @@ console.log(tableWidth, "----tableWidth---")
                         className={`richEditor-col-resizer${colResizing && this.__colResizeIndex === index ? ' active' : ''}`}
                         style={colResizing && this.__colResizeIndex === index ? { transform: `translateX(${colResizeOffset}px)` } : undefined}
                         onMouseDown={this.handleColResizerMouseDown}
+                        onMouseUp={this.handleColResizerMouseUp}
                     ></div>
                     ) : null}
                     <div className="richEditor-col-tool-left">
@@ -792,7 +862,7 @@ console.log(tableWidth, "----tableWidth---")
 
                 </table>
                 {dragSelecting ? <div className="dragging-rect" style={draggingRectBounding} /> : null}
-                {(!readOnly) && this.createContextMenu()}
+                {(!readOnly && this.showContextMenu) && this.createContextMenu()}
                 {!readOnly && this.createColTools()}
                 {!readOnly && this.createRowTools()}
             </div>

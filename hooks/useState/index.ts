@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
  * @param state
  * @returns
  */
-const useSyncState =  <T extends object>(state: T = {} as T): [T, Function] => {
+const useSyncState =  <T>(state: T): [T, Function] => {
   const cbRef: { current: any } = useRef();
   const [data, setData] = useState<T>(state);
  

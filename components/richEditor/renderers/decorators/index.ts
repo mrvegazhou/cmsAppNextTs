@@ -1,6 +1,7 @@
 import { CompositeDecorator, ContentBlock, ContentState } from 'draft-js';
 import MultiDecorator from '../../utils/multidecorators';
 import LinkBlock from './link';
+import { PrismDe } from '../../components/codeHighLighter';
 
 const builtinDecorators = [
     {
@@ -33,7 +34,8 @@ const Decorators = () => {
               strategy: createStrategy(item.decorator.key),
               component: item.decorator.component,
             })),
-        )
+        ),
+        PrismDe
     ]);
 };
 

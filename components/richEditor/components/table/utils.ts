@@ -121,8 +121,7 @@ const valueComparison = (value1: any, value2: any, operator: string) => {
         return value1 > value2
       case '<':
         return value1 < value2
-    }
-  
+    } 
 }
 
 // 使用简易值比较函数筛选符合条件的block
@@ -272,7 +271,6 @@ const updateTableBlocks = (contentState: ContentState, selection: SelectionState
         isBackward: false
       })
     })
-  
 }
 
 // 插入一个单元格block到表格的block列表中
@@ -725,5 +723,46 @@ export const removeRow = (editorState: EditorState, tableKey: string, rowIndex: 
     const nextContentState = updateTableBlocks(contentState, editorState.getSelection(), focusCellKey, nextTableBlocks, tableKey)
   
     return EditorState.push(editorState, nextContentState as ContentState, 'remove-table-row' as EditorChangeType)
-  
 }
+
+export const updateAllTableBlocks = (editorState: EditorState, tableKey: string, blockData: any) => {
+    const selectionState = editorState.getSelection()
+    const contentState = editorState.getCurrentContent()
+    const contentBlocks = contentState.getBlockMap()
+    const tableBlocks = findBlocks(contentBlocks, 'tableKey', tableKey)
+
+    const nextTableBlocks = rebuildTableBlocks(tableBlocks, blockData)
+    // @ts-ignore
+    const nextContentState = updateTableBlocks(contentState, editorState.getSelection(), selectionState.focusKey, nextTableBlocks, tableKey)
+  
+    return EditorState.push(editorState, nextContentState as ContentState, 'insert-table-row' as EditorChangeType)
+}
+
+export const updateCellBg = (editorState: EditorState, tableKey: string, extraData: {rowIndex:number;colIndex:number}[]) => {
+    const selectionState = editorState.getSelection()
+    const contentState = editorState.getCurrentContent()
+    const contentBlocks = contentState.getBlockMap()
+    const tableBlocks = findBlocks(contentBlocks, 'tableKey', tableKey)
+
+    // @ts-ignore
+    const nextTableBlocks = tableBlocks.map(block => {
+  
+      const blockData = block!.getData()
+      const rowIndex = blockData.get('rowIndex')
+      const colIndex = blockData.get('colIndex')
+  
+      let isBg = extraData.find((ele) => ele.rowIndex==rowIndex && ele.colIndex==colIndex);
+
+      return block!.merge({
+        'data': Immutable.Map({
+            ...blockData.toJS(),
+            cellBg: typeof isBg != 'undefined' ? true : false
+        })
+      })
+    })
+    
+    // @ts-ignore
+    const nextContentState = updateTableBlocks(contentState, editorState.getSelection(), selectionState.focusKey, nextTableBlocks, tableKey)
+    return EditorState.push(editorState, nextContentState as ContentState, 'insert-table-row' as EditorChangeType)
+};
+

@@ -1,9 +1,11 @@
 import { EditorState } from 'draft-js';
 import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
+import { useTranslations } from 'use-intl';
 import { toggleSelectionBackgroundColor } from '../../utils/content';
 import ColorPicker from '../colorPicker/colorPicker';
 import PopoverComp from '@/components/popover/popover';
+import OverLayTriggerComp from '@/components/overlay/overlayTrigger';
 
 const colors = [
     '#000000',
@@ -29,6 +31,8 @@ type TextBgColorProps = {
     onChange: Function;
 }
 const TextBgColortToolbar = (props: TextBgColorProps) => {
+
+    const t = useTranslations('RichEditor');
     const [currentColor, setCurrentColor] = useState("");
     const popoverCompRef = useRef(null);
 
@@ -67,7 +71,9 @@ const TextBgColortToolbar = (props: TextBgColorProps) => {
     return (
         <PopoverComp ref={popoverCompRef} trigger="click" placement="bottom" content={content} usePortal={false}>
             <span style={{color: currentColor}} className={classNames("cursor-pointer me-4", props.classNames, {'text-black': currentColor==''})} onMouseDown={(e) => e.preventDefault()}>
-                <i className='iconfont icon-ziyuan fs-4 opacity-50'></i>
+                <OverLayTriggerComp placement="top" overlay={<small className='p-1'>{t('background')}</small>}>
+                    <i className='iconfont icon-ziyuan fs-4 opacity-50'></i>
+                </OverLayTriggerComp>
             </span>
         </PopoverComp>
     );

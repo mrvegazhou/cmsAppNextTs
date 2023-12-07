@@ -3,7 +3,11 @@ import { convertToHTML, convertFromHTML } from 'draft-convert'
 import { fontFamilies } from '../components/fontFamily/fontFamily'
 import { getDecorators } from '../renderers';
 import { namedColors } from '../components/colorPicker/colorPicker';
+import { tableExportFn, tableImportFn } from '../components/table/convert';
 
+const defaultConvertOptions = {
+  fontFamilies: fontFamilies
+}
 const ignoredNodeAttributes = ['style']
 const ignoredEntityNodeAttributes = ['style', 'href', 'target', 'alt', 'title', 'id', 'controls', 'autoplay', 'loop', 'poster']
 export const blocks: {[Key: string]: string} = {
@@ -101,7 +105,7 @@ const convertAtomicBlock = (block: any, contentState: ContentState, blockNodeAtt
 
 // @ts-ignore
 const styleToHTML = (options: any) => {
-  function ttt(style: string) {
+  function f(style: string) {
     const unitExportFn = options.unitExportFn || defaultUnitExportFn
   
     if (options.styleExportFn) {
@@ -112,7 +116,7 @@ const styleToHTML = (options: any) => {
     }
   
     style = style.toLowerCase()
-  
+    
     if (style === 'strikethrough') {
       return <span style={{textDecoration: 'line-through'}}/>
     } else if (style === 'superscript') {
@@ -135,11 +139,11 @@ const styleToHTML = (options: any) => {
       return <span style={{fontFamily: fontFamily.family}}/>
     }
   }
-  return ttt;
+  return f;
 }
 
 const entityToHTML = (options: any) => {
-  function ttt(entity: any, originalText: any) {
+  function f(entity: any, originalText: any) {
 
     const { entityExportFn } = options
     const entityType = entity.type.toLowerCase()
@@ -152,12 +156,10 @@ const entityToHTML = (options: any) => {
     }
 
     if (entityType === 'link') {
-      let { class: className, ...nodeAttrAsProps } = entity.data.nodeAttributes || {}
-      nodeAttrAsProps.className = className
-      return <a href={entity.data.href} target={entity.data.target} {...nodeAttrAsProps}/>
+      return <a href={entity.data.href} target={entity.data.target} className='re-link' />
     }
   }
-  return ttt;
+  return f;
 }
 
 const blockToHTML = (options: any) => (block: any) => {
@@ -174,7 +176,9 @@ const blockToHTML = (options: any) => (block: any) => {
   let blockStyle = ''
 
   const blockType = block.type.toLowerCase()
+
   const { textAlign, textIndent, nodeAttributes = {} } = block.data
+
   const attributeString = spreadNodeAttributes(nodeAttributes)
 
   if (textAlign || textIndent) {
@@ -236,8 +240,9 @@ const blockToHTML = (options: any) => (block: any) => {
       end: '</li>',
       nest: <ol/>
     }
+  } else if (blockType === 'table-cell') {
+    return  tableExportFn(blockStyle)(contentState, block);
   }
-
 }
 
 export const getToHTMLConfig = (options: any) => {
@@ -323,13 +328,6 @@ const htmlToStyle = (options: any, source: any) => (nodeName: string, node: any,
 
 const htmlToEntity = (options: any, source: any) => (nodeName: string, node: any, createEntity: any) => {
 
-  // if (options && options.entityImportFn) {
-  //   const customInput = options.entityImportFn(nodeName, node, createEntity, source)
-  //   if (customInput) {
-  //     return customInput
-  //   }
-  // }
-
   nodeName = nodeName.toLowerCase()
 
   const { alt, title, id, controls, autoplay, loop, poster } = node
@@ -352,7 +350,7 @@ const htmlToEntity = (options: any, source: any) => (nodeName: string, node: any
   if (nodeName === 'a' && !node.querySelectorAll('img').length) {
     let href = node.getAttribute('href')
     let target = node.getAttribute('target')
-    return createEntity('LINK', 'MUTABLE',{ href, target, nodeAttributes })
+    return createEntity('LINK', 'MUTABLE', { href, target, nodeAttributes })
   } else if (nodeName === 'audio') {
     return createEntity('AUDIO', 'IMMUTABLE',{ url: node.getAttribute('src'), meta, nodeAttributes }) 
   } else if (nodeName === 'video') {
@@ -390,13 +388,6 @@ const htmlToEntity = (options: any, source: any) => (nodeName: string, node: any
 }
 
 const htmlToBlock = (options: any, source: any) => (nodeName: string, node: any) => {
-
-  // if (options && options.blockImportFn) {
-  //   const customInput = options.blockImportFn(nodeName, node, source)
-  //   if (customInput) {
-  //     return customInput
-  //   }
-  // }
 
   let nodeAttributes: any = {}
   let nodeStyle = node.style || {}
@@ -462,24 +453,24 @@ const htmlToBlock = (options: any, source: any) => (nodeName: string, node: any)
     }
 
   }
+  // table
+  return tableImportFn(nodeName, node);
 
 }
 
 export const getFromHTMLConfig = (options: any, source = 'unknow') => {
-
   return { 
     htmlToStyle: htmlToStyle(options, source),
     htmlToEntity: htmlToEntity(options, source),
     htmlToBlock: htmlToBlock(options, source)
   }
-
 }
 
 //------------------------------------------------------------分界线----------------------------------------------------------------------//
 
 export const convertEditorStateToHTML = (editorState: EditorState, options: any = {}) => {
-
-    options = { ...options }
+    
+  options = { ...defaultConvertOptions, ...options }
   
     try {
       const contentState = editorState.getCurrentContent()
@@ -492,7 +483,6 @@ export const convertEditorStateToHTML = (editorState: EditorState, options: any 
 }
 
 export const convertRawToEditorState = (rawContent: RawDraftContentState, editorDecorators: DraftDecoratorType) => {
-
   try {
     return EditorState.createWithContent(convertFromRaw(rawContent), editorDecorators)
   } catch (error) {
@@ -514,77 +504,76 @@ const convertHTMLToEditorState = (HTMLString: string, editorDecorators: any, opt
   }
 
 }
-
+// 引入此方法 把html转为state
 export const createEditorState = (content: any, options = {}) => {
   const customOptions = { ...options };
 
   let editorState = null;
 
-  if (content instanceof EditorState) {
-    editorState = content;
-  }
-  if (
-    typeof content === 'object' &&
-    content &&
-    content.blocks &&
-    content.entityMap
-  ) {
-    editorState = convertRawToEditorState(
-      content,
-      getDecorators(),
-    );
-  }
-  if (typeof content === 'string') {
-    try {
-      if (/^(-)?\d+$/.test(content)) {
-        editorState = convertHTMLToEditorState(
-          content,
-          getDecorators(),
-          customOptions,
-          'create',
-        );
-      } else {
-        editorState = createEditorState(
-          JSON.parse(content),
-          customOptions,
-        );
-      }
-    } catch (error) {
-      editorState = convertHTMLToEditorState(
-        content,
-        getDecorators(),
-        customOptions,
-        'create',
-      );
-    }
-  }
-  if (typeof content === 'number') {
-    editorState = convertHTMLToEditorState(
-      content.toLocaleString().replace(/,/g, ''),
-      getDecorators(),
-      customOptions,
-      'create',
-    );
-  } else {
-    editorState = EditorState.createEmpty(
-      getDecorators(),
-    );
-  }
+  // if (content instanceof EditorState) {
+  //   editorState = content;
+  // }
+  // if (
+  //   typeof content === 'object' &&
+  //   content &&
+  //   content.blocks &&
+  //   content.entityMap
+  // ) {
+  //   editorState = convertRawToEditorState(
+  //     content,
+  //     getDecorators(),
+  //   );
+  // }
 
-  // customOptions.styleExportFn = compositeStyleExportFn(
-  //   customOptions.styleExportFn,
-  //   customOptions.editorId,
-  // );
-  // customOptions.entityExportFn = compositeEntityExportFn(
-  //   customOptions.entityExportFn,
-  //   customOptions.editorId,
-  // );
-  // customOptions.blockExportFn = compositeBlockExportFn(
-  //   customOptions.blockExportFn,
-  //   customOptions.editorId,
-  // );
+  // if (typeof content === 'string') {
+  //   try {
+  //     if (/^(-)?\d+$/.test(content)) {
+  //       editorState = convertHTMLToEditorState(
+  //         content,
+  //         getDecorators(),
+  //         customOptions,
+  //         'create',
+  //       );
+  //     } else {
+  //       // json字符串
+  //       editorState = createEditorState(
+  //         JSON.parse(content),
+  //         customOptions,
+  //       );
+  //     }
+  //   } catch (error) {
+  //     // html字符串
+  //     editorState = convertHTMLToEditorState(
+  //       content,
+  //       getDecorators(),
+  //       customOptions,
+  //       'create',
+  //     );
+  //   }
+  // }
+
+  // if (typeof content === 'number') {
+  //   editorState = convertHTMLToEditorState(
+  //     content.toLocaleString().replace(/,/g, ''),
+  //     getDecorators(),
+  //     customOptions,
+  //     'create',
+  //   );
+  // } else {
+  //   editorState = EditorState.createEmpty(
+  //     getDecorators(),
+  //   );
+  // }
+
   // editorState.setConvertOptions(customOptions);
 
+  // html字符串
+  editorState = convertHTMLToEditorState(
+    content,
+    getDecorators(),
+    customOptions,
+    'create',
+  );
   return editorState;
 };
 
@@ -596,4 +585,8 @@ export const toRAW = (editorState: EditorState, noStringify: boolean) => {
   return noStringify
     ? convertEditorStateToRaw(editorState)
     : JSON.stringify(convertEditorStateToRaw(editorState));
+};
+
+export const toHTML = (editorState: EditorState, options: any) => {
+  return convertEditorStateToHTML(editorState, { ...options });
 };

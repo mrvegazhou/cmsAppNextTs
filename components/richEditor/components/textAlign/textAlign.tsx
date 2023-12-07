@@ -1,15 +1,22 @@
 import React, 
 {
-    MouseEvent
+    useRef,
+    MouseEvent,
+    useState
 } from 'react';
 import { 
     EditorState
 } from 'draft-js';
 import classNames from 'classnames';
+import { useTranslations } from 'use-intl';
+import PopoverComp from '@/components/popover/popover';
+import OverLayTriggerComp from '@/components/overlay/overlayTrigger';
 import { 
     getSelectionBlockData,
     toggleSelectionAlignment
 } from '../../utils/content'; 
+import { handleDrop } from '@/lib/tool';
+import './textAlign.css';
 
 export interface textAlignToolBarProps {
     onChange: Function;
@@ -27,33 +34,52 @@ enum AlignType {
 }
 const TextAlignToolBar = (props: textAlignToolBarProps) => {
     
+    const t = useTranslations('RichEditor');
+    const popoverCompRef = useRef(null);
+
     let currentAlignment = getSelectionBlockData(props.editorState, 'textAlign');
 
-    const setAlignment = (event: MouseEvent<HTMLSpanElement>) => {
-        let { alignment } = event.currentTarget.dataset;
-        props.onChange(toggleSelectionAlignment(props.editorState, alignment!));
+    const TEXT_ALIGN_STYLES = [
+        {label: <i className='iconfont icon-zuoduiqi fs-4 opacity-50'></i>, style: AlignType.LEFT},
+        {label: <i className='iconfont icon-youduiqi fs-4 opacity-50'></i>, style: AlignType.RIGHT},
+        {label: <i className='iconfont icon-juzhongduiqi fs-4 opacity-50'></i>, style: AlignType.CENTER},
+        {label: <i className='iconfont icon-zuoyouduiqi fs-4 opacity-50'></i>, style: AlignType.JUSTIFY},
+    ];
+
+    let currentLabel = TEXT_ALIGN_STYLES.filter((item)=>{
+        return item.style==currentAlignment;
+    });
+
+    const setAlignment = (event: MouseEvent<HTMLSpanElement>, align: string) => {
+        handleDrop(event);
+        props.onChange(toggleSelectionAlignment(props.editorState, align));
         props.requestFocus && props.requestFocus();
     };
 
-    const TEXT_ALIGN_STYLES = [
-        {label: <i className='iconfont icon-zuoduiqi fs-4 text-black-50'></i>, style: AlignType.LEFT},
-        {label: <i className='iconfont icon-youduiqi fs-4 text-black-50'></i>, style: AlignType.RIGHT},
-        {label: <i className='iconfont icon-juzhongduiqi fs-4 text-black-50'></i>, style: AlignType.CENTER},
-        {label: <i className='iconfont icon-zuoyouduiqi fs-4 text-black-50'></i>, style: AlignType.JUSTIFY},
-
-    ];
+    const content = (
+        <div className='textAlignMenu'>
+           {TEXT_ALIGN_STYLES.map((item) => {
+                return (
+                    <div
+                        key={item.style}
+                        className={classNames('textAlignItem cursor-pointer')}
+                        onClick={(e)=>setAlignment(e, item.style)}
+                    >
+                        {item.label}
+                    </div>
+                );
+            })}
+        </div>
+    );
 
     return (
-        <>
-            {TEXT_ALIGN_STYLES.map(item => (
-                <span key={item.style} className={classNames("cursor-pointer", props.classNames, {"user-select-none opacity-50": currentAlignment==item.style})} 
-                    data-alignment={item.style}
-                    onClick={setAlignment}
-                >
-                    {item.label}
-                </span>
-            ))}
-        </>
+        <PopoverComp ref={popoverCompRef} trigger="click" placement="bottom" content={content}>
+            <span className={classNames("cursor-pointer me-4", props.classNames)} onMouseDown={(e) => e.preventDefault()}>
+                <OverLayTriggerComp placement="top" overlay={<small className='p-1'>{t('align')}</small>}>
+                    {currentLabel.length>0 ? currentLabel[0].label : (<i className='iconfont icon-zuoduiqi fs-4 opacity-50'></i>)}
+                </OverLayTriggerComp>
+            </span>
+        </PopoverComp>
     );
 }
 

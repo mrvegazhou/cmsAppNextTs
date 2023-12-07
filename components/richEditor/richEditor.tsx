@@ -12,8 +12,6 @@ import classNames from 'classnames';
 import { 
     Editor,
     EditorState,
-    ContentState,
-    convertFromHTML,
     ContentBlock,
     RichUtils,
     getDefaultKeyBinding,
@@ -24,6 +22,7 @@ import {
 import 'draft-js/dist/Draft.css';
 import { SyntheticKeyboardEvent, MyDraftEditorProps } from './interfaces';
 import { flow } from 'lodash';
+import { useTranslations } from 'use-intl';
 import LinkToolBar from "./components/link/link";
 import { ImageToolBar } from "./components/image/image";
 import { TextIndentToolBar } from "./components/textIndent/textIndent";
@@ -34,6 +33,7 @@ import FontSizeToolBar from "./components/fontSize/fontSize";
 import WordSpaceToolBar from "./components/wordSpace/wordSpace";
 import LineHeightToolBar from "./components/lineHeight/lineHeight";
 import TableToolBar from "./components/table/table";
+import PreViewToolBar from "./components/preView/preView";
 import { increaseSelectionIndent } from "./utils/content";
 import { 
     keyCommandHandlers, 
@@ -48,16 +48,18 @@ import EmojiToolBar from "./components/emoji";
 import { DividerToolBar } from "./components/divider/divider";
 import "./richEditor.css";
 import { getCustomStyleFn, getBlockStyleFn, getBlockRendererFn, getBlockRenderMap } from "./renderers";
-
+import { createEditorState } from "./utils/convert";
 import { removeEntities, removeBlockTypes, removeInlineStyles } from "./utils/remove";
 import { getDecorators } from "./renderers";
+import PopoverComp from '@/components/popover/popover';
+import OverLayTriggerComp from '@/components/overlay/overlayTrigger';
 import PopoverToolBar from "../textSelectionPopover/popover";
-import Image from 'next/image';
-import Head from 'next/head'
-
+import { convertFromHTML as convertFromHTML2 } from "draft-convert";
 
 const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
     (props: MyDraftEditorProps, ref) => {
+    
+    const t = useTranslations('RichEditor');
     let { id = 'draft-editor', style, ...rest } = props;
     const editorRef = useRef<Editor | null>(null);
     const rootRef = useRef(null);
@@ -87,15 +89,11 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         }
     },[]);
 
-    const sampleMarkup = '<a href="http://www.facebook.com">Example link</a>';
-    const blocksFromHTML = convertFromHTML(sampleMarkup);
-    const state = ContentState.createFromBlockArray(
-        blocksFromHTML.contentBlocks,
-        blocksFromHTML.entityMap,
-    );
+    const sampleMarkup = `<p>sss</p><hr class="hr richEditorHr" style="width: 70%; margin-left: auto; margin-right: auto;"><a href="http://www.facebook.com">Example link</a><p></p><p></p><table class="re-table"><tbody><tr><td colspan="1" rowspan="1">sss</td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr></tbody></table>`;
+
     const [editorState, setEditorState] = useState(
-        // () => EditorState.createEmpty(decorator)
-        () => EditorState.createWithContent(state, decorator)
+        // () => EditorState.createWithContent(state, decorator)
+        () => createEditorState(sampleMarkup, decorator)
     );
 
     const onChange = useCallback((es: EditorState, callback?: (editorState: EditorState)=>void) => {
@@ -126,13 +124,13 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         }
     }, []);
 
-    const focus = () => {
-        editorRef?.current?.focus();
-    };
-
-    const requestFocus =  useCallback(() => {
+    const [mustBlur, setMustBlur] = useState<boolean>(false);
+    const requestFocus = () => {
+        if (mustBlur) {
+            return;
+        }
         setTimeout(() => editorRef?.current?.focus(), 0);
-    }, []);
+    };
 
     const requestBlur = () => {
         setTimeout(() => editorRef?.current?.blur(), 0);
@@ -267,21 +265,24 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         setEditorState(EditorState.redo(editorState));
     };
 
+    // 是否全屏
+    const [fullScreen, setFullScreen] = useState(false);
+
     return (
         <>
-            <div className={classNames("richEditorRoot", {"richEditorReadOnly": readOnly})} ref={rootRef}>
-                <div className="richEditorControl" onClick={requestFocus}>
+            <div className={classNames("richEditorRoot", {"richEditorReadOnly": readOnly}, {"richEditorFullScreen": fullScreen})} ref={rootRef}>
+                <div className="richEditorControl">
                     <div className="d-flex align-items-center justify-content-left">
-                        <SpanDom onToggle={undo}>
+                        <SpanDom onToggle={undo} title={t('undo')}>
                             <i className="iconfont icon-chexiao fs-5 text-black-75 opacity-75"></i>
                         </SpanDom>
-                        <SpanDom onToggle={redo}>
+                        <SpanDom onToggle={redo} title={t('redo')}>
                             <i className="iconfont icon-zhongzuo fs-5 text-black-75 opacity-75"></i>
                         </SpanDom>
-                        <SpanDom onToggle={handleClearClick}>
+                        <SpanDom onToggle={handleClearClick} title={t('clear')}>
                             <i className="iconfont icon-qingchu fs-4 text-black-75 opacity-75"></i>
                         </SpanDom>
-                        <LinkToolBar onClick={cancePopover} onChange={onChange} editorState={editorState} classNames="me-4" />
+                        <LinkToolBar onClick={cancePopover} onChange={onChange} editorState={editorState} classNames="me-4" requestBlur={requestBlur} requestFocus={requestFocus} />
                         <TextAlignToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState} classNames="me-4" />
                         <InlineStyleDoms 
                             editorState={editorState}
@@ -290,23 +291,35 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                         />
                         <BlockStyleDoms
                             editorState={editorState}
-                            setEditorState={setEditorState}
-                            removeBlockTypes={removeBlockTypes}
+                            onChange={onChange}
+                            requestFocus={requestFocus}
                         />
                         <TextIndentToolBar onChange={onChange} editorState={editorState} />
                         <DividerToolBar setEditorState={setEditorState} editorState={editorState} />
                         <EmojiToolBar onChange={onChange} editorState={editorState} />
-                        <ImageToolBar setEditorState={setEditorState} editorState={editorState} />
+                        <ImageToolBar setEditorState={setEditorState} editorState={editorState} requestBlur={requestBlur} requestFocus={requestFocus} />
                         <TextColortToolbar onChange={onChange} editorState={editorState}/>
                         <TextBgColortToolbar onChange={onChange} editorState={editorState}/>
                         <FontFamilyToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
                         <FontSizeToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
                         <WordSpaceToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
                         <LineHeightToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
-                        <TableToolBar onChange={onChange} editorState={editorState} />
+                        <TableToolBar onChange={onChange} editorState={editorState} requestBlur={requestBlur} requestFocus={requestFocus} />
+                        <PreViewToolBar editorState={editorState} />
+
+                        {fullScreen==false ? (
+                            <SpanDom onToggle={()=>setFullScreen(true)} title={t('fullScreen')}>
+                                <i className="iconfont icon-quanping fs-3 text-black-75"></i>
+                            </SpanDom>
+                        ) : (
+                            <SpanDom onToggle={()=>setFullScreen(false)} title={t('exitFullScreen')}>
+                                <i className="iconfont icon-tuichuquanping fs-3 text-black-75"></i>
+                            </SpanDom>
+                        )}
+                        
                     </div>
                 </div>
-                <div className={classNames([cls, "richEditorContent"])} onClick={focus} ref={refs}>
+                <div className={classNames([cls, "richEditorContent"])} onClick={requestFocus} ref={refs}>
                     <Editor 
                         ref={editorRef}
                         editorState={editorState} 
@@ -337,17 +350,19 @@ RichEditor.displayName = 'RichEditor';
 export default RichEditor;
 
 export interface SpanDomProps {
-    onToggle: (style:string)=>void;
+    onToggle?: (style:string)=>void;
     active?: boolean;
     classNames?: string;
     children: ReactNode;
     style?: string;
     onClick?: ()=>void;
+    title: string;
 }
 const SpanDom = (props: SpanDomProps) => {
+    const overLayRef = useRef(null);
     const onToggle = (e: MouseEvent<HTMLSpanElement>) => {
         e.preventDefault();
-        props.onToggle(props.style??'');
+        props.onToggle && props.onToggle(props.style??'');
         if(props.onClick) {
             props.onClick();
         }
@@ -361,27 +376,30 @@ const SpanDom = (props: SpanDomProps) => {
         }
     }, [props.active]);
 
+    const hidePop = ()=>{
+        // @ts-ignore
+        overLayRef.current && overLayRef.current.hide();
+    }
+
     return (
-        <span className={classNames("cursor-pointer me-4", cls, props.classNames)} onMouseDown={onToggle}>
-            {props.children}
+        <span className={classNames("cursor-pointer me-4", cls, props.classNames)} onMouseDown={(e)=>{onToggle(e); hidePop();}}>
+            <OverLayTriggerComp ref={overLayRef} placement="top" overlay={<small className='p-1'>{props.title}</small>}>
+                {props.children}
+            </OverLayTriggerComp>
         </span>
     );
 };
 
 export interface BlockStyleDomsProps {
     editorState: EditorState;
-    setEditorState: (editorState: EditorState) => void;
-    onToggle?: ()=>void;
-    removeBlockTypes?: (editorState: EditorState)=>EditorState;
+    onChange: Function;
+    onToggle?: Function;
+    requestFocus?: Function;
 }
 const BlockStyleDoms = (props: BlockStyleDomsProps) => {
-    const {editorState, setEditorState} = props;
+    const t = useTranslations('RichEditor');
+    const {editorState, onChange} = props;
     const BLOCK_TYPES = [
-        {label: <i className="iconfont icon-h fs-4"></i>, style: 'header-four'},
-        {label: <i className="iconfont icon-h12 fs-4"></i>, style: 'header-one'},
-        {label: <i className="iconfont icon-h22 fs-4"></i>, style: 'header-two'},
-        {label: <i className="iconfont icon-h32 fs-4"></i>, style: 'header-three'},
-        
         {label: <i className="iconfont icon-quote fs-4"></i>, style: 'blockquote'},
         {label: <i className="iconfont icon-unorderedList fs-4"></i>, style: 'unordered-list-item'},
         {label: <i className="iconfont icon-youxuliebiao fs-4"></i>, style: 'ordered-list-item'},
@@ -394,21 +412,59 @@ const BlockStyleDoms = (props: BlockStyleDomsProps) => {
         .getType();
 
     const toggleBlockType = (blockStyle: string) => {
-        setEditorState(RichUtils.toggleBlockType(
+        onChange(RichUtils.toggleBlockType(
             editorState,
             blockStyle
         ));
         props.onToggle && props.onToggle();
     };
+
+    const popoverCompRef = useRef(null);
+    const BLOCK_H_TITLES = [
+        {label: <i className="iconfont icon-h12 fs-4 opacity-75"></i>, style: 'header-one'},
+        {label: <i className="iconfont icon-h fs-4 opacity-75"></i>, style: 'header-two'},
+        {label: <i className="iconfont icon-h22 fs-4 opacity-75"></i>, style: 'header-three'},
+        {label: <i className="iconfont icon-h32 fs-4 opacity-75"></i>, style: 'header-four'},
+    ];
+    const toggleHTitle = (blockStyle: string) => {
+        onChange(RichUtils.toggleBlockType(editorState, blockStyle));
+        // @ts-ignore
+        popoverCompRef.current && popoverCompRef.current.hide();
+        props.requestFocus && props.requestFocus();
+    };
+    const content = (
+        <div className='richEditorHTitle'>
+           {BLOCK_H_TITLES.map((item) => {
+                return (
+                    <div
+                        key={item.style}
+                        className={classNames('richEditorHTitleItem opacity-75', {'richEditorHTitleItemActive': blockType==item.style})}
+                        onClick={()=>toggleHTitle(item.style)}
+                    >
+                        {item.label}
+                    </div>
+                );
+            })}
+        </div>
+    );
     
     return (
         <>
+            <PopoverComp ref={popoverCompRef} trigger="click" placement="bottom" content={content}>
+                <span className={classNames("cursor-pointer opacity-75 me-4",)} onMouseDown={(e) => e.preventDefault()}>
+                    <OverLayTriggerComp placement="top" overlay={<small className='p-1'>{t('Htitle')}</small>}>
+                        <i className='iconfont icon-zitibiaoti fs-4 opacity-75'></i>
+                    </OverLayTriggerComp>
+                </span>
+            </PopoverComp>
             {BLOCK_TYPES.map((type) =>
                 <SpanDom
                     key={type.style}
                     active={type.style === blockType}
                     onToggle={()=>toggleBlockType(type.style)}
                     style={type.style}
+                    // @ts-ignore
+                    title={t(type.style)}
                 >
                     {type.label}
                 </SpanDom>
@@ -424,6 +480,7 @@ export interface InlineStyleDomsProps {
     removeInlineStyles: (editorState: EditorState, styleName: string)=>EditorState;
 }
 const InlineStyleDoms = (props: InlineStyleDomsProps) => {
+    const t = useTranslations('RichEditor');
     const INLINE_STYLES = [
         {label: <i className="iconfont icon-cuti fs-4"></i>, style: 'BOLD'},
         {label: <i className="iconfont icon-zitixieti fs-4"></i>, style: 'ITALIC'},
@@ -468,6 +525,8 @@ const InlineStyleDoms = (props: InlineStyleDomsProps) => {
                 active={currentStyle.has(type.style)}
                 onToggle={()=>onToggleInlineStyle(type.style)}
                 style={type.style}
+                // @ts-ignore
+                title={t(type.style)}
             >
                 {type.label}
             </SpanDom>

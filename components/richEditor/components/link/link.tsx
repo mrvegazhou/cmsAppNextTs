@@ -18,8 +18,10 @@ import {
     getSelectionEntityData
 } from '../../utils/content';
 import classNames from 'classnames';
-import useSyncState from '@/hooks/useState';
 import useToast from '@/hooks/useToast';
+import { useTranslations } from 'use-intl';
+import OverlayComp from '@/components/overlay/overlay';
+import OverLayTriggerComp from '@/components/overlay/overlayTrigger';
 
 export interface linkToolBarProps {
     onChange: Function;
@@ -27,13 +29,18 @@ export interface linkToolBarProps {
     active?: boolean;
     classNames?: string;
     onClick?: Function;
+    requestBlur: Function;
+    requestFocus: Function;
 }
 const LinkToolBar = (props: linkToolBarProps) => {
-    const linkModalRef = useRef<HTMLDivElement>(null);
 
-    const [hrefVal, setHrefVal] = useSyncState("");
-    const [descVal, setDescVal] = useSyncState("");
-    const [text, setText] = useSyncState("");
+    const t = useTranslations('RichEditor');
+    const overLayRef = useRef(null);
+
+    const [isOpen, setOpen] = useState(false);
+    const [hrefVal, setHrefVal] = useState("");
+    const [descVal, setDescVal] = useState("");
+    const [text, setText] = useState("");
     const textSelected = !isSelectionCollapsed(props.editorState) && getSelectionBlockType(props.editorState) !== 'atomic';
     const { href } = getSelectionEntityData(
         props.editorState,
@@ -45,10 +52,8 @@ const LinkToolBar = (props: linkToolBarProps) => {
 
     // 关闭modal
     function onClickCloseModal() {
-        const current = linkModalRef.current;
-        if (current) {
-            window.bootstrap.Modal.getOrCreateInstance(current).hide();
-        }
+        setOpen(false);
+        props.requestFocus && props.requestFocus();
     }
 
     function handeKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -79,7 +84,7 @@ const LinkToolBar = (props: linkToolBarProps) => {
         if((hrefVal && descVal)==undefined || (hrefVal && descVal)=="") {
             show({
                 type: 'DANGER',
-                message: "请填写完整",
+                message: t('prompt'),
             });
             return;
         }
@@ -107,15 +112,10 @@ const LinkToolBar = (props: linkToolBarProps) => {
         if (!textSelected) {
             return;
         }
-        const current = linkModalRef.current;
-        if (current) {
-            // @ts-ignore
-            window.bootstrap.Modal.getOrCreateInstance(current).show();
-        }
-       
+        setOpen(true);
         setHrefVal("");
         setDescVal("");
-
+        props.requestBlur && props.requestBlur();
     }
     function handleLink(e: ChangeEvent<HTMLInputElement>) {
         e.preventDefault();
@@ -156,55 +156,55 @@ const LinkToolBar = (props: linkToolBarProps) => {
     return (
         <>
             <span onClick={onModalOnClick} className={classNames("cursor-pointer", props.classNames, {"user-select-none opacity-50": !textSelected})} onMouseDown={(e) => e.preventDefault()}>
-                <i className='iconfont icon-charulianjie fs-4 text-black-50'></i>
+                <OverLayTriggerComp ref={overLayRef} placement="top" overlay={<small className='p-1'>{t('link')}</small>}>
+                    <i className='iconfont icon-charulianjie fs-4 text-black-50'></i>
+                </OverLayTriggerComp>
             </span>
             <span className={classNames("cursor-pointer me-4", props.classNames, {"user-select-none opacity-50": !textSelected || !href})} onMouseDown={onUnlink}>
                 <i className='iconfont icon-quxiaolianjie fs-4 text-black-50'></i>
             </span>
-            <div ref={linkModalRef} className="modal fade" id="linkModel" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered" style={{maxWidth:"590px"}}>
-                    <div className="modal-content">
-                        <div className="d-flex flex-row justify-content-end">
-                            <a href="#" onClick={onClickCloseModal} className="close text-dark text-decoration-none px-2" data-dismiss="modal" aria-hidden="true">
-                                <i className='iconfont icon-close fs-4'></i>
-                            </a>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-group row mb-4">
-                                <label className="col-sm-3 col-form-label">文字</label>
-                                <div className="col-sm-8">
-                                    <input className="form-control" type="text" value={text} spellCheck={false} disabled={textSelected}
-                                        name="linkText"
-                                        placeholder='輸入鏈接文字'
-                                        onKeyDown={handeKeyDown}
-                                        onChange={handleLink}
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-group row">
-                                <label className="col-sm-3 col-form-label">链接</label>
-                                <div className="col-sm-8">
-                                    <input spellCheck={false} name="link" value={hrefVal} onKeyDown={handeKeyDown} onChange={handleLink} className="form-control" />
-                                </div>
-                            </div>
-                            <div className="form-group row mt-4">
-                                <label className="col-sm-3 col-form-label">描述</label>
-                                <div className="col-sm-8">
-                                    <input spellCheck={false} name="desc" value={descVal} onChange={handleLink} className="form-control" />
-                                </div>
-                            </div>
-                            <div className='form-row text-center mt-4'>
-                                <button type="button" className="btn btn-outline-primary me-5" onClick={onConfirm} onMouseDown={(e) => e.preventDefault()}>
-                                    确认
-                                </button>
-                                <button type="button" className="btn btn-outline-primary" onClick={onUnlink}>
-                                    移除
-                                </button>
-                            </div>
+
+            <OverlayComp usePortal={false} onClose={()=>{setOpen(false)}} isOpen={isOpen} className='d-flex justify-content-center align-items-center'>
+                <div className="bg-white mt-5 rounded-2" style={{width:"500px", top:"-200px"}}>
+                    <div className="d-flex flex-row justify-content-end">
+                        <a href="#" onClick={onClickCloseModal} className="close text-dark text-decoration-none px-2">
+                            <i className='iconfont icon-close fs-4'></i>
+                        </a>
+                    </div>
+
+                    <div className="form-group row my-3 px-3">
+                        <label className="col-sm-3 col-form-label">{t('linkText')}</label>
+                        <div className="col-sm-8">
+                            <input className="form-control" type="text" value={text} spellCheck={false} disabled={textSelected}
+                                name="linkText"
+                                placeholder={t('linkText')}
+                                onKeyDown={handeKeyDown}
+                                onChange={handleLink}
+                            />
                         </div>
                     </div>
+                    <div className="form-group row px-3">
+                        <label className="col-sm-3 col-form-label">{t('link')}</label>
+                        <div className="col-sm-8">
+                            <input spellCheck={false} name="link" value={hrefVal} onKeyDown={handeKeyDown} onChange={handleLink} className="form-control" />
+                        </div>
+                    </div>
+                    <div className="form-group row mt-3 px-3">
+                        <label className="col-sm-3 col-form-label">{t('linkDesc')}</label>
+                        <div className="col-sm-8">
+                            <input spellCheck={false} name="desc" value={descVal} onChange={handleLink} className="form-control" />
+                        </div>
+                    </div>
+                    <div className='form-row text-center my-4'>
+                        <button type="button" className="btn btn-outline-primary me-5" onClick={onConfirm} onMouseDown={(e) => e.preventDefault()}>
+                            {t('confirm')}
+                        </button>
+                        <button type="button" className="btn btn-outline-primary" onClick={onUnlink}>
+                            {t('linkRmove')}
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </OverlayComp>
         </>
     );
 };
