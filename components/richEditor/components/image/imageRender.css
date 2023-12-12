@@ -1,6 +1,3 @@
-.richEditor-media{
-    position: relative;
-}
 .richEditor-media {
     position: relative;
 }
@@ -56,9 +53,6 @@
 }
 .richEditor-media-toolbar a.active {
     color: #0d6efd;
-}
-.richEditor-media{
-    position: relative;
 }
 .richEditor-image {
     position: relative;

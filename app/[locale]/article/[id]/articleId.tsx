@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React,{ useEffect, useRef, useState } from 'react';
 import { useSetRecoilState } from "recoil";
 import { currentArticleDataContext, articleToolBarContext } from '@/store/articleData';
 import useToast from '@/hooks/useToast';
@@ -14,22 +14,36 @@ import ToolBar from '../toolBar';
 import { IArticle, IArticleToolBarData } from '@/interfaces';
 import Sidebar from '@/app/[locale]/article/sideBar/sideBar';
 
-
+const Child = React.memo(() => {
+    console.log("子组件 re-render，字体颜色改变");
+    const r = Math.ceil(Math.random() * 255);
+    const g = Math.ceil(Math.random() * 255);
+    const b = Math.ceil(Math.random() * 255);
+    return <p style={{ color: 'rgb('+r+','+g+','+b+')' }}>child</p>;
+});
 
 export default function ArticleIdPage({ metadata, articleInfo, toolBarData }: { metadata: TMetadata; articleInfo:IArticle; toolBarData: IArticleToolBarData }) {
-    const setCurrentArticleInfo = useSetRecoilState(currentArticleDataContext);
-    const setArticleToolBarData = useSetRecoilState(articleToolBarContext);
+    // const setCurrentArticleInfo = useSetRecoilState(currentArticleDataContext);
+    // const setArticleToolBarData = useSetRecoilState(articleToolBarContext);
 
-    useEffect(() => {
-        setCurrentArticleInfo(articleInfo);
-        setArticleToolBarData(toolBarData);
-    }, []);
+    // useEffect(() => {
+    //     setCurrentArticleInfo(articleInfo);
+    //     setArticleToolBarData(toolBarData);
+    // }, []);
+    const [count, setCount] = React.useState(0);
 
+    const handleClick = () => {
+      setCount(count + 1);
+    };
+  
     return (
         <>
-          <NavbarPage metadata={metadata} />
-          <ArticleId metadata={metadata} />
-          <FooterPage metadata={metadata} />
+        <button onClick={handleClick}>Increment Count:{count}</button>
+
+          {/* <NavbarPage metadata={metadata} /> */}
+          <div style={{position: 'absolute',width:'50px', height:'50px', backgroundColor:'yellow', top:'100px'}}><Child /></div>
+          {/* <ArticleId metadata={metadata} /> */}
+          {/* <FooterPage metadata={metadata} /> */}
         </>
     );
 }
@@ -65,7 +79,6 @@ const ArticleId = ({ metadata }: { metadata: TMetadata }) => {
                             </button>
                         </div>
                         <div className={classNames(styles.contentBody)} ref={navContent}>
-
 
 <h1>(H1标题)</h1>
 <h2>(H2标题)</h2>

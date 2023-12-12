@@ -17,7 +17,8 @@ import {
     getDefaultKeyBinding,
     KeyBindingUtil,
     DraftHandleValue,
-    SelectionState
+    SelectionState,
+    Modifier
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import { SyntheticKeyboardEvent, MyDraftEditorProps } from './interfaces';
@@ -33,6 +34,7 @@ import FontSizeToolBar from "./components/fontSize/fontSize";
 import WordSpaceToolBar from "./components/wordSpace/wordSpace";
 import LineHeightToolBar from "./components/lineHeight/lineHeight";
 import TableToolBar from "./components/table/table";
+import VideoToolBar from "./components/video/video";
 import PreViewToolBar from "./components/preView/preView";
 import { increaseSelectionIndent } from "./utils/content";
 import { 
@@ -41,7 +43,8 @@ import {
     handleFiles, 
     copyHandlers, 
     cutHandlers,
-    handlePastedText
+    handlePastedText,
+    compositionStartHandler
 } from "./utils/handles";
 import TextAlignToolBar from "./components/textAlign/textAlign";
 import EmojiToolBar from "./components/emoji";
@@ -89,7 +92,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         }
     },[]);
 
-    const sampleMarkup = `<p>sss</p><hr class="hr richEditorHr" style="width: 70%; margin-left: auto; margin-right: auto;"><a href="http://www.facebook.com">Example link</a><p></p><p></p><table class="re-table"><tbody><tr><td colspan="1" rowspan="1">sss</td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr></tbody></table>`;
+    const sampleMarkup = `<p>sss</p><a href="http://www.facebook.com">Example link</a><p></p><p></p><table class="re-table"><tbody><tr><td colspan="1" rowspan="1">sss</td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr><tr><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td><td colspan="1" rowspan="1"></td></tr></tbody></table><p></p>`;
 
     const [editorState, setEditorState] = useState(
         // () => EditorState.createWithContent(state, decorator)
@@ -110,7 +113,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
             callback(es);
         }
     }, [EditorState]);
-    
+
     const [cls, setCls] = useState("richEditorEditor");
     useEffect(() => {
         editorRef?.current?.focus();
@@ -124,11 +127,7 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
         }
     }, []);
 
-    const [mustBlur, setMustBlur] = useState<boolean>(false);
     const requestFocus = () => {
-        if (mustBlur) {
-            return;
-        }
         setTimeout(() => editorRef?.current?.focus(), 0);
     };
 
@@ -268,8 +267,14 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
     // 是否全屏
     const [fullScreen, setFullScreen] = useState(false);
 
+    const handleCompositionStart = () => compositionStartHandler(editorState, onChange);
+    
     return (
         <>
+        {/* <iframe src="//player.bilibili.com/player.html?vid=1nh6kf7lqnda4z3&page=1&high_quality=1&danmaku=0" allowfullscreen="allowfullscreen" width="100%" height="500" scrolling="no" frameborder="0" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"></iframe> */}
+        {/* <iframe src="http://v.qq.com/iframe/player.html?vid=1nh6kf7lqnda4z3&width=500&height=375&auto=0" allowfullscreen="" frameborder="0" height="375" width="500"></iframe> */}
+       
+
             <div className={classNames("richEditorRoot", {"richEditorReadOnly": readOnly}, {"richEditorFullScreen": fullScreen})} ref={rootRef}>
                 <div className="richEditorControl">
                     <div className="d-flex align-items-center justify-content-left">
@@ -297,7 +302,8 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                         <TextIndentToolBar onChange={onChange} editorState={editorState} />
                         <DividerToolBar setEditorState={setEditorState} editorState={editorState} />
                         <EmojiToolBar onChange={onChange} editorState={editorState} />
-                        <ImageToolBar setEditorState={setEditorState} editorState={editorState} requestBlur={requestBlur} requestFocus={requestFocus} />
+                        <ImageToolBar onChange={onChange} editorState={editorState} requestBlur={requestBlur} requestFocus={requestFocus} />
+                        <VideoToolBar onChange={onChange} editorState={editorState} requestBlur={requestBlur} requestFocus={requestFocus} />
                         <TextColortToolbar onChange={onChange} editorState={editorState}/>
                         <TextBgColortToolbar onChange={onChange} editorState={editorState}/>
                         <FontFamilyToolBar requestFocus={requestFocus} onChange={onChange} editorState={editorState}/>
@@ -319,7 +325,9 @@ const RichEditor = forwardRef<Editor | undefined, MyDraftEditorProps>(
                         
                     </div>
                 </div>
-                <div className={classNames([cls, "richEditorContent"])} onClick={requestFocus} ref={refs}>
+                <div className={classNames([cls, "richEditorContent"])} onClick={requestFocus} ref={refs}
+                    onCompositionStart={handleCompositionStart}
+                >
                     <Editor 
                         ref={editorRef}
                         editorState={editorState} 

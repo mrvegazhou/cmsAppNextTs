@@ -103,7 +103,7 @@ export const insertTable = (editorState: EditorState, columns = 3, rows = 3) => 
         isBackward: false
       })
     })
-  
+
     return EditorState.push(editorState, nextContentState as ContentState, 'insert-table' as EditorChangeType) 
 }
 

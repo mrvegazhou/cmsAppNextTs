@@ -44,7 +44,7 @@ type ImageProps = {
     deleteImage?: ()=>void;
 };
 export interface imageToolBarProps {
-    setEditorState: (editorState: EditorState) => void;
+    onChange: Function;
     editorState: EditorState;
     active?: boolean;
     classNames?: string;
@@ -85,7 +85,7 @@ export const ImageToolBar = (props: imageToolBarProps) => {
                 height: imgH
             }
             // @ts-ignore
-            props.setEditorState(insertImage(props.editorState, data));
+            props.onChange(insertImage(props.editorState, data));
         }
     };
 

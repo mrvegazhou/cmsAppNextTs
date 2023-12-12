@@ -200,7 +200,7 @@ const LinkToolBar = (props: linkToolBarProps) => {
                             {t('confirm')}
                         </button>
                         <button type="button" className="btn btn-outline-primary" onClick={onUnlink}>
-                            {t('linkRmove')}
+                            {t('linkRemove')}
                         </button>
                     </div>
                 </div>

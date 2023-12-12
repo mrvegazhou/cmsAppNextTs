@@ -31,7 +31,7 @@ export default async function NotFound({
 
                 <a href="/sections" className="fw-bold text-primary text-decoration-none cursor-pointer" >
                   <div className="border rounded-5 px-4 py-2 d-inline-block">
-                    
+
                   </div>
                 </a>
               </div>

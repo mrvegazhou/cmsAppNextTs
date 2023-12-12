@@ -195,13 +195,15 @@
       "link": "link",
       "linkText": "link text",
       "linkDesc": "link description",
-      "linkRmove": "remove link",
+      "linkRemove": "remove link",
 
       "imageUpload": "upload image",
       "imageUploadErr": "upload error",
       "imageUploadLimit": "Image size is limited to ",
       "imageDesc": "image description",
       "upload": "upload",
+
+      "videoUpload": "upload video",
 
       "undo": "undo",
       "redo": "redo",

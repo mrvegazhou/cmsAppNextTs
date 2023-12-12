@@ -1,0 +1,54 @@
+.iframeLayer {
+    width: 500px;
+    height: 375px;
+    position: absolute;
+    background-color: rgba(211,211,211, 0.9);
+    cursor: pointer;
+    text-align: center;
+}
+.richEditor-video-toolbar {
+    position: absolute;
+    z-index: 3;
+    bottom: 25px;
+    left: 50%;
+    width: auto;
+    background-color: #21242a;
+    opacity: 0.9;
+    border-radius: 2px;
+    font-weight: normal;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+}
+.richEditor-video-toolbar a {
+    display: inline-block;
+    min-width: 40px;
+    height: 40px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'braft-icons' !important;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 40px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.richEditor-video-toolbar a:hover {
+    color: #fff;
+}
+.richEditor-video-toolbar a:first-child {
+    border-radius: 2px 0 0 2px;
+}
+.richEditor-video-toolbar a:last-child {
+    border-radius: 0 2px 2px 0;
+}
+.richEditor-video-toolbar a.active {
+    color: #0d6efd;
+}

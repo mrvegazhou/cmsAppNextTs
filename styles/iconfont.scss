@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4212255 */
-  src: url('//at.alicdn.com/t/c/font_4212255_jtua2rr7hz.woff2?t=1701705578339') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4212255_jtua2rr7hz.woff?t=1701705578339') format('woff'),
-       url('//at.alicdn.com/t/c/font_4212255_jtua2rr7hz.ttf?t=1701705578339') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4212255_ho6wefpv1uo.woff2?t=1702118924257') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4212255_ho6wefpv1uo.woff?t=1702118924257') format('woff'),
+       url('//at.alicdn.com/t/c/font_4212255_ho6wefpv1uo.ttf?t=1702118924257') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-video1:before {
+  content: "\e88e";
+}
+
+.icon-video2:before {
+  content: "\e629";
 }
 
 .icon-tuichuquanping:before {
@@ -127,10 +135,6 @@
 
 .icon-zuoduiqi:before {
   content: "\ec87";
-}
-
-.icon-biaoshilei_shipin:before {
-  content: "\e615";
 }
 
 .icon-ic_image_upload:before {

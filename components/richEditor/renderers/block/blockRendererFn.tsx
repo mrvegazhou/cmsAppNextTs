@@ -2,6 +2,7 @@ import React from 'react';
 import ImageRenderer from '../../components/image/imageRender';
 import DividerBlock from '../../components/divider/divider';
 import { ContentBlock, ContentState, EditorState } from 'draft-js';
+import VideoRenderer from '../../components/video/videoRender';
 
 type OptionsProps = {
     onChange: Function; 
@@ -34,13 +35,13 @@ const BlockRenderFn = (props: BlockRenderFnProps) => {
         const mediaType = entity.getType();
 
         if (mediaType === 'IMAGE') {
-            return <ImageRenderer block={block} forceRender={forceRender} handleReadOnly={handleReadOnly} mediaData={mediaData} containerNode={containerNode!} editorState={editorState} onChange={onChange}/>
+            return  <ImageRenderer block={block} forceRender={forceRender} handleReadOnly={handleReadOnly} mediaData={mediaData} containerNode={containerNode!} editorState={editorState} onChange={onChange}/>
         } else if (mediaType === 'Divider') {
             return <DividerBlock />
         } else if (mediaType === 'AUDIO') {
             // return <Audio {...mediaProps} />;
         } else if (mediaType === 'VIDEO') {
-            // return <Video {...mediaProps} />;
+            return  <VideoRenderer block={block} src={mediaData.src} handleReadOnly={handleReadOnly} containerNode={containerNode!} editorState={editorState} onChange={onChange} />;
         } else if (mediaType === 'EMBED') {
             // return <Embed {...mediaProps} />;
         }

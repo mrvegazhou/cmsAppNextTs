@@ -764,7 +764,7 @@ class TableRenderer extends React.Component<TableRenderProps, TableInfoState> {
           selectedRowIndex: -1,
           selectedColumnIndex: -1
         }, () => {
-          this.props.onChange(insertRow(this.props.editorState, this.tableKey, this.colLength, rowIndex))
+          this.props.onChange(insertRow(this.props.editorState, this.tableKey, this.colLength, rowIndex));
         })
     }
     removeRow = () => {
@@ -783,7 +783,8 @@ class TableRenderer extends React.Component<TableRenderProps, TableInfoState> {
         }
     }
     createRowTools = () => {
-        const { rowToolHandlers, selectedRowIndex } = this.state
+        const { rowToolHandlers, selectedRowIndex } = this.state;
+
         return (
             <div
               data-active={selectedRowIndex >= 0}
@@ -792,6 +793,7 @@ class TableRenderer extends React.Component<TableRenderProps, TableInfoState> {
               onMouseDown={this.handleToolbarMouseDown}
             >
               {rowToolHandlers.map((item, index) => (
+                typeof item!='undefined' &&
                 <div
                   key={index}
                   data-key={item.key}
@@ -855,7 +857,7 @@ class TableRenderer extends React.Component<TableRenderProps, TableInfoState> {
                 >
                     {this.createColGroup()}
                     <tbody>
-                        {this.state.tableRows.map((cells, rowIndex) => (
+                        {tableRows.map((cells, rowIndex) => (
                             <tr ref={ref => this.__rowRefs[rowIndex] = ref} key={rowIndex}>{cells}</tr>
                         ))}
                     </tbody>

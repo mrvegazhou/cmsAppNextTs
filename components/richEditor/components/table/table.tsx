@@ -1,5 +1,5 @@
-import { EditorState } from 'draft-js';
-import React, { useState, useEffect, useRef } from 'react';
+import { EditorState, RichUtils } from 'draft-js';
+import React, { useState, useRef } from 'react';
 import classNames from 'classnames';
 import { useTranslations } from 'use-intl';
 import OverLayTriggerComp from '@/components/overlay/overlayTrigger';
@@ -31,7 +31,7 @@ const TableToolBar = (props: TableToolBarProps) => {
             return;
         }
         if (cellCount.columnCount!=0 && cellCount.rowCount!=0) {
-            props.onChange(insertTable(props.editorState, cellCount.columnCount, cellCount.rowCount));
+            props.onChange(insertTable(props.editorState, cellCount.columnCount, cellCount.rowCount));;
         }
         props.requestFocus && props.requestFocus();
         // @ts-ignore

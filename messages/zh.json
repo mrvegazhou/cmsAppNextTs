@@ -196,13 +196,16 @@
       "link": "链接",
       "linkText": "链接文字",
       "linkDesc": "描述",
-      "linkRmove": "移除",
+      "linkRemove": "移除",
 
       "imageUpload": "上传图片",
       "imageUploadErr": "上传失败",
       "imageUploadLimit": "图片大小限制在",
       "imageDesc": "图片描述",
       "upload": "上传",
+
+      "videoUpload": "上传视频",
+      "videoUrl": "视频链接",
 
       "undo": "撤销",
       "redo": "重做",

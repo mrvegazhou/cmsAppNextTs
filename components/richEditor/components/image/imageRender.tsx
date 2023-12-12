@@ -43,6 +43,7 @@ let initialHeight: number;
 let reSizeType: string;
 let zoom: number;
 const ImageRenderer = (props: ImageRenderProps) => {
+
     const { show } = useToast();
     const imageControls = [
         'float-left',
@@ -555,7 +556,7 @@ const ImageRenderer = (props: ImageRenderProps) => {
                     }}
                 >
                     <div className="d-flex flex-column align-items-center">
-                        <Image ref={imageEleRef} src={src} alt="Alt" width={imgSize.width} height={imgSize.height} />
+                        <Image ref={imageEleRef} src={src} alt="Alt" width={imgSize.width} height={imgSize.height}/>
                         {inputDescVisible ? (
                             <input className="editor-input text-center p-1" 
                                 defaultValue={changeImgDesc} 
@@ -568,7 +569,6 @@ const ImageRenderer = (props: ImageRenderProps) => {
                                         className={classNames("text-left p-1 mt-1 text-black-50")} 
                                         style={{fontSize:"14px"}}>{changeImgDesc ? changeImgDesc : '添加图片注释，不超过100字(可选)'}
                             </figcaption>)}
-                        
                     </div>
                     
                     {toolbarVisible && imageResizable ? (

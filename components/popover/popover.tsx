@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import OverLayTriggerComp, { OverlayTriggerProps } from '../overlay/overlayTrigger';
 import './popover.css';
 
@@ -68,84 +68,53 @@ export function ConfirmComp(props: Confirm) {
 export interface PopoverProps extends OverlayTriggerProps {
   content?: React.ReactNode;
   visibleArrow?: boolean;
-  onClick?: Function;
 }
 
-
-export type PopoverRef = {
-    hide: () => void;
-    show: () => void;
-};
-const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
-    const overLayRef = useRef(null);
-    const {
-        prefixCls = 'w-popover',
-        placement = 'top',
-        usePortal = true,
-        visibleArrow = true,
-        className, 
-        content,
-        ...other
-    } = props;
-
-    const [isOpen, setIsOpen] = useState(!!props.isOpen);
-    
-    useEffect(() => {
-        if (props.isOpen !== isOpen) {
-            setIsOpen(!!props.isOpen);
-        }
-    }, [props.isOpen]);
-
-    React.useImperativeHandle(ref, () => ({
-        // @ts-ignore
-        hide: () => overLayRef.current.hide(),
-        // @ts-ignore
-        show: () => overLayRef.current.show()
-    }));
-
-    const renderArrow = () => {
-        return (
-            <div className={`${prefixCls}-arrow`}>
-                <svg viewBox="0 0 30 30">
-                <path
-                    fillOpacity="0.2"
-                    d="M8.11 6.302c1.015-.936 1.887-2.922 1.887-4.297v26c0-1.378-.868-3.357-1.888-4.297L.925 17.09c-1.237-1.14-1.233-3.034 0-4.17L8.11 6.302z"
-                />
-                <path
-                    fill="#fff"
-                    d="M8.787 7.036c1.22-1.125 2.21-3.376 2.21-5.03V0v30-2.005c0-1.654-.983-3.9-2.21-5.03l-7.183-6.616c-.81-.746-.802-1.96 0-2.7l7.183-6.614z"
-                />
-                </svg>
-            </div>
-        );
-    };
-  
-    const cls = [prefixCls, className, !visibleArrow ? 'no-arrow' : null].filter(Boolean).join(' ').trim();
-
+export default class PopoverComp extends React.Component<PopoverProps> {
+  static Confirm = ConfirmComp;
+  public static defaultProps: PopoverProps = {
+    prefixCls: 'w-popover',
+    placement: 'top',
+    usePortal: true,
+    isOpen: false,
+    visibleArrow: true,
+  };
+  renderArrow = () => {
+    const { prefixCls } = this.props;
     return (
-        <>
-            <OverLayTriggerComp
-                ref={overLayRef}
-                {...other}
-                isOpen={isOpen}
-                placement={placement}
-                overlay={
-                    <div className={cls}>
-                        {visibleArrow && renderArrow()}
-                        <div className={`${prefixCls}-inner`}>{props.content}</div>
-                    </div>
-                }
-            >
-                {typeof props.children === 'object' && (props.children as JSX.Element).type.name !== 'Icon' ? (
-                    props.children
-                ) : (
-                    <span style={{ display: 'block', writingMode: 'vertical-rl' }}>{props.children}</span>
-                )}
-            </OverLayTriggerComp>
-        </>
-        
+      <div className={`${prefixCls}-arrow`}>
+        <svg viewBox="0 0 30 30">
+          <path
+            fillOpacity="0.2"
+            d="M8.11 6.302c1.015-.936 1.887-2.922 1.887-4.297v26c0-1.378-.868-3.357-1.888-4.297L.925 17.09c-1.237-1.14-1.233-3.034 0-4.17L8.11 6.302z"
+          />
+          <path
+            fill="#fff"
+            d="M8.787 7.036c1.22-1.125 2.21-3.376 2.21-5.03V0v30-2.005c0-1.654-.983-3.9-2.21-5.03l-7.183-6.616c-.81-.746-.802-1.96 0-2.7l7.183-6.614z"
+          />
+        </svg>
+      </div>
     );
-});
-
-PopoverComp.displayName = "PopoverComp";
-export default PopoverComp;
+  };
+  render() {
+    const { prefixCls, className, content, visibleArrow, ...other } = this.props;
+    const cls = [prefixCls, className, !visibleArrow ? 'no-arrow' : null].filter(Boolean).join(' ').trim();
+    return (
+      <OverLayTriggerComp
+        {...other}
+        overlay={
+          <div className={cls}>
+            {visibleArrow && this.renderArrow()}
+            <div className={`${prefixCls}-inner`}>{this.props.content}</div>
+          </div>
+        }
+      >
+        {typeof this.props.children === 'object' && (this.props.children as JSX.Element).type.name !== 'Icon' ? (
+          this.props.children
+        ) : (
+          <span style={{ display: 'block', writingMode: 'vertical-rl' }}>{this.props.children}</span>
+        )}
+      </OverLayTriggerComp>
+    );
+  }
+}

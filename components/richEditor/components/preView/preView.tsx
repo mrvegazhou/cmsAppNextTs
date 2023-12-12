@@ -83,8 +83,7 @@ const PreViewToolBar = (props: PreViewToolBarProps) => {
         window.previewWindow.document.write(buildPreviewHtml())
         // @ts-ignore
         window.previewWindow.document.close()
-    
-    }    
+    }
 
     return (
         <span className={classNames("cursor-pointer me-4", props.classNames)} onClick={preview} onMouseDown={(e) => e.preventDefault()}>

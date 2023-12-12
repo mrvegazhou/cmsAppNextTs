@@ -19,7 +19,7 @@ import {
     increaseSelectionIndent, 
     decreaseSelectionIndent, 
     insertText,
-    getSelectionEntityData
+    getSelectedBlocks
 } from './content';
 import { handleNewLine } from './keyPress';
 import { UploadImage } from '../components/image/image';
@@ -233,4 +233,22 @@ export const handlePastedText = (
         return "not-handled";
     }
     return "not-handled";
-  };
+};
+
+export const compositionStartHandler = (editorState: EditorState, onChange: Function) => {
+
+    const selectedBlocks = getSelectedBlocks(editorState);
+
+    if (selectedBlocks && selectedBlocks.length > 1) {
+      const nextEditorState = EditorState.push(
+        editorState,
+        Modifier.removeRange(
+          editorState.getCurrentContent(),
+          editorState.getSelection(),
+          'backward',
+        ),
+        'remove-range',
+      );
+      onChange(nextEditorState);
+    }
+};

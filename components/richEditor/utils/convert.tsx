@@ -502,7 +502,6 @@ const convertHTMLToEditorState = (HTMLString: string, editorDecorators: any, opt
     console.warn(error)
     return EditorState.createEmpty(editorDecorators)
   }
-
 }
 // 引入此方法 把html转为state
 export const createEditorState = (content: any, options = {}) => {
