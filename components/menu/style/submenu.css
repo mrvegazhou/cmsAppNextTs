@@ -1,0 +1,46 @@
+.w-menu-subitem .w-menu-subitem-collapse {
+    height: 0;
+}
+
+.w-menu-subitem-collapse {
+    transition: height 300ms;
+    position: relative !important;
+    top: initial !important;
+    left: initial !important;
+    right: initial !important;
+    bottom: initial !important;
+    width: auto !important;
+    overflow: hidden !important;
+}
+
+.w-menu-subitem-collapse ul {
+    min-width: 100%;
+    padding-right: 0px !important;
+}
+
+.w-menu-subitem-collapse-icon {
+    transform: scale(0.79);
+}
+
+.w-menu-subitem-popup {
+    min-width: 180px;
+}
+
+.w-menu-subitem-title.w-menu-subitem-collapse-title .w-close,
+.w-menu-subitem-title.w-menu-subitem-collapse-title .w-open {
+    transition: rotate 0.3s all;
+}
+
+.w-menu-subitem-title.w-menu-subitem-collapse-title .w-close {
+    transform: scale(0.79) rotate(90deg);
+}
+
+.w-menu-subitem-title.w-menu-subitem-collapse-title .w-open {
+    transform: scale(0.79) rotate(-90deg);
+}
+
+.w-menu-subitem-enter,
+.w-menu-subitem-enter-done,
+.w-menu-subitem-exit {
+    display: inherit;
+}

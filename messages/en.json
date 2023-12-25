@@ -200,7 +200,7 @@
       "imageUpload": "upload image",
       "imageUploadErr": "upload error",
       "imageUploadLimit": "Image size is limited to ",
-      "imageDesc": "image description",
+      "imageAltText": "image alt description",
       "upload": "upload",
 
       "undo": "undo",

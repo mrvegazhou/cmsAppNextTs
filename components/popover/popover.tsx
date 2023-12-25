@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import OverLayTriggerComp, { OverlayTriggerProps } from '../overlay/overlayTrigger';
+import OverLayTriggerComp, { OverlayTriggerProps } from '../overlayTrigger';
 import './popover.css';
 
 interface Confirm {

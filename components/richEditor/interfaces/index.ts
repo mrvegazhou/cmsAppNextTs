@@ -15,7 +15,7 @@ export type DraftEditorType = Editor;
 export interface MyDraftEditorProps extends Partial<DraftEditorType> {
     classNames?: string;
     style?: React.CSSProperties;
-    id: string;
+    id?: string;
     height?: string;
     content?: string;
     customStyleFn?: ((style: DraftInlineStyle, block: ContentBlock, output:{}) => React.CSSProperties) | undefined;

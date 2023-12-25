@@ -1,0 +1,314 @@
+.editor-shell {
+    margin: 20px auto;
+    // border-radius: 2px;
+    color: #000;
+    position: relative;
+    line-height: 1.7;
+    font-weight: 400;
+
+    .toolbar {
+        display: flex;
+        margin-bottom: 1px;
+        // background: #fff;
+        padding: 4px;
+        vertical-align: middle;
+        overflow: auto;
+        height: 36px;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+
+        .icon-font {
+            display: flex;
+            line-height: 20px;
+            vertical-align: middle;
+            font-size: 14px;
+            color: #212529;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            height: 20px;
+            text-align: left;
+            cursor: pointer;
+
+            .active {
+                background-color: rgba(223, 232, 250, 0.3);
+            }
+        }
+
+        .disabled {
+            pointer-events: none !important;
+            cursor: not-allowed !important;
+        }
+
+        .icon-font>* {
+            margin-right: 4px;
+        }
+    }
+
+    .editor-container {
+        width: 1100px;
+        background: #fff;
+        position: relative;
+        display: block;
+
+        // 表格内单元格操作按钮
+        .table-cell-action-button-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            will-change: transform;
+            cursor: pointer;
+        }
+    }
+
+    .editor-image {
+        .image-caption-container {
+            display: block;
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            padding: 0;
+            margin: 0;
+            border-top: 1px solid #fff;
+            background-color: rgba(255, 255, 255, 0.9);
+            min-width: 100px;
+            color: #000;
+            overflow: hidden;
+        }
+        .image-edit-button {
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            background-size: 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 35px;
+            height: 35px;
+            vertical-align: -0.25em;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .image-caption-button {
+            display: block;
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            width: 30%;
+            padding: 10px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            min-width: 100px;
+            color: #fff;
+            cursor: pointer;
+            user-select: none;
+        }
+        img {
+            max-width: 100%;
+            cursor: default;
+        }
+        img.focused.draggable:active {
+            cursor: grabbing;
+        }
+        img.focused.draggable {
+            cursor: grab;
+        }
+        img.focused {
+            outline: 2px solid rgb(60, 132, 244);
+            user-select: none;
+        }
+        // imageResizer样式
+        .image-caption-button:hover {
+            background-color: rgba(60, 132, 244, 0.5);
+        }
+        .image-edit-button:hover {
+            background-color: rgba(60, 132, 244, 0.1);
+        }
+        .image-resizer {
+            display: block;
+            width: 7px;
+            height: 7px;
+            position: absolute;
+            background-color: rgb(60, 132, 244);
+            border: 1px solid #fff;
+            .image-resizer-n {
+                top: -6px;
+                left: 48%;
+                cursor: n-resize;
+            }
+            &.image-resizer-ne {
+                top: -6px;
+                right: -6px;
+                cursor: ne-resize;
+            }
+            &.image-resizer-e {
+                bottom: 48%;
+                right: -6px;
+                cursor: e-resize;
+            }
+            &.image-resizer-se {
+                bottom: -2px;
+                right: -6px;
+                cursor: nwse-resize;
+            }
+            &.image-resizer-s {
+                bottom: -2px;
+                left: 48%;
+                cursor: s-resize;
+            }
+            &.image-resizer-sw {
+                bottom: -2px;
+                left: -6px;
+                cursor: sw-resize;
+            }
+            &.image-resizer-w {
+                bottom: 48%;
+                left: -6px;
+                cursor: w-resize;
+            }
+            &.image-resizer-nw {
+                top: -6px;
+                left: -6px;
+                cursor: nw-resize;
+            }
+        }
+    }
+    .inline-editor-image {
+        &.position-full {
+            margin: 1em 0 1em 0;
+        }
+        &.position-left {
+            float: left;
+            width: 50%;
+            margin: 1em 1em 0 0;
+        }
+        &.position-right {
+            float: right;
+            width: 50%;
+            margin: 1em 0 0 1em;
+        }
+        .image-caption-container {
+            display: block;
+            background-color: #f4f4f4;
+            min-width: 100%;
+            color: #000;
+            overflow: hidden;
+        }
+        img {
+            max-width: 100%;
+            cursor: default;
+        }
+        img.focused {
+            outline: 2px solid rgb(60, 132, 244);
+        }
+        img.focused.draggable {
+            cursor: grab;
+        }
+        img.focused.draggable:active {
+            cursor: grabbing;
+        }
+        .image-edit-button {
+            display: block;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 8px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            min-width: 60px;
+            color: #fff;
+            cursor: pointer;
+            user-select: none;
+        }
+        .image-edit-button:hover {
+            background-color: rgba(60, 132, 244, 0.5);
+        }         
+    }
+
+    span {
+        &.inline-editor-image {
+            cursor: default;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+        &.editor-image {
+            cursor: default;
+            display: inline-block;
+            position: relative;
+            user-select: none;
+        }
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .icon-font-name {
+      display: none !important;
+    }
+}
+
+.richEditorImageUploader {
+    input[type='text']::placeholder {
+        opacity: 0.6;
+        color: #6c757d !important;
+    }
+    .imagesWrapper {
+        display: flex;
+        max-width: 100%;
+        padding: 0 15px;
+        justify-content: center;
+        align-items: center;
+    }
+    .imageBox {
+        position: relative;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+    .uploadImage {
+        box-sizing: border-box;
+        min-width: 0px;
+        line-height: 32px;
+        font-size: 12px;
+        color: rgb(132, 147, 165);
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        vertical-align: top;
+        display: inline-flex;
+        cursor: pointer;
+        border-radius: 8px;
+        width: 104px;
+        height: 104px;
+        border: 1px dashed rgb(211, 211, 211);
+        margin: 0px;
+        background: transparent;
+    }
+    .uploadImageBlock {
+        width: 80%;
+        padding-bottom: 5px;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .draggable {
+        border: dashed 2px #0d6efd;
+        border-radius: 5px;
+    }
+}
+
+// 表格菜单
+.richEditorDropdown {
+    z-index: 100;
+    display: block;
+    position: fixed;
+    min-height: 40px;
+}

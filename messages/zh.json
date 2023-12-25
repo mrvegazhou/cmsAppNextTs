@@ -201,7 +201,7 @@
       "imageUpload": "上传图片",
       "imageUploadErr": "上传失败",
       "imageUploadLimit": "图片大小限制在",
-      "imageDesc": "图片描述",
+      "imageAltText": "图片Alt描述",
       "upload": "上传",
 
       "undo": "撤销",
