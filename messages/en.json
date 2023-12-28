@@ -110,12 +110,13 @@
       "saveDraftsErr": "Please fill in the title, article content, and label",
       "wordsCount": "Number of words",
       "linesCount": "Number of lines",
-      "backToTop": "Back to top",
+      "backToEditor": "Back to top",
       "publishSetting": "Publish setting",
       "saveArticle": "Submit",
       "savedStatus": "Successfully saved",
       "savingStatus": "Saving...",
-      "switchEditor": "Switch Editor"
+      "switchEditor": "Switch Editor",
+      "clearEditor": "Clear Editor"
     },
     "LoginPage": {
       "logInNow": "Login in now",

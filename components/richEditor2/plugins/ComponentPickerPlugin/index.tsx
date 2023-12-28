@@ -139,8 +139,8 @@ type ShowModal = ReturnType<typeof useModal>[1];
 // 命令弹出菜单层
 function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
   return [
-    new ComponentPickerOption('Paragraph', {
-      icon: <i className="icon paragraph" />,
+    new ComponentPickerOption('段落', {
+      icon: <i className="icon iconfont opacity-75 icon-duanla" />,
       keywords: ['normal', 'paragraph', 'p', 'text'],
       onSelect: () =>
         editor.update(() => {
@@ -152,8 +152,8 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
     }),
     ...([1, 2, 3] as const).map(
       (n) =>
-        new ComponentPickerOption(`Heading ${n}`, {
-          icon: <i className={`icon h${n}`} />,
+        new ComponentPickerOption(`标题 ${n}`, {
+          icon: <i className='icon iconfont icon-title opacity-75'/>,
           keywords: ['heading', 'header', `h${n}`],
           onSelect: () =>
             editor.update(() => {
@@ -165,8 +165,8 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
         }),
     ),
 
-    new ComponentPickerOption('Image', {
-      icon: <i className="icon image" />,
+    new ComponentPickerOption('图片', {
+      icon: <i className="icon iconfont icon-ic_image_upload opacity-75" />,
       keywords: ['image', 'photo', 'picture', 'file'],
       onSelect: () => 
         showModal('Insert Image', (onClose) => (
@@ -174,26 +174,26 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
         )),
     }),
     
-    new ComponentPickerOption('Numbered List', {
-      icon: <i className="icon number" />,
+    new ComponentPickerOption('有序列表', {
+      icon: <i className="icon iconfont icon-youxuliebiao opacity-75" />,
       keywords: ['numbered list', 'ordered list', 'ol'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
     }),
-    new ComponentPickerOption('Bulleted List', {
-      icon: <i className="icon bullet" />,
+    new ComponentPickerOption('无序列表', {
+      icon: <i className="icon iconfont opacity-75 icon-unorderedList" />,
       keywords: ['bulleted list', 'unordered list', 'ul'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
     }),
-    new ComponentPickerOption('Check List', {
-      icon: <i className="icon check" />,
+    new ComponentPickerOption('清单', {
+      icon: <i className="icon iconfont opacity-75 icon-textedit_check_list" />,
       keywords: ['check list', 'todo list'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
     }),
-    new ComponentPickerOption('Quote', {
-      icon: <i className="icon quote" />,
+    new ComponentPickerOption('引用', {
+      icon: <i className="icon iconfont opacity-75 icon-quote" />,
       keywords: ['block quote'],
       onSelect: () =>
         editor.update(() => {
@@ -203,8 +203,8 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
           }
         }),
     }),
-    new ComponentPickerOption('Code', {
-      icon: <i className="icon code" />,
+    new ComponentPickerOption('代码块', {
+      icon: <i className="icon iconfont opacity-75 icon-code1" />,
       keywords: ['javascript', 'python', 'js', 'codeblock'],
       onSelect: () =>
         editor.update(() => {
@@ -223,20 +223,36 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
           }
         }),
     }),
-    new ComponentPickerOption('Divider', {
-      icon: <i className="icon horizontal-rule" />,
+    new ComponentPickerOption('分割线', {
+      icon: <i className="icon iconfont opacity-75 icon-henggang" />,
       keywords: ['horizontal rule', 'divider', 'hr'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined),
     }),
     ...(['left', 'center', 'right', 'justify'] as const).map(
       (alignment) =>
-        new ComponentPickerOption(`Align ${alignment}`, {
-          icon: <i className={`icon ${alignment}-align`} />,
-          keywords: ['align', 'justify', alignment],
-          onSelect: () =>
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, alignment),
-        }),
+        {
+          let label = '', icon = '';
+          if ( alignment=='left' ) {
+            label = '左对齐';
+            icon = 'icon-zuoduiqi';
+          } else if ( alignment=='center' ) {
+            label = '居中对齐';
+            icon = 'icon-juzhongduiqi';
+          } else if ( alignment=='right' ) {
+            label = '右对齐';
+            icon = 'icon-youduiqi';
+          } else {
+            label = '两边对齐';
+            icon = 'icon-zuoyouduiqi';
+          }
+          return new ComponentPickerOption(label, {
+            icon: <i className={`icon iconfont opacity-75 ${icon}`} />,
+            keywords: ['align', 'justify', alignment],
+            onSelect: () =>
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, alignment),
+          })
+        }
     ),
   ];
 }
@@ -301,7 +317,7 @@ export default function ComponentPickerMenuPlugin(): JSX.Element {
         ) =>
           anchorElementRef.current && options.length
             ? ReactDOM.createPortal(
-                <div className="typeahead-popover component-picker-menu">
+                <div className="typeahead-popover">
                   <ul>
                     {options.map((option, i: number) => (
                       <ComponentPickerMenuItem

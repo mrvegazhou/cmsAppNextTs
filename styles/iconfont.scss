@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4212255 */
-  src: url('//at.alicdn.com/t/c/font_4212255_p6x08e817z.woff2?t=1703408514977') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4212255_p6x08e817z.woff?t=1703408514977') format('woff'),
-       url('//at.alicdn.com/t/c/font_4212255_p6x08e817z.ttf?t=1703408514977') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4212255_yqxstog1hjh.woff2?t=1703687762327') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4212255_yqxstog1hjh.woff?t=1703687762327') format('woff'),
+       url('//at.alicdn.com/t/c/font_4212255_yqxstog1hjh.ttf?t=1703687762327') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-duanla:before {
+  content: "\e851";
+}
+
+.icon-textedit_check_list:before {
+  content: "\e838";
+}
+
+.icon-title:before {
+  content: "\e61d";
+}
+
+.icon-redo:before {
+  content: "\e7c4";
+}
+
+.icon-undo1:before {
+  content: "\e7c6";
 }
 
 .icon-columns:before {
@@ -215,14 +235,6 @@
 
 .icon-henggang:before {
   content: "\e628";
-}
-
-.icon-chexiao:before {
-  content: "\e602";
-}
-
-.icon-zhongzuo:before {
-  content: "\e603";
 }
 
 .icon-qingchu:before {

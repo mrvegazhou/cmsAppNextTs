@@ -13,7 +13,7 @@ export const DEFAULT_SETTINGS = {
   isCharLimit: false,
   isCharLimitUtf8: false,
   isCollab: false,
-  isMaxLength: false,
+  isMaxLength: true,
   isRichText: true,
   measureTypingPerf: false,
   shouldUseLexicalContextMenu: false,

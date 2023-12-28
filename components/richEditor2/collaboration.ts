@@ -10,7 +10,7 @@ import {Provider} from '@lexical/yjs';
 import {WebsocketProvider} from 'y-websocket';
 import {Doc} from 'yjs';
 
-const url = new URL(window.location.href);
+const url = new URL('http://localhost');
 const params = new URLSearchParams(url.search);
 const WEBSOCKET_ENDPOINT =
   params.get('collabEndpoint') || 'ws://localhost:1234';

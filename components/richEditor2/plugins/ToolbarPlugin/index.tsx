@@ -22,7 +22,6 @@ import {
   ListNode,
   REMOVE_LIST_COMMAND,
 } from '@lexical/list';
-import {INSERT_EMBED_COMMAND} from '@lexical/react/LexicalAutoEmbedPlugin';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$isDecoratorBlockNode} from '@lexical/react/LexicalDecoratorBlockNode';
 import {INSERT_HORIZONTAL_RULE_COMMAND} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -49,7 +48,6 @@ import {
 import {
   $createParagraphNode,
   $getNodeByKey,
-  $getRoot,
   $getSelection,
   $INTERNAL_isPointSelection,
   $isElementNode,
@@ -101,11 +99,11 @@ function Divider(): JSX.Element {
 }
 
 function ToolIcon({title='', disabled=false, label, iconName, click, active}: 
-  { disabled: boolean; 
+  { disabled?: boolean; 
     label: string; 
     iconName: string; 
     click: Function; 
-    active: boolean;
+    active?: boolean;
     title: string;
   }): JSX.Element {
   return (
@@ -182,35 +180,35 @@ const ELEMENT_FORMAT_OPTIONS: {
   };
 } = {
   center: {
-    icon: 'center-align',
-    iconRTL: 'center-align',
-    name: 'Center Align',
-  },
-  end: {
-    icon: 'right-align',
-    iconRTL: 'left-align',
-    name: 'End Align',
-  },
-  justify: {
-    icon: 'justify-align',
-    iconRTL: 'justify-align',
-    name: 'Justify Align',
-  },
-  left: {
-    icon: 'left-align',
-    iconRTL: 'left-align',
-    name: 'Left Align',
-  },
-  right: {
-    icon: 'right-align',
-    iconRTL: 'left-align',
-    name: 'Right Align',
+    icon: 'icon-juzhongduiqi',
+    iconRTL: 'icon-juzhongduiqi',
+    name: '中心对齐',
   },
   start: {
-    icon: 'left-align',
-    iconRTL: 'right-align',
-    name: 'Start Align',
+    icon: 'icon-zuoduiqi',
+    iconRTL: 'icon-zuoduiqi',
+    name: '开始对齐',
   },
+  end: {
+    icon: 'icon-zuoduiqi',
+    iconRTL: 'icon-zuoduiqi',
+    name: '尾部对齐',
+  },
+  justify: {
+    icon: 'icon-zuoyouduiqi',
+    iconRTL: 'icon-zuoyouduiqi',
+    name: '两端对齐',
+  },
+  left: {
+    icon: 'icon-zuoduiqi',
+    iconRTL: 'icon-zuoduiqi',
+    name: '左对齐',
+  },
+  right: {
+    icon: 'icon-zuoduiqi',
+    iconRTL: 'icon-zuoduiqi',
+    name: '右对齐',
+  }
 };
 
 function BlockFormatDropDown({
@@ -439,7 +437,6 @@ function BlockFormatDropDown({
     >
       <div className='icon-font'>{iconTitle()}</div>
     </Dropdown>
-
   );
 }
 
@@ -518,94 +515,53 @@ function ElementFormatDropdown({
   disabled: boolean;
 }) {
   const formatOption = ELEMENT_FORMAT_OPTIONS[value || 'left'];
-
+  const [open, setOpen] = React.useState(false);
   return (
-    <DropDown
-      disabled={disabled}
-      buttonLabel={formatOption.name}
-      buttonIconClassName={`icon ${
-        isRTL ? formatOption.iconRTL : formatOption.icon
-      }`}
-      buttonClassName="toolbar-item spaced alignment"
-      buttonAriaLabel="Formatting options for text alignment">
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
-        }}
-        className="item">
-        <i className="icon left-align" />
-        <span className="text">Left Align</span>
-      </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center');
-        }}
-        className="item">
-        <i className="icon center-align" />
-        <span className="text">Center Align</span>
-      </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
-        }}
-        className="item">
-        <i className="icon right-align" />
-        <span className="text">Right Align</span>
-      </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify');
-        }}
-        className="item">
-        <i className="icon justify-align" />
-        <span className="text">Justify Align</span>
-      </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'start');
-        }}
-        className="item">
-        <i
-          className={`icon ${
-            isRTL
-              ? ELEMENT_FORMAT_OPTIONS.start.iconRTL
-              : ELEMENT_FORMAT_OPTIONS.start.icon
-          }`}
-        />
-        <span className="text">Start Align</span>
-      </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'end');
-        }}
-        className="item">
-        <i
-          className={`icon ${
-            isRTL
-              ? ELEMENT_FORMAT_OPTIONS.end.iconRTL
-              : ELEMENT_FORMAT_OPTIONS.end.icon
-          }`}
-        />
-        <span className="text">End Align</span>
-      </DropDownItem>
-      <Divider />
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined);
-        }}
-        className="item">
-        <i className={'icon ' + (isRTL ? 'indent' : 'outdent')} />
-        <span className="text">Outdent</span>
-      </DropDownItem>
-      <DropDownItem
-        onClick={() => {
-          editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
-        }}
-        className="item">
-        <i className={'icon ' + (isRTL ? 'outdent' : 'indent')} />
-        <span className="text">Indent</span>
-      </DropDownItem>
-    </DropDown>
+    <Dropdown
+        disabled={disabled}
+        trigger="click"
+        onVisibleChange={(isOpen) => setOpen(isOpen)}
+        isOpen={open}
+        menu={
+          <div>
+            <Menu bordered style={{ minWidth: 120 }}>
+              {Object.keys(ELEMENT_FORMAT_OPTIONS).map((item, idx) => {
+                  let icon = ELEMENT_FORMAT_OPTIONS.start.icon;
+                  if (item=='start' || item=='end') {
+                    icon = isRTL ? ELEMENT_FORMAT_OPTIONS.start.iconRTL : ELEMENT_FORMAT_OPTIONS.start.icon
+                  }
+                  return (
+                    <Menu.Item
+                      key={item}
+                      // @ts-ignore
+                      text={ELEMENT_FORMAT_OPTIONS[item].name}
+                      iconClass={icon}
+                      // @ts-ignore
+                      onClick={() => {editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, item.toLowerCase()); setOpen(false);}}
+                    />
+                  );
+              })}
+              <Menu.Divider />
+              <Menu.Item
+                  text='减少缩进'
+                  iconClass={isRTL ? 'icon-formatindentdecrease' : 'icon-format-indent-increase'}
+                  onClick={() => {editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined); setOpen(false);}}
+              />
+              <Menu.Item
+                  text='缩进'
+                  iconClass={isRTL ? 'icon-format-indent-increase' : 'icon-formatindentdecrease'}
+                  onClick={() => {editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined); setOpen(false);}}
+              />
+            </Menu>
+          </div>
+        }
+      >
+        <div className='icon-font'>
+          <i className={`iconfont fs-5 ${isRTL ? formatOption.iconRTL : formatOption.icon}`}></i>
+          <span>{formatOption.name}</span>
+          <i className={classNames('iconfont', {'icon-xiangxia': !open}, {'icon-xiangshang': open})}></i>
+        </div>
+    </Dropdown>
   );
 }
 
@@ -687,6 +643,7 @@ export default function ToolbarPlugin({
       setIsSubscript(selection.hasFormat('subscript'));
       setIsSuperscript(selection.hasFormat('superscript'));
       setIsCode(selection.hasFormat('code'));
+      
       setIsRTL($isParentElementRTL(selection));
 
       // Update links
@@ -926,9 +883,6 @@ export default function ToolbarPlugin({
     },
     [activeEditor, selectedElementKey],
   );
-  // const insertGifOnClick = (payload: InsertImagePayload) => {
-  //   activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, payload);
-  // };
 
   // 编程语言列表
   const [openCodeLan, setOpenCodeLan] = React.useState<boolean>();
@@ -960,7 +914,7 @@ export default function ToolbarPlugin({
       >
         <div className='icon-font'>
           <i className='iconfont icon-code fs-5'></i>
-          <span>{codeLanguage}</span>
+          <span>{getLanguageFriendlyName(codeLanguage)}</span>
           <i className={classNames('iconfont', {'icon-xiangxia': !openCodeLan}, {'icon-xiangshang': openCodeLan})}></i>
         </div>
       </Dropdown>
@@ -986,19 +940,18 @@ export default function ToolbarPlugin({
                   onClick={() => {activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough'); setOtherOpen(false);}}
               />
               <Menu.Item
-                  active={isStrikethrough}
+                  active={isSubscript}
                   text='下标'
                   iconClass='icon-subscript2'
                   onClick={() => {activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript'); setOtherOpen(false);}}
               />
               <Menu.Item
-                  active={isStrikethrough}
+                  active={isSuperscript}
                   text='上标'
                   iconClass='icon-superscript2'
                   onClick={() => {activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript'); setOtherOpen(false);}}
               />
               <Menu.Item
-                  active={isStrikethrough}
                   text='清除格式'
                   iconClass='icon-qingchu'
                   onClick={() => {clearFormatting(); setOtherOpen(false);}}
@@ -1097,7 +1050,25 @@ export default function ToolbarPlugin({
   }, []);
 
   return (
+    <>
     <div className="toolbar">
+      <div className='overflow-x-auto d-inline-flex flex-nowrap flex-row align-content-center align-items-center'>
+      <ToolIcon 
+            click={() => {activeEditor.dispatchCommand(UNDO_COMMAND, undefined);}}
+            iconName='icon-undo1'
+            label='撤销'
+            title={IS_APPLE ? '撤销 (⌘Z)' : '撤销 (Ctrl+Z)'}
+            disabled={!canUndo || !isEditable}
+      />
+      <Divider />
+      <ToolIcon 
+            click={() => {activeEditor.dispatchCommand(REDO_COMMAND, undefined);}}
+            iconName='icon-redo'
+            label='重做'
+            title={IS_APPLE ? '重做 (⌘Y)' : '重做 (Ctrl+Y)'}
+            disabled={!canRedo || !isEditable}
+      />
+      <Divider />
       {blockType in blockTypeToBlockName && activeEditor === editor && (
             <>
               <BlockFormatDropDown
@@ -1109,7 +1080,14 @@ export default function ToolbarPlugin({
               <Divider />
             </>
       )}
-      
+      {/* 布局 */}
+      <ElementFormatDropdown
+        disabled={!isEditable}
+        value={elementFormat}
+        editor={editor}
+        isRTL={isRTL}
+      />
+      <Divider />
       {/* 编程语言列表 */}
       {blockType === 'code' ? (
         <>
@@ -1146,7 +1124,7 @@ export default function ToolbarPlugin({
           <ToolIcon 
             click={() => {activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');}}
             iconName='icon-bold4'
-            active={isCode}
+            active={isBold}
             label='加粗'
             title={IS_APPLE ? '加粗 (⌘B)' : '加粗 (Ctrl+B)'}
             disabled={!isEditable}
@@ -1204,13 +1182,12 @@ export default function ToolbarPlugin({
           <Divider />
           {/* 插入图片等 */}
           <InsertList />
-          <Divider />
-          {/* 列布局 */}
-
-          {/*  弹出框  */}
-          {modal}
         </>
       )}
+      </div>
+      {/* 弹出框 */}
+      {modal}
     </div>
+    </>
   );
 }

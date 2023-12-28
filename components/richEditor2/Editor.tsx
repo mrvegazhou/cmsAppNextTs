@@ -1,25 +1,17 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
 import {AutoFocusPlugin} from '@lexical/react/LexicalAutoFocusPlugin';
-import {CharacterLimitPlugin} from '@lexical/react/LexicalCharacterLimitPlugin';
 import {CheckListPlugin} from '@lexical/react/LexicalCheckListPlugin';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
-import LexicalClickableLinkPlugin from '@lexical/react/LexicalClickableLinkPlugin';
 import {CollaborationPlugin} from '@lexical/react/LexicalCollaborationPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
-import {HashtagPlugin} from '@lexical/react/LexicalHashtagPlugin';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
-
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {createDOMRange} from '@lexical/selection';
+import {$getSelection} from 'lexical';
 import useLexicalEditable from '@lexical/react/useLexicalEditable';
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, forwardRef} from 'react';
+
 import {CAN_USE_DOM} from './shared/canUseDOM';
 
 import {useSettings} from './context/SettingsContext';
@@ -42,32 +34,31 @@ import InlineImagePlugin from './plugins/InlineImagePlugin';
 import LinkPlugin from './plugins/LinkPlugin';
 import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin';
 import ListMaxIndentLevelPlugin from './plugins/ListMaxIndentLevelPlugin';
-// import MarkdownShortcutPlugin from './plugins/MarkdownShortcutPlugin';
+import MarkdownShortcutPlugin from './plugins/MarkdownShortcutPlugin';
 import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
 import TableCellResizer from './plugins/TableCellResizer';
 import TableCellActionMenuPlugin from './plugins/TableActionMenuPlugin';
 import TableOfContentsPlugin from './plugins/TableOfContentsPlugin';
-import CommentPlugin from './plugins/CommentPlugin';
 import {LayoutPlugin} from './plugins/LayoutPlugin/LayoutPlugin';
 import VideoIframePlugin from './plugins/VideoIframePlugin';
+import FloatingTextFormatToolbarPlugin from './plugins/FloatingTextFormatToolbarPlugin';
+import ActionTool from './actionTool';
+import MentionsPlugin from './plugins/MentionsPlugin';
+
 // ui
 import Placeholder from './ui/Placeholder';
 import ContentEditable from './ui/ContentEditable';
 
-// const skipCollaborationInit =
-//   // @ts-expect-error
-//   window.parent != null && window.parent.frames.right === window;
-
-export default function Editor(): JSX.Element {
+const Editor = forwardRef((prop, ref): JSX.Element => {
   const {historyState} = useSharedHistoryContext();
   const {
     settings: {
       isCollab,
+      isRichText,
       isAutocomplete,
       isMaxLength,
       isCharLimit,
       isCharLimitUtf8,
-      showTreeView,
       showTableOfContents,
       shouldUseLexicalContextMenu,
       tableCellMerge,
@@ -76,12 +67,11 @@ export default function Editor(): JSX.Element {
   } = useSettings();
   const isEditable = useLexicalEditable();
   
-  const text = 'Enter some rich text...';
+  const text = "输入文本内容或键入'/'命令操作";
   const placeholder = <Placeholder>{text}</Placeholder>;
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
-  const [isSmallWidthViewport, setIsSmallWidthViewport] =
-    useState<boolean>(false);
+  const [isSmallWidthViewport, setIsSmallWidthViewport] = useState<boolean>(false);
   const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false);
 
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -105,15 +95,59 @@ export default function Editor(): JSX.Element {
     };
   }, [isSmallWidthViewport]);
 
+  const contentRef = React.useRef(null);
+  const [editor] = useLexicalComposerContext();
+  // 光标到达底部的时候滚动条自动下移
+  useEffect(() => {
+    let contentObj = contentRef.current;
+    return editor.registerUpdateListener(
+      () => {
+        editor.getEditorState().read(() => {
+          if ( contentObj ) {
+            const selection = $getSelection();
+            // @ts-ignore
+            const anchor = selection.anchor;
+            // @ts-ignore
+            const focus = selection.focus;
+            const range = createDOMRange(
+              editor,
+              anchor.getNode(),
+              anchor.offset,
+              focus.getNode(),
+              focus.offset,
+            );
+            // @ts-ignore
+            const { bottom } = range.getBoundingClientRect();
+            let diff = Math.round(bottom - window.innerHeight + 80);
+            if ( diff>0 ) {
+              diff = diff > 28 ? diff : 28;
+              document.documentElement.scrollTop += diff;
+            }
+          }
+        });
+      },
+    );
+  }, [editor, isEditable]);
+  
+
   return (
     <>
-      <ToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
+      <ToolbarPlugin  setIsLinkEditMode={setIsLinkEditMode} />
       <div
-        className={`editor-container ${showTreeView ? 'tree-view' : ''}`}>
+        className='editor-container'>
           <>
+            {isCollab ? (
+              <CollaborationPlugin
+                id="main"
+                providerFactory={createWebsocketProvider}
+                shouldBootstrap={true}
+              />
+            ) : (
+              <HistoryPlugin externalHistoryState={historyState} />
+            )}
             <RichTextPlugin
               contentEditable={
-                <div className="editor-scroller">
+                <div className="editor-scroller" ref={contentRef} id="richEditor">
                   <div className="editor" ref={onRef}>
                     <ContentEditable />
                   </div>
@@ -122,8 +156,10 @@ export default function Editor(): JSX.Element {
               placeholder={placeholder}
               ErrorBoundary={LexicalErrorBoundary}
             />
+            {/* <OnChangePlugin onChange={onChange} /> */}
             {isMaxLength && <MaxLengthPlugin maxLength={10240} />}
             <DragDropPaste />
+            <AutoFocusPlugin />
             <TabIndentationPlugin />
             <TabFocusPlugin />
             <HorizontalRulePlugin />
@@ -153,6 +189,9 @@ export default function Editor(): JSX.Element {
                   anchorElem={floatingAnchorElem}
                   cellMerge={true}
                 />
+                <FloatingTextFormatToolbarPlugin
+                  anchorElem={floatingAnchorElem}
+                />
               </>
             )}
             {/* 链接 */}
@@ -169,12 +208,20 @@ export default function Editor(): JSX.Element {
               hasCellBackgroundColor={tableCellBackgroundColor}
             />
             <TableCellResizer />
+            <div>{showTableOfContents && <TableOfContentsPlugin />}</div>
+
             <LayoutPlugin />
             {/* 视频iframe */}
             <VideoIframePlugin />
+            {/* @提示 */}
+            <MentionsPlugin />
+            <ClearEditorPlugin />
+            <MarkdownShortcutPlugin />
           </>
       </div>
-      
+      <ActionTool />
     </>
   );
-}
+});
+Editor.displayName = 'Editor';
+export default Editor;

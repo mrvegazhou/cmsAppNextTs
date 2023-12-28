@@ -672,14 +672,14 @@ function TableCellActionMenuContainer({
     <div className="table-cell-action-button-container" ref={menuButtonRef}>
       {tableCellNode != null && (
         <>
-          <div
-            className="iconfont icon-zhankai1 fs-5 opacity-50"
+          <button
+            className="iconfont icon-zhankai1 fs-5 opacity-50 table-cell-action-button"
             onClick={(e) => {
               e.stopPropagation();
               setIsMenuOpen(!isMenuOpen);
             }}
             ref={menuRootRef}>
-          </div>
+          </button>
           {colorPickerModal}
           {isMenuOpen && (
             <TableActionMenu

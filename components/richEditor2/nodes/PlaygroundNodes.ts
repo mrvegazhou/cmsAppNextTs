@@ -22,6 +22,8 @@ import {InlineImageNode} from './InlineImageNode';
 import {LayoutContainerNode} from './LayoutContainerNode';
 import {LayoutItemNode} from './LayoutItemNode';
 import {VideoIframeNode} from './VideoIframeNode';
+import {MentionNode} from './MentionNode';
+import {EquationNode} from './EquationNode';
 
 const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   HeadingNode,
@@ -42,7 +44,8 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   OverflowNode,
   LayoutContainerNode,
   LayoutItemNode,
-  VideoIframeNode
+  VideoIframeNode,
+  MentionNode
 ];
 
 export default PlaygroundNodes;

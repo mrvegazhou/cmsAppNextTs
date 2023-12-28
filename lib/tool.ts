@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import type { Metadata } from 'next';
 import type { IData, IError, IUser } from '@/interfaces';
 import type { TMetadata } from '@/types';
+import punycode from 'punycode';
 
 export const aesEncryptStr = (str: string, key: string) => {
     return CryptoJS.AES.encrypt(str, key).toString();
@@ -289,3 +290,31 @@ export const handleDrop = (event: React.SyntheticEvent<Element> | React.DragEven
 
 const pow1024 = (num: number) => Math.pow(1024, num);
 export const convertBytesToKB = (bytes: number) => Math.round(bytes / pow1024(1) * 100) / 100;
+
+// 统计字数
+export const WordCounter = (plainText: string) => {
+  const regex = /(?:\r\n|\r|\n)/g; // new line, carriage return, line feed
+  const cleanString = plainText.replace(regex, ' ').trim(); 
+  const wordArray = cleanString.match(/\S+/g);
+  return wordArray ? wordArray.length : 0;
+};
+
+export const CharCounter = (plainText: string) => {
+  const decodeUnicode = (str: string): number[] => punycode.ucs2.decode(str); // func to handle unicode characters
+  const regex = /(?:\r\n|\r|\n)/g; // new line, carriage return, line feed
+  const cleanString = plainText.replace(regex, '').trim(); // replace above characters w/ nothing
+  return decodeUnicode(cleanString).length;
+};
+
+// 统计行数
+export const LineCounter = (plainText: string, hasSpace: boolean) => {
+  let arr = plainText.split(/[(\r\n)\r\n]+/);
+  if ( !hasSpace ) {
+    arr.forEach((item,index)=>{
+      if ( !item ) {
+        arr.splice(index, 1);//删除空项
+      }
+    })
+  }
+  return arr.length;
+};
