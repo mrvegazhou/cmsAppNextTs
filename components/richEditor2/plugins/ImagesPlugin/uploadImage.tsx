@@ -24,6 +24,7 @@ import type {
 import type { TBody } from '@/types';
 import { ImagePayload } from '../../nodes/ImageNode';
 import type {Position} from '../../nodes/InlineImageNode';
+import { GetImageFile } from '@/lib/tool';
 
 
 export type ImageProps = ImagePayload & { dataSrc?: string; deleteImage?: Function; fileName: string; position?: Position};
@@ -36,7 +37,7 @@ export type Props = {
     inline?: boolean;
     height?: number;
     onClose: () => void;
-    insertImg: (e: MouseEvent<HTMLSpanElement>, img: ImagePayload) => void;
+    insertImg: (e: MouseEvent<HTMLSpanElement> | null, img: ImagePayload) => void;
 };
 
 export type State = {
@@ -70,10 +71,15 @@ const ImageUploader = forwardRef((props: Props, ref) => {
     let initState = {
         loading: false,
         images: [],
-        formData: new FormData(),
+        formData: new FormData(), // 为了submit提交图片文件给后台
         err: null,
         uploaded: false,
     } as State;
+
+    // 左边菜单选择
+    const [leftMenu, setLeftMenu] = useState("local");
+    const [checkedImgs, setCheckedImgs] = 
+        useState<{src:string; width:number; height: number; fileName: string}[]>([]);
 
     const [drop, setDrop] = useState(false);
     const fileUploadRef = useRef<HTMLInputElement | null>(null);
@@ -102,6 +108,32 @@ const ImageUploader = forwardRef((props: Props, ref) => {
     };
     const _uploadFileByClick = (e: React.ChangeEvent<HTMLInputElement>) => {
         return Array.from(e.target.files || []);
+    };
+    // 远程图片下载
+    const _uploadFileByNet = () => {
+        setImgState((prev) => ({
+            ...prev,
+            loading: true
+        }));
+        let arrImgs = checkedImgs.map((image, i) => {
+            return {
+                src: image.src,
+                fileName: image.fileName,
+                width: image.width,
+                altText: '',
+                height: image.height,
+                position: position,
+                showCaption: showCaption
+            }
+        });
+        setImgState({
+            ...imgState,
+            images: arrImgs,
+            formData: new FormData(),
+            loading: false
+        });
+        // 插入图片
+        arrImgs.length>0 && props.insertImg(null, arrImgs[0]);
     };
 
     const onFileUpload = async (e: React.SyntheticEvent<Element>, drop?: boolean) => {
@@ -175,7 +207,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
 
     const uploadArticleImageMutation = useMutation(
         async (variables: TBody<IArticleUploadImages>) => {
-          return (await uploadArticleImages(variables)) as IData<any>;
+            return (await uploadArticleImages(variables)) as IData<any>;
         },
     );
 
@@ -184,45 +216,49 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             ...prev,
             loading: true
         }));
-        let formData = imgState.formData;
-        const { multi } = props;        
-        if (formData) {
-            uploadArticleImageMutation.mutateAsync({ 
-                data: {
-                    formData
-                }
-            }).then(res => {
-                if(res.status==200) {
-                    let arrImgs = imgState.images.map((image, i) => {
-                        if(image.fileName==res.data.fileName) {
-                            let src = BASE_URL + IMAGE_URL + res.data.imageName;
-                            return {
-                                src: src,
-                                fileName: image.fileName,
-                                width: image.width,
-                                altText: altText,
-                                height: image.height,
-                                position: position,
-                                showCaption: showCaption
+        if (leftMenu=='local') {
+            let formData = imgState.formData;
+            const { multi } = props;        
+            if (formData) {
+                uploadArticleImageMutation.mutateAsync({ 
+                    data: {
+                        formData
+                    }
+                }).then(res => {
+                    if(res.status==200) {
+                        let arrImgs = imgState.images.map((image, i) => {
+                            if(image.fileName==res.data.fileName) {
+                                let src = BASE_URL + IMAGE_URL + res.data.imageName;
+                                return {
+                                    src: src,
+                                    fileName: image.fileName,
+                                    width: image.width,
+                                    altText: altText,
+                                    height: image.height,
+                                    position: position,
+                                    showCaption: showCaption
+                                }
                             }
-                        }
-                    });
-                    let newObj = Object.assign({}, imgState, {images: arrImgs});
-                    setImgState(newObj);
-                    // 插入图片
-                    props.insertImg(e, newObj.images[0]);
-                } else {
+                        });
+                        let newObj = Object.assign({}, imgState, {images: arrImgs});
+                        setImgState(newObj);
+                        // 插入图片
+                        props.insertImg(e, newObj.images[0]);
+                    } else {
+                        show({
+                            type: 'DANGER',
+                            message: t('imageUploadErr')
+                        });
+                    }
+                }).catch(err => {
                     show({
                         type: 'DANGER',
                         message: t('imageUploadErr')
                     });
-                }
-            }).catch(err => {
-                show({
-                    type: 'DANGER',
-                    message: t('imageUploadErr')
                 });
-            });
+            }
+        } else {
+            _uploadFileByNet();
         }
         props.onClose();
     };
@@ -273,81 +309,124 @@ const ImageUploader = forwardRef((props: Props, ref) => {
 
     return (
         <div className='richEditorImageUploader'>
-            <div className={classNames("form-group row uploadImageBlock", {"draggable": drop})}
-                onDragOver={(e) => { handleDrop(e); }}
-                onDragLeave={(e) => dragLeave(e)}
-                onDragEnter={(e) => dragEnter(e)}
-                onDrop={(e) => onFileUpload(e, true)}
-            >
-                <input
-                    style={{display: 'none'}} 
-                    id="image-uploader"
-                    type="file"
-                    accept="image/*"
-                    ref={fileUploadRef}
-                    multiple={props.multi}
-                    onChange={onFileUpload}
-                />
-                <LoaderComp loading={imgState.loading} className="imagesWrapper">
-                <div>
-                { imgState.images.length > 0
-                    ? imgState.images.map((image: ImageProps, index: number) => {
-                        return (
-                            <div className="imageBox" key={index}>
-                                <strong>
-                                    <i className='iconfont icon-close cursor-pointer fs-2 text-danger position-absolute translate-middle-y top-0 end-0' 
-                                    onClick={() => removeImage(image.fileName)}></i>
-                                </strong>
-                                <Image src={image.src} width={image.width} height={image.height} alt="" />
+            <div className='d-flex'>
+                <div className='col-2 d-flex flex-column align-items-left'>
+                    <div onClick={()=>{setLeftMenu('local');}} className={classNames('cursor-pointer text-left ps-2 me-3 mb-3 py-1', {'active': leftMenu=='local'})}>
+                        本地上传
+                    </div>
+                    <div onClick={()=>{setLeftMenu('net');}} className={classNames('cursor-pointer text-left ps-2 me-3 mb-3 py-1', {'active': leftMenu=='net'})}>
+                        图片库
+                    </div>
+                </div>
+                <div className="d-flex" style={{height: '220px'}}>
+                    <div className="vr"></div>
+                </div>
+                {leftMenu=='local' && (                
+                    <div className='col-9'>
+                        <div className={classNames("form-group row uploadImageBlock", {"draggable": drop})}
+                            onDragOver={(e) => { handleDrop(e); }}
+                            onDragLeave={(e) => dragLeave(e)}
+                            onDragEnter={(e) => dragEnter(e)}
+                            onDrop={(e) => onFileUpload(e, true)}
+                        >
+                            <input
+                                style={{display: 'none'}} 
+                                id="image-uploader"
+                                type="file"
+                                accept="image/*"
+                                ref={fileUploadRef}
+                                multiple={props.multi}
+                                onChange={onFileUpload}
+                            />
+                            <LoaderComp loading={imgState.loading} className="imagesWrapper">
+                            <div>
+                            { imgState.images.length > 0
+                                ? imgState.images.map((image: ImageProps, index: number) => {
+                                    return (
+                                        <div className="imageBox" key={index}>
+                                            <strong>
+                                                <i className='iconfont icon-close cursor-pointer fs-2 text-danger position-absolute translate-middle-y top-0 end-0' 
+                                                onClick={() => removeImage(image.fileName)}></i>
+                                            </strong>
+                                            <Image src={image.src} width={image.width} height={image.height} alt="" />
+                                        </div>
+                                    );
+                                })
+                                :
+                                <div className='uploadImage' onClick={uploadFileOnchange}>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M12 0C11.4477 0 11 0.447716 11 1V11H1C0.447715 11 0 11.4477 0 12C0 12.5523 0.447716 13 1 13H11V23C11 23.5523 11.4477 24 12 24C12.5523 24 13 23.5523 13 23V13H23C23.5523 13 24 12.5523 24 12C24 11.4477 23.5523 11 23 11H13V1C13 0.447715 12.5523 0 12 0Z" fill="#999999"></path>
+                                    </svg>
+                                </div>
+                                }
                             </div>
-                        );
-                    })
-                    :
-                    <div className='uploadImage' onClick={uploadFileOnchange}>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M12 0C11.4477 0 11 0.447716 11 1V11H1C0.447715 11 0 11.4477 0 12C0 12.5523 0.447716 13 1 13H11V23C11 23.5523 11.4477 24 12 24C12.5523 24 13 23.5523 13 23V13H23C23.5523 13 24 12.5523 24 12C24 11.4477 23.5523 11 23 11H13V1C13 0.447715 12.5523 0 12 0Z" fill="#999999"></path>
-                        </svg>
+                            </LoaderComp>
+                        </div>
+                        <div className="form-group row mt-3">
+                            <label className="col-sm-3 col-form-label text-end">{t('imageAltText')}</label>
+                            <div className="col-sm-8">
+                            <input type='text' name="altText" placeholder={t('optional')} value={altText} className="form-control" onChange={handleChange}/>
+                            </div>
+                        </div>
+                        {props.inline && (
+                            <>
+                            <div className="form-group row mt-3">
+                                <label className="col-sm-3 col-form-label text-end">位置</label>
+                                <div className="col-sm-8">
+                                    <select className="form-select" aria-label="Default select example" onChange={handlePositionChange}>
+                                        <option value="left">左</option>
+                                        <option value="right">右</option>
+                                        <option value="full">全宽</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="form-group row mt-3">
+                                <label className="col-sm-3 col-form-label text-end">是否显示标题</label>
+                                <div className="col-sm-8">
+                                    <input className="form-check-input" 
+                                        type="checkbox"
+                                        value=""
+                                        checked={showCaption}
+                                        onChange={handleShowCaptionChange}
+                                        id="caption" />
+                                </div>
+                            </div>
+                            </>
+                        )}
+
                     </div>
-                    }
-                </div>
-                </LoaderComp>
-            </div>
-            <div className="form-group row mt-3">
-                <label className="col-sm-3 col-form-label text-end">{t('imageAltText')}</label>
-                <div className="col-sm-8">
-                <input type='text' name="altText" placeholder={t('optional')} value={altText} className="form-control" onChange={handleChange}/>
-                </div>
-            </div>
-            {props.inline && (
-                <>
-                <div className="form-group row mt-3">
-                    <label className="col-sm-3 col-form-label text-end">位置</label>
-                    <div className="col-sm-8">
-                        <select className="form-select" aria-label="Default select example" onChange={handlePositionChange}>
-                            <option value="left">左</option>
-                            <option value="right">右</option>
-                            <option value="full">全宽</option>
-                        </select>
+                )}
+                {leftMenu=='net' && (
+                    <div className='col-9 mx-auto'>
+                        <div className='d-flex flex-row flex-wrap align-items-center text-center'>
+                            <div className='img-picker-item'>
+                                <i role="img" aria-describedby="图片描述" title="图片描述" className="img-i" 
+                                    style={{backgroundImage: 'url("https://tse2-mm.cn.bing.net/th/id/OIP-C.g9UbVfyVZX-SfD09JcYr5QHaEK?rs=1&pid=ImgDetMain")'}}>
+                                    <span className="img-checkbox"></span>
+                                </i>
+                                <strong className="img-title">xxxxxx</strong>
+                            </div>
+                            <div className='img-picker-item' >
+                                <i role="img" aria-describedby="图片描述" title="图片描述" className="img-i img-selected"
+                                    style={{backgroundImage: 'url("https://tse2-mm.cn.bing.net/th/id/OIP-C.g9UbVfyVZX-SfD09JcYr5QHaEK?rs=1&pid=ImgDetMain")'}}>
+                                    <span className="img-checkbox img-selected"></span>
+                                </i>
+                                <strong className="img-title">2222</strong>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="form-group row mt-3">
-                    <label className="col-sm-3 col-form-label text-end">是否显示标题</label>
-                    <div className="col-sm-8">
-                        <input className="form-check-input" 
-                            type="checkbox"
-                            value=""
-                            checked={showCaption}
-                            onChange={handleShowCaptionChange}
-                            id="caption" />
-                    </div>
-                </div>
-                </>
-            )}
-            <div className='form-row text-center mt-4 mb-3'>
-                <button disabled={imgState.loading} type="button" className="btn btn-outline-primary" onClick={onFileSubmit}>
-                    {t('upload')}
-                </button>
+                )}
             </div>
+            <div className='d-flex'>
+                <div className='col-2'></div>
+                <div className=''></div>
+                <div className='form-row text-center mt-4 mb-3 col-9'>
+                    <button disabled={imgState.loading} type="button" className="btn btn-outline-primary" onClick={onFileSubmit}>
+                        {t('upload')}
+                    </button>
+                </div>
+            </div>
+            
         </div>
     );
 });

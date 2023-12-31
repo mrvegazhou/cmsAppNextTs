@@ -29,6 +29,7 @@ $utilities: map-merge(
   )
 );
 
+
 // margin-x
 $utilities: map-merge(
   $utilities,
@@ -87,6 +88,7 @@ $utilities: map-merge(
             map-merge(
               map-get(map-get($utilities, 'width'), 'values'),
               (
+                x5: 50px,
                 5: 5%,
                 10: 10%,
                 15: 15%,
@@ -174,8 +176,6 @@ $utilities: map-merge(
  * @import
  */
 @import 'bootstrap/scss/bootstrap';
-@import 'bootstrap-icons/font/bootstrap-icons';
-@import './imagestyle';
 @import './iconfont';
 /**
  * var
@@ -193,138 +193,6 @@ $utilities: map-merge(
   --yw-bg-color-rgb: 173, 181, 189;
   --yw-bg-bg: #2b3035;
   --yw-bg-bg-rgb: 43, 48, 53;
-}
-
-// bg
-.yw-bg {
-  --bs-bg-opacity: 1;
-  background-color: #ffffff !important;
-}
-
-// line
-.yw-line-clamp {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.yw-line-clamp-3 {
-  @extend .yw-line-clamp;
-  -webkit-line-clamp: 3;
-}
-
-// editor
-.ck.ck-reset {
-  --ck-color-base-background: var(--bs-card-bg);
-  --ck-color-base-border: var(--bs-card-border-color);
-  --ck-color-toolbar-background: var(--bs-card-bg);
-  --ck-color-toolbar-border: var(--bs-card-border-color);
-  --ck-color-text: var(--bs-body-color);
-}
-
-.ck-focused {
-  border-color: #86b7fe !important;
-  outline: 0 !important;
-  box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%) !important;
-}
-
-.ck.ck-editor__editable_inline {
-  --ck-border-radius: var(--bs-card-border-radius);
-  min-height: 35em;
-}
-
-.ck-content pre {
-  color: var(--bs-body-color) !important;
-}
-
-// font
-.yw-font-jetBrains-mono {
-  font-family: var(--font-jetBrains-mono);
-}
-
-// code
-.yw-code-num-width {
-  width: 2rem;
-}
-
-// h1-h6
-h1:hover i.bi-hash {
-  visibility: visible !important;
-}
-
-h2:hover i.bi-hash {
-  visibility: visible !important;
-}
-
-h3:hover i.bi-hash {
-  visibility: visible !important;
-}
-
-h4:hover i.bi-hash {
-  visibility: visible !important;
-}
-
-h5:hover i.bi-hash {
-  visibility: visible !important;
-}
-
-h6:hover i.bi-hash {
-  visibility: visible !important;
-}
-
-.yw-code-li {
-  width: min-content;
-}
-
-.yw-cursor-pointer {
-  cursor: pointer;
-}
-
-// callout
-.bd-callout {
-  --bs-link-color-rgb: var(--bd-callout-link);
-  --bs-code-color: var(--bd-callout-code-color);
-  padding: 1.25rem;
-  margin-top: 1.25rem;
-  margin-bottom: 1.25rem;
-  color: var(--bd-callout-color, inherit);
-  background-color: var(--bd-callout-bg, var(--bs-gray-100));
-  border-left: 0.25rem solid var(--bd-callout-border, var(--bs-gray-300));
-}
-
-.bd-callout h4 {
-  margin-bottom: 0.25rem;
-}
-
-.bd-callout > :last-child {
-  margin-bottom: 0;
-}
-
-.bd-callout + .bd-callout {
-  margin-top: -0.25rem;
-}
-
-.bd-callout .highlight {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.bd-callout-info {
-  --bd-callout-color: var(--bs-info-text-emphasis);
-  --bd-callout-bg: var(--bs-info-bg-subtle);
-  --bd-callout-border: var(--bs-info-border-subtle);
-}
-
-.bd-callout-warning {
-  --bd-callout-color: var(--bs-warning-text-emphasis);
-  --bd-callout-bg: var(--bs-warning-bg-subtle);
-  --bd-callout-border: var(--bs-warning-border-subtle);
-}
-
-.bd-callout-danger {
-  --bd-callout-color: var(--bs-danger-text-emphasis);
-  --bd-callout-bg: var(--bs-danger-bg-subtle);
-  --bd-callout-border: var(--bs-danger-border-subtle);
 }
 
 .nav-bg {

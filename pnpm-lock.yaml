@@ -107,9 +107,6 @@ dependencies:
   bootstrap:
     specifier: 5.3.0
     version: registry.npmmirror.com/bootstrap@5.3.0(@popperjs/core@2.11.8)
-  bootstrap-icons:
-    specifier: ^1.11.1
-    version: registry.npmmirror.com/bootstrap-icons@1.11.1
   cherry-markdown:
     specifier: ^0.8.26
     version: registry.npmmirror.com/cherry-markdown@0.8.26
@@ -3513,12 +3510,6 @@ packages:
     name: binary-extensions
     version: 2.2.0
     engines: {node: '>=8'}
-
-  registry.npmmirror.com/bootstrap-icons@1.11.1:
-    resolution: {integrity: sha512-F0DDp7nKUX+x/QtpfRZ+XHFya60ng9nfdpdS59vDDfs4Uhuxp7zym/QavMsu/xx51txkoM9eVmpE7D08N35blw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/bootstrap-icons/-/bootstrap-icons-1.11.1.tgz}
-    name: bootstrap-icons
-    version: 1.11.1
-    dev: false
 
   registry.npmmirror.com/bootstrap@5.3.0(@popperjs/core@2.11.8):
     resolution: {integrity: sha512-UnBV3E3v4STVNQdms6jSGO2CvOkjUMdDAVR2V5N4uCMdaIkaQjbcEAMqRimDHIs4uqBYzDAKCQwCB+97tJgHQw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/bootstrap/-/bootstrap-5.3.0.tgz}

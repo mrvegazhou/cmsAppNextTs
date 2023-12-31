@@ -400,7 +400,7 @@ function BlockFormatDropDown({
       isOpen={open}
       menu={
         <div>
-          <Menu bordered style={{ minWidth: 120 }}>
+          <Menu bordered style={{ minWidth: 50 }}>
             {Object.keys(blockTypeToBlockFn).map((item, idx) => {
               const active = blockType === item;
               if (item=='h') {
@@ -414,7 +414,7 @@ function BlockFormatDropDown({
                           iconClass={value['iconClass']} 
                           active={active}
                           onClick={() => {executeCommand(value.fn, value.type); setOpen(false)}}
-                          text={key} />
+                          text={blockTypeToBlockName[key]} />
                       );
                     })}
                   </Menu.SubMenu>
@@ -424,7 +424,7 @@ function BlockFormatDropDown({
                   <Menu.Item
                     key={idx}
                     active={active}
-                    text={item}
+                    text={blockTypeToBlockName[item]}
                     iconClass={blockTypeToBlockFn[item].iconClass}
                     onClick={() => {executeCommand(blockTypeToBlockFn[item].fn, blockTypeToBlockFn[item].type); setOpen(false)}}
                   />
@@ -994,7 +994,7 @@ export default function ToolbarPlugin({
                       activeEditor={activeEditor}
                       onClose={onClose}
                     />
-                  ), 500);setInsertOpen(false)}}
+                  ), 810);setInsertOpen(false)}}
               />
               <Menu.Item
                   text='行内图片'
@@ -1102,7 +1102,7 @@ export default function ToolbarPlugin({
             iconName='icon-code1'
             active={isCode}
             label='文本块'
-            title='文本块'
+            title='Insert code block'
             disabled={!isEditable}
           />
           <Divider />

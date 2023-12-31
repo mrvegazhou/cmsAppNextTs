@@ -318,3 +318,11 @@ export const LineCounter = (plainText: string, hasSpace: boolean) => {
   }
   return arr.length;
 };
+
+// fetch 下载图片
+export const GetImageFile = async (imageUrl: string, fileName: string) => {
+  const response = await fetch(imageUrl);
+  const blob = await response.blob();
+  const file = new File([blob], fileName);
+  return file;
+}

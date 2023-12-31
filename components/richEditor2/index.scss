@@ -1,3 +1,5 @@
+$bgColor: rgba(108,117,125, 0.2);
+
 .editor-shell {
     margin: 2px auto;
     color: #000;
@@ -28,10 +30,13 @@
             height: 20px;
             text-align: left;
             cursor: pointer;
+        }
+        .active {
+            background-color: $bgColor;
+        }
 
-            .active {
-                background-color: rgba(223, 232, 250, 0.3);
-            }
+        .subMenuWidth {
+            width: 120px
         }
 
         .disabled {
@@ -53,6 +58,7 @@
         max-width: 1000px;
 
         .editor-scroller {
+            margin-top: 8px;
             min-height: 150px;
             border: 0;
             display: flex;
@@ -61,8 +67,8 @@
             z-index: 0;
             overflow: auto;
             resize: vertical;
-            border-left: 1px dashed rgba(33, 37, 41, 0.4);
-            border-right: 1px dashed rgba(33, 37, 41, 0.4);
+            border: 1px dashed rgba(33, 37, 41, 0.4);
+            border-radius: 6px;
         }
 
         // 表格内单元格操作按钮
@@ -469,6 +475,9 @@
         opacity: 0.6;
         color: #6c757d !important;
     }
+    .active {
+        background-color: $bgColor;
+    }
     .imagesWrapper {
         display: flex;
         max-width: 100%;
@@ -512,6 +521,71 @@
     .draggable {
         border: dashed 2px #0d6efd;
         border-radius: 5px;
+    }
+    .img-picker-item {
+        cursor: pointer;
+        width: 134px;
+        margin: 7px;
+        -webkit-box-shadow: 0 0 0 2px rgba(238,238,238, 0.9) inset;
+        box-shadow: 0 0 0 2px rgba(238,238,238, 0.9) inset;
+        .img-i {
+            position: relative;
+            display: block;
+            width: 130px;
+            height: 130px;
+            background-size: contain;
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        .img-i.img-selected {
+            background-color: rgba(60, 132, 244, 0.5) !important;
+        }
+        .img-checkbox.img-selected {
+            background-color: rgba(60, 132, 244, 0.8) !important;
+        }
+        .img-selected::before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 4px;
+            width: 11px;
+            height: 6px;
+            border-left: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            -webkit-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+        }
+        .img-checkbox {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            border: 1px solid #fff;
+            border-radius: 1px;
+            background-color: rgba(0,0,0,0.2);
+        }
+        .img-title {
+            margin-top: 5px;
+            display: block;
+            width: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-wrap: normal;
+            font-weight: 400;
+            line-height: 20px;
+            text-align: center;
+        }
+    }
+    .img-picker-item:hover {
+        -webkit-box-shadow: 0 0 0 2px rgba(60, 132, 244, 0.8) inset;
+        box-shadow: 0 0 0 2px rgba(60, 132, 244, 0.8) inset;
     }
 }
 

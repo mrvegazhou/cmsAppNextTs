@@ -195,6 +195,7 @@ export default function Overlay(props: OverlayProps) {
             }}
         </CSSTransition>
     );
+    
     if (visible && usePortal) {
         return <Portal {...{ ...portalProps }}>{TransitionGroupComp}</Portal>;
     } else {

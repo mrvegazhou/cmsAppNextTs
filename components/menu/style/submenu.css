@@ -23,7 +23,7 @@
 }
 
 .w-menu-subitem-popup {
-    min-width: 180px;
+    min-width: 100px;
 }
 
 .w-menu-subitem-title.w-menu-subitem-collapse-title .w-close,

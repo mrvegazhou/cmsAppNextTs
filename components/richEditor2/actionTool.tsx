@@ -11,9 +11,12 @@ import SaveEditor from "@/components/common/editor/saveEditor";
 import ClearEditor from "@/components/common/editor/clearEditor";
 import { CharCounter } from "@/lib/tool";
 
-const scrollTo = () => {
-  const curEl = document.getElementById('richEditor');
-  curEl?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+const scrollTo = (again: boolean) => {
+  const curEl = document.getElementById('richEditorHeader');
+  curEl?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+  again && setTimeout(() => {
+    curEl?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, 300)
 };
 
 const ActionTool = forwardRef((prop, ref): JSX.Element => {
@@ -80,7 +83,7 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
     return (
         <>
             <div id='xxx' className="fixed-bottom d-inline-flex justify-content-center align-items-center border-top bg-white" style={{height:"52px"}}>
-                <small className="me-4 pe-3 text-secondary cursor-pointer" onClick={scrollTo}>{t('backToEditor')}</small>
+                <small className="me-4 pe-3 text-secondary cursor-pointer" onClick={() => { scrollTo(false)} }>{t('backToEditor')}</small>
                 <small className="me-2 pe-2 text-secondary">{t('wordsCount')}:{wordsNum}</small>
                 <small className="me-5 pe-5 text-secondary">{t('linesCount')}:{linesNum}</small>
                 {/* 清空编辑 */}
@@ -116,7 +119,7 @@ export function ShowClearDialog({
             editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
             editor.focus();
             onClose();
-            scrollTo();
+            scrollTo(true);
           }} 
             className="btn btn-outline-primary me-4">确认</button>
           <button type="button" onClick={() => {editor.focus();onClose();}} className="btn btn-outline-secondary">取消</button>

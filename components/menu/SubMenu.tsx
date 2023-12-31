@@ -90,7 +90,6 @@ export const SubMenu = React.forwardRef(function <Tag extends TagType = 'a'>(
 
     useMemo(() => {
         if (collapse) setIsOpen(false);
-        console.log(collapse, isOpen, "--i---");
     }, [collapse]);
 
     function onClick(e: React.MouseEvent<HTMLUListElement, MouseEvent>) {
@@ -118,7 +117,6 @@ export const SubMenu = React.forwardRef(function <Tag extends TagType = 'a'>(
         node.style.height = `${node.scrollHeight}px`;
     }
     function onEntered(node: HTMLElement) {
-        // node.style.height = 'initial';
         if (popupRef.current && popupRef.current.overlayDom.current) {
             node.style.height = popupRef.current.overlayDom.current.getBoundingClientRect().height + 'px';
         }
@@ -158,6 +156,7 @@ export const SubMenu = React.forwardRef(function <Tag extends TagType = 'a'>(
         overlayTriggerProps.usePortal = true;
         menuProps.onClick = onClick;
     }
+    
     return (
         <li
             data-menu="subitem"

@@ -72,7 +72,6 @@
   vertical-align: super;
 }
 .PlaygroundEditorTheme__textCode {
-  color: rgb(5, 5, 5);
   background-color: rgb(240, 242, 245);
   padding: 1px 0.25rem;
   font-family: Menlo, Consolas, Monaco, monospace;

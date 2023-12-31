@@ -51,7 +51,7 @@ export function InsertImageDialog({
   onClose: () => void;
 }): JSX.Element {
 
-  const insertImg = (e: React.MouseEvent<HTMLSpanElement>, img: InsertImagePayload) => {
+  const insertImg = (e: React.MouseEvent<HTMLSpanElement> | null, img: InsertImagePayload) => {
     if(img!=undefined && img!=null) {
       const data = {
           src: img.src,

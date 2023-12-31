@@ -43,6 +43,7 @@ export interface IArticleUploadImage {
 
 export interface IArticleUploadImages {
   files?: string[] | Blob[];
+  urls?: string[];
   formData?: FormData;
 }
 
