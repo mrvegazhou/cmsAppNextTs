@@ -7,6 +7,7 @@ export * from './modal';
 export * from './captcha';
 export * from './register';;
 export * from './article';
+export * from './image';
 export * from './html';
 export * from './tag';
 export * from './reply';

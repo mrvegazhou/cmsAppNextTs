@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
-  apiAuthMiddleware,
-  apiQueryBody,
   apiQueryParams,
   apiResponse,
   createConfig,
@@ -9,15 +7,21 @@ import {
 import { IMAGE_URL } from '@/lib/constant';
 
 export async function GET(request: NextRequest, { params }: any) {
-  try {
+  try { 
     const config = createConfig({
       baseURL: process.env.APP_API_SERVER,
-      token: apiAuthMiddleware(request),
+      query: apiQueryParams({
+        request,
+      }),
       id: apiQueryParams({
         request,
         params,
-        filter: [{ name: 'name' }],
-      }).name
+        filter: [
+          {
+            name: 'id',
+          },
+        ],
+      }).id
     });
     const response = await fetch(
       config.baseURL + IMAGE_URL + config.id,

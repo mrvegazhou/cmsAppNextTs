@@ -50,7 +50,7 @@ import {useSettings} from '../context/SettingsContext';
 import {useSharedHistoryContext} from '../context/SharedHistoryContext';
 // import EmojisPlugin from '../plugins/EmojisPlugin';
 // import KeywordsPlugin from '../plugins/KeywordsPlugin';
-import LinkPlugin from '../plugins/LinkPlugin';
+// import LinkPlugin from '../plugins/LinkPlugin';
 // import MentionsPlugin from '../plugins/MentionsPlugin';
 import ContentEditable from '../ui/ContentEditable';
 import ImageResizer from '../ui/ImageResizer';
@@ -365,6 +365,7 @@ export default function ImageComponent({
 
   const draggable = isSelected && $isNodeSelection(selection) && !isResizing;
   const isFocused = isSelected || isResizing;
+
   return (
     <Suspense fallback={null}>
       <>

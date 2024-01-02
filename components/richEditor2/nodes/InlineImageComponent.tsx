@@ -38,7 +38,6 @@ import useModal from '../hooks/useModal';
 import FloatingLinkEditorPlugin from '../plugins/FloatingLinkEditorPlugin/index';
 import FloatingTextFormatToolbarPlugin from '../plugins/FloatingTextFormatToolbarPlugin/index';
 import LinkPlugin from '../plugins/LinkPlugin';
-import Button from '../ui/Button';
 import ContentEditable from '../ui/ContentEditable';
 import {DialogActions} from '../ui/Dialog';
 import Placeholder from '../ui/Placeholder';
@@ -166,11 +165,12 @@ export function UpdateInlineImageDialog({
       </div>
 
       <DialogActions>
-        <Button
+        <button
+          className="btn btn-primary"
           data-test-id="image-modal-file-upload-btn"
           onClick={() => handleOnConfirm()}>
-          Confirm
-        </Button>
+          确认
+        </button>
       </DialogActions>
     </>
   );

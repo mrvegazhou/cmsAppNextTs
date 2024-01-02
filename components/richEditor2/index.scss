@@ -524,14 +524,14 @@ $bgColor: rgba(108,117,125, 0.2);
     }
     .img-picker-item {
         cursor: pointer;
-        width: 134px;
+        width: 130px;
         margin: 7px;
         -webkit-box-shadow: 0 0 0 2px rgba(238,238,238, 0.9) inset;
         box-shadow: 0 0 0 2px rgba(238,238,238, 0.9) inset;
         .img-i {
             position: relative;
             display: block;
-            width: 130px;
+            width: 120px;
             height: 130px;
             background-size: contain;
             background-position: 50% 50%;
@@ -587,6 +587,51 @@ $bgColor: rgba(108,117,125, 0.2);
         -webkit-box-shadow: 0 0 0 2px rgba(60, 132, 244, 0.8) inset;
         box-shadow: 0 0 0 2px rgba(60, 132, 244, 0.8) inset;
     }
+    .img-pagination {
+        padding: 10px 20px 20px;
+        display: flex;
+        flex: row;
+        justify-content: right;
+        .img-nav {
+            color: rgba(108, 117, 125, 1);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            vertical-align: middle;
+            margin-right: 17px;
+            & span, label {
+                margin-right: 3px;
+            }
+            .img-pageBtn {
+                font-size: 12px;
+                padding: 3px 6px;
+                background-color: #eee;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+        }
+        .img-page-form {
+            display: flex;
+            align-items: center;
+            input {
+                width: 45px;
+                text-align: left;
+                padding: 0 6px;
+                height: 24px;
+                line-height: 24px;
+                border: none;
+                background-color: #eee;
+                color: rgba(108, 117, 125, 1);
+                border-radius: 3px;
+                margin-right: 10px;
+            }
+            .img-page-link {
+                text-align: center;
+                text-decoration: none;
+            }
+        }
+    }
+    
 }
 
 // 表格菜单

@@ -52,7 +52,7 @@ export function InsertImageDialog({
 }): JSX.Element {
 
   const insertImg = (e: React.MouseEvent<HTMLSpanElement> | null, img: InsertImagePayload) => {
-    if(img!=undefined && img!=null) {
+    if(img!=undefined && img!=null) {      
       const data = {
           src: img.src,
           altText: img.altText,

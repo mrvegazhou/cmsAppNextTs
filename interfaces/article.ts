@@ -1,6 +1,7 @@
 import type {
   IBase
 } from '@/interfaces';
+import { IImage } from './image';
 
 export interface IArticle extends IBase {
   id: number;

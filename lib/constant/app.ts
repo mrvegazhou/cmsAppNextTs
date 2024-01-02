@@ -36,6 +36,7 @@ export const BASE_URL = "http://localhost:3000/api";
 
 // 图片展示
 export const IMAGE_URL = "/image/static/";
+export const ARTICLE_PERSONAL_IMAGE_URL =  IMAGE_URL + "p/"; 
 export const GEN_CAPTCHA_URL = "/user/captcha/email";
 export const LOGIN_BY_EMAIL = "/user/login/email";
 export const LOGOUT_BY_EAMIL = "/user/logout/email";
@@ -67,3 +68,5 @@ export const ARTICLE_TOOLBAR_DATA = "/article/toolBarData";
 export const ARTICLE_COLLECTION = "/article/collection";
 //  图片上传
 export const ARTICLE_UPLOAD_IMAGE = "/article/uploadImage";
+// 图片列表
+export const ARTICLE_IMAGE_LIST = "/image/personalImageList";

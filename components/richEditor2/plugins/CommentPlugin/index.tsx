@@ -64,7 +64,6 @@ import {
 } from '../../commenting';
 import useModal from '../../hooks/useModal';
 import CommentEditorTheme from '../../themes/CommentEditorTheme';
-import Button from '../../ui/Button';
 import ContentEditable from '../../ui/ContentEditable';
 import Placeholder from '../../ui/Placeholder';
 
@@ -343,17 +342,17 @@ function CommentInputBox({
         onChange={onChange}
       />
       <div className="CommentPlugin_CommentInputBox_Buttons">
-        <Button
+        <button
           onClick={cancelAddComment}
           className="CommentPlugin_CommentInputBox_Button">
           Cancel
-        </Button>
-        <Button
+        </button>
+        <button
           onClick={submitComment}
           disabled={!canSubmit}
           className="CommentPlugin_CommentInputBox_Button primary">
           Comment
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -402,12 +401,12 @@ function CommentsComposer({
         editorRef={editorRef}
         placeholder={placeholder}
       />
-      <Button
+      <button
         className="CommentPlugin_CommentsPanel_SendButton"
         onClick={submitComment}
         disabled={!canSubmit}>
         <i className="send" />
-      </Button>
+      </button>
     </>
   );
 }
@@ -432,19 +431,19 @@ function ShowDeleteCommentOrThreadDialog({
     <>
       Are you sure you want to delete this {commentOrThread.type}?
       <div className="Modal__content">
-        <Button
+        <button
           onClick={() => {
             deleteCommentOrThread(commentOrThread, thread);
             onClose();
           }}>
           Delete
-        </Button>{' '}
-        <Button
+        </button>{' '}
+        <button
           onClick={() => {
             onClose();
           }}>
           Cancel
-        </Button>
+        </button>
       </div>
     </>
   );
@@ -487,7 +486,7 @@ function CommentsPanelListComment({
       </p>
       {!comment.deleted && (
         <>
-          <Button
+          <button
             onClick={() => {
               showModal('Delete Comment', (onClose) => (
                 <ShowDeleteCommentOrThreadDialog
@@ -500,7 +499,7 @@ function CommentsPanelListComment({
             }}
             className="CommentPlugin_CommentsPanel_List_DeleteButton">
             <i className="delete" />
-          </Button>
+          </button>
           {modal}
         </>
       )}
@@ -602,7 +601,7 @@ function CommentsPanelList({
                   <span>{commentOrThread.quote}</span>
                 </blockquote>
                 {/* INTRODUCE DELETE THREAD HERE*/}
-                <Button
+                <button
                   onClick={() => {
                     showModal('Delete Thread', (onClose) => (
                       <ShowDeleteCommentOrThreadDialog
@@ -614,7 +613,7 @@ function CommentsPanelList({
                   }}
                   className="CommentPlugin_CommentsPanel_List_DeleteButton">
                   <i className="delete" />
-                </Button>
+                </button>
                 {modal}
               </div>
               <ul className="CommentPlugin_CommentsPanel_List_Thread_Comments">
