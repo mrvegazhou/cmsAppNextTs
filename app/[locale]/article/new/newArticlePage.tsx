@@ -11,6 +11,7 @@ import { userDataContext } from "@/store/userData";
 import ContentLayout from "../../common/contentLayout";
 import { IArticle } from "@/interfaces";
 import RichEditor from "@/components/richEditor2/App";
+import "./newArticlePage.scss"
 
 // const Editor = dynamic(() => import('@/components/richEditor2/App'), {
 //   ssr: false,
@@ -79,14 +80,6 @@ const NewArticleEditor: FC<propsType> = props => {
 
   };
 
-  const handleSwitchEditor = () => {
-    if( switchEditor=="MarkdownEditor" ) {
-      setSwitchEditor("RichEditor");
-    } else {
-      setSwitchEditor("MarkdownEditor");
-    }
-  };
-
   return (
     <>
       <style jsx>{`
@@ -112,7 +105,6 @@ const NewArticleEditor: FC<propsType> = props => {
               maxLength={300}
             />
           <small className="text-secondary text-nowrap">{t('savedStatus')}</small>
-          <i className="iconfont icon-qiehuan fs-4 text-black-50 opacity-75 ms-3 me-2 cursor-pointer" onClick={handleSwitchEditor} title={t('switchEditor')}></i>
           <Avatar class="me-4 ms-4"/>
         </div>
 
@@ -128,12 +120,21 @@ const NewArticleEditor: FC<propsType> = props => {
                 封面
               </div>
               <div className="col-10">
-                <input type="text" className="form-control ms-2" placeholder="Last name" aria-label="Last name" />
+                <label className="add-img-label">
+                  <input type="file" accept=".jpeg, .jpg, .png" className="d-none" />
+                  <div className="add-cover-img">
+                    <svg width="14" height="14" viewBox="0 0 24 24" className="me-2" fill="currentColor">
+                      <path fillRule="evenodd" d="M13.25 3.25a1.25 1.25 0 1 0-2.5 0v7.5h-7.5a1.25 1.25 0 1 0 0 2.5h7.5v7.5a1.25 1.25 0 1 0 2.5 0v-7.5h7.5a1.25 1.25 0 0 0 0-2.5h-7.5v-7.5Z" clipRule="evenodd"></path>
+                    </svg>
+                    添加文章封面
+                  </div>
+                </label>
+                <small className="text-muted">图片上传格式支持 JPEG、JPG、PNG</small>
               </div>
             </div>
             <div className="row mt-4 d-flex flex-row align-items-center justify-content-center">
               <div className="col-2 text-end">
-                分类
+                <span className="text-danger">*</span>分类
               </div>
               <div className="col-10">
                 <input type="text" className="form-control ms-2" placeholder="Last name" aria-label="Last name" />

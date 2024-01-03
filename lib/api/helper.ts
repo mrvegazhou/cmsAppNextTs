@@ -68,8 +68,7 @@ export const createConfig = (
     if (!config.body) {
       if (!config.headers) {
         config.headers = {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         };
       }
 
@@ -80,6 +79,7 @@ export const createConfig = (
     }
   }
   config.mode = 'cors';
+
   return token
     ? {
         ...config,
@@ -138,16 +138,6 @@ export const handleReqData = async (
   }
   return response;
 };
-
-// export const setConfig = (params?: TParams): TParams => {
-//   return createConfig(params, {
-//     method: 'POST', 
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Accept': 'application/json',
-//     }
-//   });
-// }
 
 export const isClient = () => {
   return typeof window !== 'undefined';

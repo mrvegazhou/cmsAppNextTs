@@ -69,6 +69,12 @@ $bgColor: rgba(108,117,125, 0.2);
             resize: vertical;
             border: 1px dashed rgba(33, 37, 41, 0.4);
             border-radius: 6px;
+            .editor {
+                flex: auto;
+                position: relative;
+                resize: vertical;
+                z-index: -1;
+            }
         }
 
         // 表格内单元格操作按钮
@@ -588,6 +594,7 @@ $bgColor: rgba(108,117,125, 0.2);
         box-shadow: 0 0 0 2px rgba(60, 132, 244, 0.8) inset;
     }
     .img-pagination {
+        margin-top: 15px;
         padding: 10px 20px 20px;
         display: flex;
         flex: row;

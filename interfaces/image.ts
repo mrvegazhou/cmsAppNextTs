@@ -8,6 +8,7 @@ export interface IImage extends IBase {
     width?: number;
     height?: number;
     tags?: string;
+    src?: string;
 }
 
 export interface IImageList {

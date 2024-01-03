@@ -15,7 +15,7 @@ import useToast from '@/hooks/useToast';
 import LoaderComp from '@/components/loader/loader';
 import Image from 'next/image'
 import { useMutation } from '@tanstack/react-query';
-import { BASE_URL, IMAGE_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
+import { BASE_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
 import { handleDrop, loadImage, convertBytesToKB } from '@/lib/tool';
 import { uploadArticleImages } from '@/services/api';
 import type { IImageList, IImage, IData, IArticleUploadImages } from '@/interfaces';
@@ -23,7 +23,7 @@ import type { TBody } from '@/types';
 import { ImagePayload } from '../../nodes/ImageNode';
 import type {Position} from '../../nodes/InlineImageNode';
 import { getPersonalImageList } from '@/services/api/image';
-
+import { useMap } from 'ahooks';
 
 export type ImageProps = ImagePayload & { dataSrc?: string; deleteImage?: Function; fileName: string; position?: Position};
 
@@ -76,7 +76,9 @@ const ImageUploader = forwardRef((props: Props, ref) => {
 
     // 左边菜单选择
     const [leftMenu, setLeftMenu] = useState("local");
-    const [checkedImgs, setCheckedImgs] = useState<{[id: number]:IImage}>({});
+    // const [checkedImgs, setCheckedImgs] = useState<Map<string, IImage>>(new Map());
+    const [checkedImgs, { set, setAll, remove, reset, get }] = useMap<string, IImage>([]);
+
     // 图片分页
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
@@ -105,24 +107,64 @@ const ImageUploader = forwardRef((props: Props, ref) => {
         async (variables: TBody<{page: number}>) => {
             return (await getPersonalImageList(variables)) as IData<IImageList>;
         },
-    ); 
-    const handleImageList = useCallback((pageNum: number) => {
-        getPersonalImageListMutation.mutateAsync({ 
+    );
+    const handleImageList = useCallback(async (pageNum: number) => {
+        await getPersonalImageListMutation.mutateAsync({ 
             data: {
                 page: pageNum
             }
         }).then(res => {
             if (res.status==200) {
-                console.log(res.data, "----s-----");
                 setPage(res.data.page);
                 setTotalPage(res.data.totalPage);
+                let imgs: IImage[] = [];
+                res.data.imgList.forEach((img, idx) => {
+                    img.src = BASE_URL + ARTICLE_PERSONAL_IMAGE_URL;
+                    imgs.push(img);
+                });
+                setImgList(imgs);
             }
         });
     }, [page]);
 
+    // 选中网络图片
+    const handleCheckImg = (e: React.MouseEvent<HTMLDivElement>, image: IImage) => {
+        handleDrop(e);
+        if (get(image.name)) {
+            remove(image.name);
+        } else {
+            set(image.name, image)
+        }
+    };
+
+    // 跳转
+    const jump = () => {
+        if (page<=0) {
+            setPage(1);
+        }
+        if (page>totalPage) {
+            setPage(totalPage);
+        }
+        handleImageList(page);
+    };
+
+    // input跳转
+    const handlePage = (e: ChangeEvent<HTMLInputElement>) => {
+        let num = Number(e.target.value);
+        if (num<=0) {
+            setPage(1);
+        } else if (num>totalPage) {
+            setPage(totalPage);
+        } else {
+            setPage(num);
+        }
+
+    };
+
     useEffect(() => {
         setAltText("");
-        // handleImageList(1);
+        setPage(1);
+        handleImageList(1);
     }, []);
 
     const _uploadFileByDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -137,11 +179,10 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             ...prev,
             loading: true
         }));
-        let arrImgs = Object.keys(checkedImgs).map((id, idx) => {
-            let image = checkedImgs[Number(id)];
-            let src = BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + image.name;
-            return {
-                src: src,
+        let arrImgs: ImageProps[] = Array.from(checkedImgs).map((item) => {
+            let image = item[1];
+            let insert = {
+                src: BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + image.name,
                 fileName: image.tags,
                 width: image.width,
                 altText: '',
@@ -149,6 +190,9 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                 position: position,
                 showCaption: showCaption
             } as ImageProps;
+            // 插入图片
+            props.insertImg(null, insert);
+            return insert;
         });
         setImgState({
             ...imgState,
@@ -156,8 +200,6 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             formData: new FormData(),
             loading: false
         });
-        // 插入图片
-        arrImgs.length>0 && props.insertImg(null, arrImgs[0]);
     };
 
     const onFileUpload = async (e: React.SyntheticEvent<Element>, drop?: boolean) => {
@@ -425,35 +467,36 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                 )}
                 {leftMenu=='net' && (
                     <div className='col-9 mx-auto'>
-                        <div className='d-flex flex-row flex-wrap align-items-center text-center'>
-                            <LoaderComp loading={getPersonalImageListMutation.isLoading} className="imagesWrapper">
-                            <>
-                                {imgList.map((item, idx) => {
-                                    return (
-                                        <div className='img-picker-item' >
-                                            <i role="img" aria-describedby="图片描述" title="图片描述" className={classNames("img-i", {"img-selected": checkedImgs[item.id]})}
-                                                style={{backgroundImage: 'url("https://tse2-mm.cn.bing.net/th/id/OIP-C.g9UbVfyVZX-SfD09JcYr5QHaEK?rs=1&pid=ImgDetMain")'}}>
-                                                <span className={classNames("img-checkbox", {"img-selected": checkedImgs[item.id]})}></span>
-                                            </i>
-                                            <strong className="img-title">2222</strong>
-                                        </div>
-                                    );
-                                })}
-                            </>
-                            </LoaderComp>
-                        </div>
+                        <LoaderComp loading={getPersonalImageListMutation.isLoading} className='d-flex flex-row flex-wrap align-items-center text-center'>
+                        <>
+                            {imgList.map((item, idx) => {
+                                return (
+                                    <div key={idx} className='img-picker-item' onClick={(e)=>{ handleCheckImg(e, item);}}>
+                                        <i role="img" aria-describedby="图片描述" title={item.name} className={classNames("img-i", {"img-selected": checkedImgs.has(item.name)})}
+                                            style={{backgroundImage: 'url("https://tse2-mm.cn.bing.net/th/id/OIP-C.g9UbVfyVZX-SfD09JcYr5QHaEK?rs=1&pid=ImgDetMain")'}}>
+                                            <span className={classNames("img-checkbox", {"img-selected": checkedImgs.has(item.name)})}></span>
+                                        </i>
+                                        <strong className="img-title">{item.tags}</strong>
+                                    </div>
+                                );
+                            })}
+                        </>
+                        </LoaderComp>
                         <div className="img-pagination">
                             <span className="img-nav">
+                                {page>1 && (
+                                    <i className='iconfont icon-zuojiantou img-pageBtn me-2' onClick={jump}></i>
+                                )}
                                 <span className="img-pageNum">
                                     <label>{page}</label> 
                                     <span>/</span> 
                                     <label>{totalPage}</label>
                                 </span> 
-                                <i className='iconfont icon-youjiantou img-pageBtn'></i>
+                                <i className='iconfont icon-youjiantou img-pageBtn' onClick={jump}></i>
                             </span> 
                             <span className="img-page-form">
-                                <input type="number" className="img-page-input" /> 
-                                <a href="javascript:;" className="img-page-link" onClick={() => handleImageList(page)}>跳转</a>
+                                <input type="number" className="img-page-input" onChange={handlePage}/> 
+                                <a href="#!" className="img-page-link" onClick={jump}>跳转</a>
                             </span>
                         </div>
                     </div>

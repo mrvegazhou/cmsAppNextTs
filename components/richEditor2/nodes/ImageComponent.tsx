@@ -56,6 +56,16 @@ import ContentEditable from '../ui/ContentEditable';
 import ImageResizer from '../ui/ImageResizer';
 import Placeholder from '../ui/Placeholder';
 import {$isImageNode} from './ImageNode';
+import { SkeletonLayout } from '@/components/skeleton/layout';
+
+const Skeleton = () => <SkeletonLayout
+  align="center"
+  items={[
+    { height: 20, width: '90%', marginBottom: 30 },
+    { height: 20, width: '90%', marginBottom: 30 },
+    { height: 20, width: '90%', marginBottom: 30 }
+  ]}
+/>;
 
 const imageCache = new Set();
 
@@ -367,7 +377,7 @@ export default function ImageComponent({
   const isFocused = isSelected || isResizing;
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<Skeleton />}>
       <>
         <div draggable={draggable}>
           <LazyImage

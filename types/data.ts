@@ -4,6 +4,7 @@ export type TParams = RequestInit & {
   baseURL?: string;
   token?: string;
   id?: any;
+  name?: any;
   query?: Record<any, any>;
   type?: 'formData';
 };

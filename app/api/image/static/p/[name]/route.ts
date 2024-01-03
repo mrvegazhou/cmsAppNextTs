@@ -1,30 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  apiAuthMiddleware,
   apiQueryParams,
   apiResponse,
   createConfig,
 } from '@/lib/api';
-import { IMAGE_URL } from '@/lib/constant';
+import { ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
 
 export async function GET(request: NextRequest, { params }: any) {
-  try { 
+  try {
     const config = createConfig({
       baseURL: process.env.APP_API_SERVER,
-      query: apiQueryParams({
-        request,
-      }),
-      id: apiQueryParams({
+      token: apiAuthMiddleware(request),
+      name: apiQueryParams({
         request,
         params,
         filter: [
           {
-            name: 'id',
+            name: 'name',
           },
         ],
-      }).id
+      }).name,
     });
     const response = await fetch(
-      config.baseURL + IMAGE_URL + config.id,
+      config.baseURL + ARTICLE_PERSONAL_IMAGE_URL + config.name,
       config
     );
     const data = await response.blob();

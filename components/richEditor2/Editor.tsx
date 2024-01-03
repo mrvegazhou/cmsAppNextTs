@@ -48,6 +48,7 @@ import MentionsPlugin from './plugins/MentionsPlugin';
 // ui
 import Placeholder from './ui/Placeholder';
 import ContentEditable from './ui/ContentEditable';
+import JSXStyle from 'styled-jsx/style';
 
 const Editor = forwardRef((prop, ref): JSX.Element => {
   const {historyState} = useSharedHistoryContext();
@@ -104,24 +105,30 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
       () => {
         editor.getEditorState().read(() => {
           if ( contentObj ) {
-            const selection = $getSelection();
-            // @ts-ignore
-            const anchor = selection.anchor;
-            // @ts-ignore
-            const focus = selection.focus;
-            const range = createDOMRange(
-              editor,
-              anchor.getNode(),
-              anchor.offset,
-              focus.getNode(),
-              focus.offset,
-            );
-            // @ts-ignore
-            const { bottom } = range.getBoundingClientRect();
-            let diff = Math.round(bottom - window.innerHeight + 80);
-            if ( diff>0 ) {
-              diff = diff > 28 ? diff : 28;
-              document.documentElement.scrollTop += diff;
+            try {
+              const selection = $getSelection();
+              // @ts-ignore
+              const anchor = selection.anchor;
+              // @ts-ignore
+              const focus = selection.focus;
+              if (typeof anchor != 'undefined' && typeof focus != 'undefined') {
+                const range = createDOMRange(
+                  editor,
+                  anchor.getNode(),
+                  anchor.offset,
+                  focus.getNode(),
+                  focus.offset,
+                );
+                // @ts-ignore
+                const { bottom } = range.getBoundingClientRect();
+                let diff = Math.round(bottom - window.innerHeight + 80);
+                if (diff > 0) {
+                  diff = diff > 28 ? diff : 28;
+                  document.documentElement.scrollTop += diff;
+                }
+              }
+            } catch(e) {
+
             }
           }
         });
@@ -132,6 +139,13 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
 
   return (
     <>
+      <style jsx>
+      {`
+        .toolbar {
+          overflow-x: auto;
+        }
+      `}
+      </style>
       <ToolbarPlugin  setIsLinkEditMode={setIsLinkEditMode} />
       <div
         className='editor-container'>

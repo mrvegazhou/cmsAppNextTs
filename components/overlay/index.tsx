@@ -126,11 +126,9 @@ export default function Overlay(props: OverlayProps) {
     }
 
     function overlayWillClose() {
-        if (hasBackdrop && usePortal) {
+        // if (hasBackdrop && usePortal) {
             document.body.classList.remove(`${prefixCls}-open`);
-        }
-        // if (unmountOnExit) {
-        //   setVisible(false)
+
         // }
     }
     const TransitionGroupComp = (

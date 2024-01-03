@@ -8,7 +8,11 @@ import {
 export const getPersonalImageList = (
     params: TBody<{page: number}>
 ): Promise<Response | IData<any>> => {
-    let config = createConfig(params, { method: 'POST' });
+    let config = createConfig(params, {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json'
+    }});
     const url = config.baseURL + ARTICLE_IMAGE_LIST;
     return fetch(url, config).then(
         handleReqMiddleware

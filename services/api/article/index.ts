@@ -1,6 +1,6 @@
 import type { TBody } from '@/types';
 import { createConfig, handleReqMiddleware } from '@/lib/api';
-import type { IData, IArticleId, IArticleUploadImages, IUploadArticleContent } from '@/interfaces';
+import type { IData, IArticleId, IArticleUploadImages } from '@/interfaces';
 import { 
     CURRENT_ARTICLE_INFO,
     ARTICLE_LIKE,
