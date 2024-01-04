@@ -76,7 +76,6 @@ const ImageUploader = forwardRef((props: Props, ref) => {
 
     // 左边菜单选择
     const [leftMenu, setLeftMenu] = useState("local");
-    // const [checkedImgs, setCheckedImgs] = useState<Map<string, IImage>>(new Map());
     const [checkedImgs, { set, setAll, remove, reset, get }] = useMap<string, IImage>([]);
 
     // 图片分页

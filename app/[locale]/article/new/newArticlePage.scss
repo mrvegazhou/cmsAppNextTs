@@ -1,3 +1,8 @@
+.input-placeholder::placeholder {
+    color: #6c757d !important;
+    font-size: 1rem;
+    font-weight: 400;
+}
 .add-cover-img {
     box-sizing: border-box;
     margin: 0;
@@ -25,4 +30,84 @@
     -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
+}
+
+.article-type-label {
+    margin: 0px 20px 0px 0px;
+    display: flex;
+    align-items: center;
+    min-width: 180px;
+    height: 38px;
+    border: 1px solid rgb(235, 236, 237);
+    background: rgb(255, 255, 255);
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+.article-type-name {
+    box-sizing: border-box;
+    margin: 0px 0px 0px 10px;
+    min-width: 0px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-wrap: nowrap;
+    max-width: 150px;
+}
+
+.article-type-btn {
+    color: rgb(196, 199, 206);
+    margin-left: auto;
+    flex: 0 0 auto;
+    height: 38px;
+    line-height: 38px;
+    padding: 0px 10px 
+}
+
+.article-type-input {
+    display: flex;
+    align-items: center;
+    min-width: 180px;
+    height: 38px;
+    border: 1px solid rgb(235, 236, 237);
+    background: rgb(255, 255, 255);
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin-right: 20px;
+    padding-right: 0px;
+    input {
+        height: 24px;
+        line-height: 24px;
+        background: transparent;
+        border: none;
+        flex: 1 1;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        overflow: hidden;
+        padding: 0;
+        resize: none;
+        outline: none;
+    }
+    svg {
+        color: rgb(145, 150, 161);
+        margin-right: 6px;
+    }
+    .article-type-input-btn svg {
+        color: rgb(196, 199, 206);
+        height: 38px;
+        line-height: 38px;
+    }
+}
+.article-type-add {
+    display: flex;
+    align-items: center;
+    min-width: 180px;
+    height: 38px;
+    border: 1px solid rgb(235, 236, 237);
+    background: rgb(255, 255, 255);
+    box-sizing: border-box;
+    border-radius: 4px;
+    margin-right: 20px;
+    justify-content: center;
+    cursor: pointer;
 }

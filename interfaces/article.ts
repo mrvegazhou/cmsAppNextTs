@@ -54,3 +54,8 @@ export interface IUploadArticleContent {
   };
 }
 
+export interface IArticleTypeList {
+  id: number;
+  name: string;
+}
+
