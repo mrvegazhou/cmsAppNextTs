@@ -6,3 +6,5 @@ export * from './register';
 export * from './search';
 export * from './siteInfo';
 export * from './article';
+export * from './tag';
+export * from './type';

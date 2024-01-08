@@ -66,9 +66,15 @@ export const ARTICLE_UNLIKE = "/article/unlike";
 export const ARTICLE_TOOLBAR_DATA = "/article/toolBarData";
 // 文章收藏
 export const ARTICLE_COLLECTION = "/article/collection";
-// 文章类型
-export const ARTICLE_TYPE_LIST = "/article/typeList";
 //  图片上传
 export const ARTICLE_UPLOAD_IMAGE = "/article/uploadImage";
 // 图片列表
 export const ARTICLE_IMAGE_LIST = "/image/personalImageList";
+// tag
+export const APP_TAG_LIST = "/tag/list";
+// 分类
+export const APP_TYPE_LIST = "/type/list";
+// 根据pid获取分类列表
+export const APP_TYPE_PID = "/type/pid";
+// 根据id获取分类列表
+export const APP_TYPE_ID = "/type/id";

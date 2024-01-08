@@ -3,11 +3,10 @@ import type {
   } from '@/interfaces';
 
 export interface IImage extends IBase {
-    id: number;
     name: string;
     width?: number;
     height?: number;
-    tags?: string;
+    tag?: string;
     src?: string;
 }
 
@@ -16,3 +15,11 @@ export interface IImageList {
     page: number;
     totalPage: number;
 }
+
+export type IImageState = {
+    loading?: boolean;
+    image: IImage;
+    formData: FormData;
+    err?: Error | null;
+    uploaded?: boolean;
+};

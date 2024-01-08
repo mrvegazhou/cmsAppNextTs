@@ -18,3 +18,10 @@ export const getPersonalImageList = (
         handleReqMiddleware
     );
 };
+
+export const getPersonalImageListConf = {
+    staleTime: 1000 * 3600 * 5, // 3小时后过期
+    retry: 3, // 在显示错误之前将重试失败的请求3次
+    retryDelay: 5000, // 总是等待 1000ms 重新请求, 忽略总共请求了多少次
+    keepPreviousData: true
+};

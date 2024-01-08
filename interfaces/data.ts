@@ -1,6 +1,6 @@
 
 export interface IBase {
-  id: number;
+  id?: number;
   createdBy?: number;
   updatedBy?: number;
   createTime?: string;
@@ -57,4 +57,14 @@ export interface IData<T> {
 
 export interface ILocale {
   locale: string;
+}
+
+export interface ITag extends IBase {
+  id: number;
+  name: string;
+}
+
+export interface IType extends IBase {
+  id: number;
+  name: string;
 }

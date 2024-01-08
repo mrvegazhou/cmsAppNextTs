@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthMiddleware, apiQueryBody, apiResponse } from '@/lib/api';
-import { getArticleTypeList } from '@/services/api';
+import { getTypeList } from '@/services/api';
 
 export async function POST(request: NextRequest) {
   try {
-    const response = (await getArticleTypeList({
+    const response = (await getTypeList({
       baseURL: process.env.APP_API_SERVER,
       token: apiAuthMiddleware(request),
       data: await apiQueryBody({ request }),
