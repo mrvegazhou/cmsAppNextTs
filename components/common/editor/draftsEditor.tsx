@@ -20,6 +20,9 @@ const DraftsEditor: FC<propsType> = props => {
 
     /** 判断按钮是否禁止点击*/
     let isDisabled = useMemo(() => {
+        // console.log( !/^[\s\S]*.*[^\s][\s\S]*$/.test(article.title))
+        // console.log(article.title.length > 199)
+        // console.log(article.content.length < 20)
         return (
             !/^[\s\S]*.*[^\s][\s\S]*$/.test(article.title) ||
             article.title.length > 199 ||

@@ -168,7 +168,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             let image = item[1];
             let insert = {
                 src: BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + image.name,
-                fileName: image.tags,
+                fileName: image.tag,
                 width: image.width,
                 altText: '',
                 height: image.height,
@@ -253,7 +253,6 @@ const ImageUploader = forwardRef((props: Props, ref) => {
         fileUploadRef.current.value = '';
         // @ts-ignore
         e.type == "change" && (e.target.reset && e.target.reset());
-        
     };
 
     const uploadArticleImageMutation = useMutation(
@@ -462,7 +461,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                                             style={{backgroundImage: 'url("https://tse2-mm.cn.bing.net/th/id/OIP-C.g9UbVfyVZX-SfD09JcYr5QHaEK?rs=1&pid=ImgDetMain")'}}>
                                             <span className={classNames("img-checkbox", {"img-selected": checkedImgs.has(item.name)})}></span>
                                         </i>
-                                        <strong className="img-title">{item.tags}</strong>
+                                        <strong className="img-title">{item.tag}</strong>
                                     </div>
                                 );
                             })}

@@ -8,7 +8,7 @@ import FooterPage from '@/app/[locale]/footer';
 import { writeArticleContext, writeArticleInitValue } from "@/store/articleData";
 import { userDataContext } from "@/store/userData";
 import ContentLayout from "../../common/contentLayout";
-import { IArticle } from "@/interfaces";
+import { debounce } from "lodash"
 import RichEditor from "@/components/richEditor2/App";
 import ArticleTag from "../articleTag";
 import ArticleType from "../aritcleType";
@@ -54,7 +54,20 @@ const NewArticleEditor: FC<propsType> = props => {
   }, []);
 
 
-  const handleTitle = () => {
+  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debounce(() => {
+      setArticleData(pre => {
+        return {...pre, ...{title: e.target.value}};
+      });
+    }, 500)();
+  };
+
+  const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    debounce(() => {
+      setArticleData(pre => {
+        return {...pre, ...{description: e.target.value}};
+      });
+    }, 500)();
   };
 
   return (
@@ -90,7 +103,7 @@ const NewArticleEditor: FC<propsType> = props => {
                 封面
               </div>
               <div className="col-10">
-                <ArticleCover />
+                <ArticleCover init={false} />
               </div>
             </div>
             <div className="row mt-4 d-flex flex-row align-items-center justify-content-center">
@@ -99,7 +112,7 @@ const NewArticleEditor: FC<propsType> = props => {
               </div>
               <div className="col-10">
                 <div className="d-flex text-muted">
-                  <ArticleType />
+                  <ArticleType init={false} />
                 </div>
               </div>
             </div>
@@ -108,8 +121,8 @@ const NewArticleEditor: FC<propsType> = props => {
                 <span className="text-danger">*</span>标签
               </div>
               <div className="col-10">
-                <div className="d-flex text-muted">
-                  <ArticleTag />
+                <div className="d-flex text-muted flex-wrap">
+                  <ArticleTag init={true} />
                 </div>
               </div>
             </div>
@@ -118,7 +131,7 @@ const NewArticleEditor: FC<propsType> = props => {
                 摘要
               </div>
               <div className="col-10">
-                <textarea className="form-control" style={{ height: '100px', width: '600px' }}></textarea>
+                <textarea className="form-control" style={{ height: '100px', width: '600px' }} onChange={handleDescription}></textarea>
               </div>
             </div>
           </div>

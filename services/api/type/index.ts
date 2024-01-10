@@ -1,6 +1,6 @@
 import type { TBody } from '@/types';
 import { createConfig, handleReqMiddleware } from '@/lib/api';
-import type { IData, IType } from '@/interfaces';
+import type { IData, IType, ITypeAndPType } from '@/interfaces';
 import { 
     APP_TYPE_LIST, APP_TYPE_PID, APP_TYPE_ID
 } from '@/lib/constant'
@@ -34,7 +34,7 @@ export const getTypeListByPid = (
 
 export const getTypeInfoById = (
     params: TBody<{ id: number }>
-): Promise<Response | IData<{ typeInfo: IType }>> => {
+): Promise<Response | IData<{ typeInfo: ITypeAndPType }>> => {
     let config = createConfig(params, { method: 'POST' });
     const url = config.baseURL + APP_TYPE_ID;
     return fetch(url, config).then(

@@ -68,3 +68,10 @@ export interface IType extends IBase {
   id: number;
   name: string;
 }
+
+export interface ITypeAndPType {
+  id: number;
+  name: string;
+  pid: number;
+  pname: string;
+}

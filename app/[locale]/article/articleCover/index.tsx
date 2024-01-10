@@ -10,10 +10,11 @@ import { BASE_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib
 import { handleDrop, convertBytesToKB, loadImage } from "@/lib/tool";
 import useToast from '@/hooks/useToast';
 import { uploadArticleImages } from "@/services/api";
+import LoaderComp from '@/components/loader/loader';
 import './index.scss';
 
 
-const ArticleCover = (props:{}) => {
+const ArticleCover = (props:{init: boolean}) => {
     const t = useTranslations('RichEditor');
     const { show } = useToast();
     const [articleData, setArticleData] = useRecoilState(writeArticleContext);
@@ -29,7 +30,15 @@ const ArticleCover = (props:{}) => {
     const [imgState, setImgState] = useState<IImageState>(initState);
     
     useEffect(() => {
-        
+        // 初始化
+        if (props.init) {
+            if (articleData.coverImage.src!="") {
+                setImgState((prev) => ({
+                    ...prev,
+                    image: articleData.coverImage,
+                }));
+            }
+        }
     }, []);
 
     const uploadArticleCoverMutation = useMutation(
@@ -127,11 +136,13 @@ const ArticleCover = (props:{}) => {
 
     return (
         <>
+            <LoaderComp loading={uploadArticleCoverMutation.isLoading} className='d-flex flex-column' style={{width:'152px'}}>
+            <>
             <label className="add-img-label cursor-pointer">
                 <input type="file" accept=".jpeg, .jpg, .png" multiple={false} className="d-none" onChange={onFileUpload} ref={fileUploadRef} />
-                {articleData.coverImage.src ? (
+                {imgState.image.src ? (
                     <div className="add-cover-img">
-                        <img src={articleData.coverImage.src} width={articleData.coverImage.width} height={articleData.coverImage.height} alt={articleData.coverImage.tag}  />
+                        <img src={imgState.image.src} width={imgState.image.width} height={imgState.image.height} alt={imgState.image.tag}  />
                     </div>
                 ) : (
                     <div className="add-cover-img">
@@ -141,9 +152,10 @@ const ArticleCover = (props:{}) => {
                         添加文章封面
                     </div>
                 )}
-                
             </label>
-            <small className="text-muted">图片上传格式支持 JPEG、JPG、PNG</small>
+            </>
+            </LoaderComp>
+            <small className="text-muted mt-1">图片上传格式支持 JPEG、JPG、PNG</small>
         </>
     );
 };

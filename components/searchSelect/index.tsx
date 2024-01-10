@@ -20,7 +20,7 @@ export interface SearchSelectProps extends IProps, DropdownProps {
     loading?: boolean;
     showSearch?: boolean;
     allowClear?: boolean;
-    defaultValue?: ValueType | Array<ValueType>;
+    defaultValue?: Array<SearchSelectOptionData>;
     value?: ValueType | Array<ValueType>;
     option: SearchSelectOptionData[];
     onSelect?: (value: ValueType | Array<ValueType> | Array<SearchSelectOptionData>) => void;
@@ -77,12 +77,20 @@ export default function SearchSelect(props: SearchSelectProps) {
         return value !== undefined && value !== '';
     };
 
+
     const valueRef = useRef<Array<SearchSelectOptionData>>();
     valueRef.current = useMemo(() => selectedValue, [selectedValue]);
 
     useEffect(() => {
-        if (!valueVerify(value) && valueVerify(defaultValue)) {
-            selectedValueChange(defaultValue!);
+        // if (!valueVerify(value) && valueVerify(defaultValue)) {
+        //     selectedValueChange(defaultValue!);
+        // }
+        
+        // @ts-ignore
+        if (defaultValue.length>0 && defaultValue[0].label!="" && (defaultValue[0].value!="" || defaultValue[0].value!=0)) {
+            // @ts-ignore
+            if (!isMultiple) setSelectedLabel(defaultValue[0].label);
+            setSelectedValue(defaultValue!);
         }
     }, []);
 
@@ -129,7 +137,7 @@ export default function SearchSelect(props: SearchSelectProps) {
         }
 
         if (!isMultiple && opts.length > 0) setSelectedLabel(opts[0].label || '');
-        setSelectedValue(opts.slice(0, valueAmount));
+        setSelectedValue(opts.slice(0, valueAmount));   
     }
 
     function removeSelectItem(index: number) {
