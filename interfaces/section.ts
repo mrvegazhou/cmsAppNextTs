@@ -1,33 +1,9 @@
 import type {
     IBase,
-    IPagination,
-    IPost,
-    ISectionGroup,
     ITag,
-    ITagGroup,
     IUser,
   } from '@/interfaces';
-  import type { TSectionOtherState, TSectionState } from '@/types';
   
-  export interface ISectionClient extends ISection {
-    postCount: number;
-    tagCount: number;
-    sectionGroup?: ISectionGroup;
-    admins: IUser[];
-    tags: ITag[];
-  }
-  
-  export interface ISection extends IBase {
-    id: number;
-    cover?: string;
-    name: string;
-    state: TSectionState;
-    otherStates: TSectionOtherState[];
-    overview?: string;
-    sort: number;
-    allow?: number[];
-    block?: number[];
-  }
   
   export interface ICreateSectionBody {
     name: string;
@@ -52,15 +28,6 @@ import type {
     formData?: FormData;
   }
   
-  export interface ISectionDetails {
-    basic: ISection;
-    content?: string;
-    tagGroups?: ITagGroup[];
-    sectionGroup?: ISectionGroup;
-    tags: ITag[];
-    admins: IUser[];
-    data?: IPagination<IPost>;
-  }
   
   export interface IUpdateSectionStatusBody {
     status: string;

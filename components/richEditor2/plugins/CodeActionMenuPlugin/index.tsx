@@ -22,7 +22,7 @@ import { createPortal } from 'react-dom';
 
 import { CopyButton } from './components/CopyButton';
 import { canBePrettier, PrettierButton } from './components/PrettierButton';
-import { useDebounce } from './utils';
+import useDebounce from '@/hooks/useDebounce';
 
 const CODE_PADDING = 8;
 

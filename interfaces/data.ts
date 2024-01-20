@@ -9,24 +9,6 @@ export interface IBase {
   expirTime?: string;
 }
 
-export interface IPagination<item> {
-  content: item[];
-  pageable: IPageable;
-}
-
-export interface IPageable {
-  next: boolean;
-  page: number;
-  pages: number;
-  previous: boolean;
-  size: number;
-  keyset?: IKeySet;
-}
-
-export interface IKeySet {
-  lowest: [];
-  highest: [];
-}
 
 export interface IQueryParams {
   page?: number;

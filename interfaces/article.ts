@@ -1,5 +1,5 @@
 import type {
-  IBase
+  IBase, IUser, IUserList
 } from '@/interfaces';
 import { IImage } from './image';
 
@@ -65,4 +65,8 @@ export interface IUploadArticleContent {
 export interface IArticleType {
   id: number;
   name: string;
+}
+
+export interface IArticleCollabView {
+  [Key: number]: {"userList": IUser[]; "articleInfo": {"info": IArticle; "tokenUrl": string}};
 }

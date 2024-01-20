@@ -62,7 +62,7 @@ import {
   Thread,
   useCommentStore,
 } from '../../commenting';
-import useModal from '../../hooks/useModal';
+import useModal from '@/hooks/useModal/show';
 import CommentEditorTheme from '../../themes/CommentEditorTheme';
 import ContentEditable from '../../ui/ContentEditable';
 import Placeholder from '../../ui/Placeholder';

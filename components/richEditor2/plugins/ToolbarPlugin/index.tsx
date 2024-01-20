@@ -77,7 +77,7 @@ import classNames from 'classnames';
 import Dropdown from '@/components/dropdown';
 import Menu from '@/components/menu/Menu';
 
-import useModal from '../../hooks/useModal';
+import useModal from '@/hooks/useModal/show';
 // import catTypingGif from '../../images/cat-typing.gif';
 // import {$createStickyNode} from '../../nodes/StickyNode';
 // import DropDown, {DropDownItem} from '../../ui/DropDown';

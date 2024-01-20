@@ -52,6 +52,8 @@ export const SEARCH_TRENDING_TODAY = "/user/search/trendingToday";
 export const REFRESH_TOKEN = "/user/token/refresh";
 // 用户信息
 export const USER_INFO = "/user/info";
+// 通过名称搜用户列表
+export const SEARCH_USER_LIST = "/user/search/name";
 // app配置信息
 export const SITE_CONFIG_URL = "/site/config/info";
 // 登录页信息
@@ -66,7 +68,7 @@ export const ARTICLE_UNLIKE = "/article/unlike";
 export const ARTICLE_TOOLBAR_DATA = "/article/toolBarData";
 // 文章收藏
 export const ARTICLE_COLLECTION = "/article/collection";
-//  图片上传
+// 图片上传
 export const ARTICLE_UPLOAD_IMAGE = "/article/uploadImage";
 // 图片列表
 export const ARTICLE_IMAGE_LIST = "/image/personalImageList";
@@ -78,3 +80,9 @@ export const APP_TYPE_LIST = "/type/list";
 export const APP_TYPE_PID = "/type/pid";
 // 根据id获取分类列表
 export const APP_TYPE_ID = "/type/id";
+// 协作
+export const INVITE_COLLAB = "/article/collab/invite";
+// 退出协作
+export const EXIT_COLLAB = "/article/collab/exit"
+// 文章协作列表
+export const COLLAB_VIEW = "/article/collab/view"

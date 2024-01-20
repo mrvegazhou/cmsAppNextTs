@@ -11,6 +11,7 @@ import {$getSelection} from 'lexical';
 import useLexicalEditable from '@lexical/react/useLexicalEditable';
 import * as React from 'react';
 import {useEffect, useState, forwardRef} from 'react';
+import { $generateHtmlFromNodes } from '@lexical/html';
 
 import {CAN_USE_DOM} from './shared/canUseDOM';
 
@@ -44,10 +45,13 @@ import VideoIframePlugin from './plugins/VideoIframePlugin';
 import FloatingTextFormatToolbarPlugin from './plugins/FloatingTextFormatToolbarPlugin';
 import ActionTool from './actionTool';
 import MentionsPlugin from './plugins/MentionsPlugin';
+import CodeActionMenuPlugin from './plugins/CodeActionMenuPlugin';
 
 // ui
 import Placeholder from './ui/Placeholder';
 import ContentEditable from './ui/ContentEditable';
+import classNames from 'classnames';
+
 
 const Editor = forwardRef((prop, ref): JSX.Element => {
   const {historyState} = useSharedHistoryContext();
@@ -134,7 +138,41 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
       },
     );
   }, [editor, isEditable]);
-  
+
+  // 定时保存文章内容
+  // const record2Html = useDebounce((editorState: EditorState) => {
+  //   editorState.read(() => {
+  //     const htmlString = $generateHtmlFromNodes(editor, null);
+  //   });
+  // }, 2000);
+
+  // useEffect(() => {
+  //   const removeUpdateListener = editor.registerUpdateListener(
+  //     ({ editorState }) => {
+  //       record2Html(editorState);
+  //     }
+  //   );
+  //   return () => {
+  //     removeUpdateListener();
+  //   };
+  // }, [editor]);
+
+  const handleSave2Html = () => {
+    let content = "";
+    editor.update(() => {
+      const htmlString = $generateHtmlFromNodes(editor, null);
+      content = htmlString
+    });
+    return content;
+  };
+
+  React.useImperativeHandle(ref, () => ({
+    handleSave2Html
+  }));
+
+  // const room = useRoom();
+  // const userInfo = useSelf((me) => me.info);
+
   return (
     <>
       <style jsx>
@@ -142,16 +180,34 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
         .toolbar {
           overflow-x: auto;
         }
+        .mask{
+          position: relative;filter: blur(2px);user-select: none;
+        }
+        .mask::after {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          content: '';
+          display: block;
+          background: rgba(255, 253, 253, 0.2);
+        }
       `}
       </style>
-      <ToolbarPlugin  setIsLinkEditMode={setIsLinkEditMode} />
+      
+      <ToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
       <div
-        className='editor-container'>
+        className={classNames('editor-container', {'mask': !isEditable})}>
           <>
+            {!isEditable && (<div className="position-absolute top-50 start-50"><i className='iconfont icon-lock fs-2 opacity-25' /></div>)}
             {isCollab ? (
               <CollaborationPlugin
-                id="main"
+                id="yjs-plugin2"
+                cursorColor={"red"}
+                username={Math.random().toString(36).slice(-8)}
                 providerFactory={createWebsocketProvider}
+                // initialEditorState={initialEditorState}
                 shouldBootstrap={true}
               />
             ) : (
@@ -191,6 +247,7 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
             {floatingAnchorElem && !isSmallWidthViewport && (
               <>
                 <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+                <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
                 {/* 链接浮层 */}
                 <FloatingLinkEditorPlugin
                   anchorElem={floatingAnchorElem}

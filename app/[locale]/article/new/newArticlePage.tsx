@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, FC, useState, useRef } from "react";
+import { useEffect, FC, useRef, useState } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { useTranslations } from 'use-intl';
 import type { TMetadata } from '@/types';
@@ -15,7 +15,13 @@ import ArticleType from "../aritcleType";
 import ArticleCover from "../articleCover";
 import "./newArticlePage.scss"
 import Avatar from "../../login/avatar";
+import InviteCollab from "../inviteCollab";
+import { useInterval } from 'ahooks';
 type articleContextType = typeof writeArticleInitValue;
+// import dynamic from "next/dynamic";
+// const EditorCSR = dynamic(() => import("../components/Editor"), {
+//   ssr: false,
+// });
 
 interface propsType {
   metadata: TMetadata;
@@ -48,7 +54,8 @@ const NewArticleEditor: FC<propsType> = props => {
   const t = useTranslations('ArticleEditPage');
   const editorRef = useRef(null);
   const [articleData, setArticleData] = useRecoilState(writeArticleContext);
-
+  const [saveLocalState, setSaveLocalState] = useState<string>();
+  const [title, setTitle] = useState<string>();
   useEffect(() => {
 
   }, []);
@@ -57,17 +64,42 @@ const NewArticleEditor: FC<propsType> = props => {
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     debounce(() => {
       setArticleData(pre => {
-        return {...pre, ...{title: e.target.value}};
+        return {...pre, title: e.target.value};
       });
     }, 500)();
   };
 
   const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     debounce(() => {
+      setTitle(e.target.value);
       setArticleData(pre => {
         return {...pre, ...{description: e.target.value}};
       });
     }, 500)();
+  };
+
+  useInterval(() => {
+    setSaveLocalState("正在保存到本地缓存...");
+    if (editorRef!=null) {
+      // @ts-ignore
+      let contentTmp = editorRef.current.handleSave2Html();
+      let titleTmp = title ?? "";
+      setArticleData(pre => {
+        return {...pre, content: contentTmp, title: titleTmp};
+      });
+      setTimeout(() => {setSaveLocalState(t('savedStatus')); }, 1000);
+    } else {
+      setSaveLocalState("");
+    }
+  }, 900000);
+
+  const setCatalogue = () => {
+    
+  };
+
+  // 邀请协作
+  const InviteColla = () => {
+
   };
 
   return (
@@ -82,12 +114,13 @@ const NewArticleEditor: FC<propsType> = props => {
           <input
             placeholder="输入文章标题..."
             onChange={handleTitle}
-            className="input-placeholder w-100 border-0 fs-5 shadow-none min-vw-50 text-center "
+            className="input-placeholder w-100 border-0 fs-5 shadow-none min-vw-50 text-left "
             style={{ outline: "none" }}
             spellCheck="false"
             maxLength={300}
           />
-          <small className="text-secondary text-nowrap">{t('savedStatus')}</small>
+          <small className="text-secondary text-nowrap">{saveLocalState}</small>
+          <small className="ms-3 text-secondary text-nowrap"><InviteCollab /></small>
           <Avatar class="me-4 ms-4" />
         </div>
 
@@ -98,6 +131,16 @@ const NewArticleEditor: FC<propsType> = props => {
             设置
           </div>
           <div className="card-body mb-3">
+            <div className="row mt-4 d-flex flex-row align-items-center justify-content-center">
+              <div className="col-2 text-end">
+                目录
+              </div>
+              <div className="col-10">
+                <div className="form-check">
+                  <input className="form-check-input" type="checkbox" value="" checked={true} onChange={setCatalogue}/>
+                </div>
+              </div>
+            </div>
             <div className="row mt-4 d-flex flex-row align-items-center justify-content-center">
               <div className="col-2 text-end">
                 封面

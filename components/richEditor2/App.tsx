@@ -44,6 +44,11 @@ const App = forwardRef((prop, ref): JSX.Element => {
       editorRef.current && editorRef.current.showClear();
     };
 
+    useImperativeHandle(ref, () => ({
+      // @ts-ignore
+      handleSave2Html: editorRef.current && editorRef.current.handleSave2Html
+    }))
+
     const Loading = useCallback((): JSX.Element => {
       return <SkeletonLayout
                 align="center"

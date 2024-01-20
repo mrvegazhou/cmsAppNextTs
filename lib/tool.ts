@@ -326,3 +326,13 @@ export const GetImageFile = async (imageUrl: string, fileName: string) => {
   const file = new File([blob], fileName);
   return file;
 }
+
+// 获取当前地址
+export const GetCurrentUrl = () => {
+  const urlParams = new URL(window.location.href);
+  const pathname = urlParams?.pathname;
+  let url = document.location.toString();
+  let arrUrl = url.split("//");
+  let host = window.location.host;
+  return `${arrUrl[0]}//${host}${pathname}`;
+};

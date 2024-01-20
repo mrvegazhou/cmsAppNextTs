@@ -5,7 +5,7 @@ import {mergeRegister} from '@lexical/utils';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {CONNECTED_COMMAND} from '@lexical/yjs';
 import { useTranslations } from 'use-intl';
-import useModal from './hooks/useModal';
+import useModal from '@/hooks/useModal/show';
 import DraftsEditor from "@/components/common/editor/draftsEditor";
 import SaveEditor from "@/components/common/editor/saveEditor";
 import ClearEditor from "@/components/common/editor/clearEditor";
@@ -81,20 +81,33 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
     }, [editor, isEditable]);
 
     return (
-        <>
-            <div id='xxx' className="fixed-bottom d-inline-flex justify-content-center align-items-center border-top bg-white" style={{height:"52px"}}>
-                <small className="me-4 pe-3 text-secondary cursor-pointer" onClick={() => { scrollTo(false)} }>{t('backToEditor')}</small>
-                <small className="me-2 pe-2 text-secondary">{t('wordsCount')}:{wordsNum}</small>
-                <small className="me-5 pe-5 text-secondary">{t('linesCount')}:{linesNum}</small>
-                {/* 清空编辑 */}
-                <ClearEditor class="ms-5" clearFn={clearEditorContent} isEmpty={isEditorEmpty} />
-                {/* 保存到草稿 */}
-                <DraftsEditor class="ms-3"></DraftsEditor>
-                {/* 发布 */}
-                <SaveEditor class="ms-3"></SaveEditor>
+        <div className="fixed-bottom text-center border-top bg-white w-100">
+            <div id='xxx' className="d-inline-flex justify-content-around align-items-center mx-auto flex-nowrap" style={{height:"52px", maxWidth:"1000px", width: "1000px"}}>
+                <div className="justify-content-start align-items-center d-flex flex-nowrap w-50">
+                  <small className="me-2 pe-2 text-secondary">{t('wordsCount')}:{wordsNum}</small>
+                  <small className="me-4 pe-4 text-secondary">{t('linesCount')}:{linesNum}</small>
+                  <small className="me-4 pe-3 text-secondary cursor-pointer" onClick={() => { scrollTo(false)} }>{t('backToEditor')}</small>
+                </div>
+                <div className="justify-content-end align-items-center d-flex flex-nowrap w-50">
+                  <i className={`cursor-pointer ms-5 fs-4 text-secondary iconfont ${!isEditable ? 'icon-unlock' : 'icon-lock'}`} 
+                    onClick={() => {
+                      // Send latest editor state to commenting validation server
+                      if (isEditable) {
+                        // sendEditorState(editor);
+                      }
+                      editor.setEditable(!editor.isEditable());
+                    }}
+                  />
+                  {/* 清空编辑 */}
+                  <ClearEditor class="ms-3" clearFn={clearEditorContent} isEmpty={isEditorEmpty} />
+                  {/* 保存到草稿 */}
+                  <DraftsEditor class="ms-3"></DraftsEditor>
+                  {/* 发布 */}
+                  <SaveEditor class="ms-3"></SaveEditor>
+                </div>
             </div>
             {modal}
-        </>
+        </div>
     );
 });
 ActionTool.displayName = 'ActionTool';

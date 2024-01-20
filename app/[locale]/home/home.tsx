@@ -2,7 +2,6 @@
 
 import type { TMetadata } from '@/types';
 import type {
-  IPagination,
 //   IPost,
   IQueryParams,
 
