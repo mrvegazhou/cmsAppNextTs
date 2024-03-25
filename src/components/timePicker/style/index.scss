@@ -1,0 +1,19 @@
+.w-timepicker {
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.w-timepicker-input.disabled .w-timepicker-close-btn {
+    display: none !important;
+}
+
+.w-timepicker-input .w-timepicker-close-btn {
+    display: none;
+    min-height: initial;
+    color: #a5a5a5;
+}
+
+.w-timepicker-input .w-timepicker-close-btn:hover {
+    color: #393e48;
+    background-color: transparent !important;
+}

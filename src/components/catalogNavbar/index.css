@@ -1,0 +1,30 @@
+.cms-catelog-list {
+    width: 300px;
+    height: 500px;
+    position: fixed;
+    left: 20px;
+    top: 100px;
+    overflow-y: auto;
+    font-size: 14px;
+    border: 1px solid #e0e0e0;
+}
+
+.cms-catelog-list>ul {
+    padding: 0;
+}
+
+.cms-catelog-list li {
+    list-style: none;
+}
+
+.cms-catelog-link {
+    cursor: pointer;
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+}
+
+.cms-catelog-link-active {
+    background: #333;
+    color: white;
+}

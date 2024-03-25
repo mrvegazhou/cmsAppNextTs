@@ -1,0 +1,112 @@
+.w-datepicker-caption {
+    user-select: none;
+    text-align: center;
+    padding: 0 0 3px 0;
+    border-bottom: 1px solid #ececec;
+}
+
+.w-datepicker-caption-pane {
+    transition: background-color 0.3s;
+    display: inline-block;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.w-datepicker-caption-pane:hover {
+    background-color: #eaeaea;
+}
+
+.w-datepicker-caption-pane:active {
+    background-color: #d2d2d2;
+}
+
+.w-datepicker-caption-pane.year+.w-datepicker-caption-pane.month {
+    margin-left: 5px;
+}
+
+.w-datepicker-caption-pane.prev,
+.w-datepicker-caption-pane.next {
+    z-index: 30;
+    position: relative;
+    padding: 1px 8px 6px 8px;
+}
+
+.w-datepicker-caption-pane.prev::after,
+.w-datepicker-caption-pane.next::after,
+.w-datepicker-caption-pane.prev::before,
+.w-datepicker-caption-pane.next::before {
+    content: '';
+    display: block;
+    height: 8px;
+    width: 2px;
+    border-radius: 2px;
+    background-color: #333;
+}
+
+.w-datepicker-caption-pane.prev::after,
+.w-datepicker-caption-pane.next::after {
+    margin-top: -4px;
+}
+
+.w-datepicker-caption-pane.prev::before,
+.w-datepicker-caption-pane.next::before {
+    margin-top: 4px;
+}
+
+.w-datepicker-caption-pane.prev::after,
+.w-datepicker-caption-pane.next::before {
+    transform: rotate(-45deg);
+}
+
+.w-datepicker-caption-pane.prev::before,
+.w-datepicker-caption-pane.next::after {
+    transform: rotate(45deg);
+}
+
+.w-datepicker-caption-pane.prev {
+    float: left;
+}
+
+.w-datepicker-caption-pane.next {
+    float: right;
+}
+
+.w-datepicker-caption-today {
+    cursor: pointer;
+    background: #dedede;
+    border-radius: 3px;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    overflow: hidden;
+    margin: 0 0 0 2px;
+    transition: background-color 0.3s;
+}
+
+.w-datepicker-caption-today::before {
+    content: '';
+    display: block;
+    height: 4px;
+    width: 4px;
+    border-radius: 3px;
+    margin: 3px 0 0 3px;
+    background-color: #a0a0a0;
+}
+
+.w-datepicker-caption-today:hover {
+    background-color: #2ea3f4;
+}
+
+.w-datepicker-caption-today:hover::before {
+    background-color: #fff;
+}
+
+.w-datepicker-caption-today:active {
+    background-color: #007cd2;
+}
+
+.w-datepicker-caption-today:active::before {
+    background-color: #fff;
+}
