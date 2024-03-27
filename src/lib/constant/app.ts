@@ -18,6 +18,18 @@ export const X_POWERED_BY_HEADER = {
   [X_POWERED_BY]: 'www.baidu.com',
 };
 
+// 客户端类型
+export const CLIENT_TPYES = {
+  WAP: 'wap',
+  PC: 'pc',
+  TABLET: 'tablet',
+};
+// 文章保存方式
+export const SAVE_TYPE = {
+  MANUAL: 1,
+  AUTO: 0,
+};
+
 // 上传图片限制
 export const MAX_FILE_SIZE_IN_KB = 10000;
 

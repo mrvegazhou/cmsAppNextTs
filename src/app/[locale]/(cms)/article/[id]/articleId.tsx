@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useSetAtom } from 'jotai'
 import { currentArticleDataAtom, articleToolBarAtom } from '@/store/articleData';
 import useToast from '@/hooks/useToast';
-import Header from '@/app/[locale]/layouts/siteHeader';
-import Footer from '@/app/[locale]/layouts/siteFooter';
+import Header from '@/app/[locale]/_layouts/siteHeader';
+import Footer from '@/app/[locale]/_layouts/siteFooter';
 
 import type { TMetadata } from '@/types';
 import classNames from 'classnames';
 import styles from './articleId.module.scss'
-// import BackTopPage from '../../common/backTop';
+// import BackTopPage from '../../_common/backTop';
 import ToolBar from '../toolBar';
 import { IArticle, IArticleToolBarData } from '@/interfaces';
 import Sidebar from '@/app/[locale]/(cms)/article/sideBar/sideBar';

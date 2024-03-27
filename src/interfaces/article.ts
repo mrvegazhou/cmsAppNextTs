@@ -100,6 +100,7 @@ export interface ICollabTokenInfo {
   cursorColor?: string;
   isCollab: boolean;
   token?: string;
+  isMe?: boolean;
 }
 
 // 文章atom store初始化

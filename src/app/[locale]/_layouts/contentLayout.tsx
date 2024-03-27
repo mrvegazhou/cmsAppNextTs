@@ -1,8 +1,8 @@
 import type { FC, ReactNode } from "react";
 import classNames from 'classnames';
-import BackTopPage from '@/app/[locale]/common/backTop/backTop';
-import Header from '@/app/[locale]/layouts/siteHeader';
-import FooterPage from '@/app/[locale]/layouts/siteFooter';
+import BackTopPage from '@/app/[locale]/_common/backTop/backTop';
+import Header from '@/app/[locale]/_layouts/siteHeader';
+import FooterPage from '@/app/[locale]/_layouts/siteFooter';
 import type { TMetadata } from '@/types';
 
 export interface propsType {

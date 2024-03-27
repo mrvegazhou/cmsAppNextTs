@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { authMiddleware } from '@/lib/api';
 import Metadata from '@/lib/metadata';
-import ResetPage from '../../../common/reset/reset';
+import ResetPage from '../../../_common/reset/reset';
 import NewArticlePage from './newArticlePage';
 import { getLocale } from 'next-intl/server';
 import { TMetadata } from '@/types';
@@ -13,7 +13,6 @@ export default async function Page({
 }: Props & {
     searchParams: { v?: 'h5' }; 
 }) {
-    console.log(params.locale, "===params==");
     
     try {
         const locale = await getLocale();

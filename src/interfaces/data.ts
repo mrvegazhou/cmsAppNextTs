@@ -9,7 +9,6 @@ export interface IBase {
   expirTime?: string;
 }
 
-
 export interface IQueryParams {
   page?: number;
   size?: number;

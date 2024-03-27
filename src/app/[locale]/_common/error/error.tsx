@@ -1,6 +1,6 @@
 'use client';
 
-import { ColorModeItem } from '@/app/[locale]/layouts/siteHeader';
+import { ColorModeItem } from '@/app/[locale]/_layouts/siteHeader';
 import { useTranslations } from 'next-intl';
 
 export default function ErrorPage({ error = '未知错误' }: { error?: any }) {

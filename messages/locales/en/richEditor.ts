@@ -16,6 +16,7 @@ export default {
     linkDesc: "link description",
     linkRmove: "remove link",
 
+    imageTypeErr: "Please upload the correct type of image?",
     imageUpload: "upload image",
     imageUploadErr: "upload error",
     imageUploadLimit: "Image size is limited to ",
@@ -43,5 +44,14 @@ export default {
     prompt: "please fill it out completely",
     optional: "optional filling",
     confirm: "confirm",
-    submit: "submit"
+    submit: "submit",
+
+    localUpload: 'Local upload',
+    currentUsage: 'Current usage images',
+    imgLib: 'Image Library',
+    position: 'position',
+    left: 'Left',
+    right: 'Right',
+    fullWidth: 'Full width',
+    displayCaption: 'Is the caption displayed?'
 };

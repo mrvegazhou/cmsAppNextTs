@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import ResetPage from '../../../common/reset/reset';
+import ResetPage from '../../../_common/reset/reset';
 import { createTranslator } from 'next-intl';
 import type { Metadata as MetadataNext } from 'next';
 import { getMetadata } from '@/lib/tool';

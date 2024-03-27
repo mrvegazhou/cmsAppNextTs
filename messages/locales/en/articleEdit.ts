@@ -3,6 +3,15 @@ export default {
     enterArticleTitle: "Enter article title...",
     goHome: "Go Home",
 
+    wapClient: "WAP client",
+    pcClient: "PC client",
+    tabletClient: 'Tablet client',
+    autoSave: 'Auto save',
+    manualSave: 'Manual save',
+    historyLogs: 'History logs',
+    historyEditList: 'History item',
+    isClearEditContent: 'Are you sure to clear the edited content?',
+
     saveToDrafts: "Save to Drafts",
     saveDraftsErr: "Please fill in the title, article content, and label",
     wordsCount: "Number of words",
@@ -32,7 +41,10 @@ export default {
     articleTagErr: "The label must be filled in",
     articleTypeErr: "Category must be filled in",
 
-    saveDraftSuccess: "Saved successfully",
+    saveArticleSuccess: 'Saved article successfully',
+    saveArticleErr: 'Save article failed',
+
+    saveDraftSuccess: "Saved draft successfully",
     saveDraftErr: "Save draft failed",
     copySuccess: "Copy successfully",
     copyErr: "Copy successfully",

@@ -7,8 +7,8 @@ import {
 } from 'react';
 import type { TMetadata } from '@/types';
 import { useRouter, useParams } from 'next/navigation';
-import Header from '../../layouts/siteHeader';
-import Footer from '../../layouts/siteFooter';
+import Header from '../../_layouts/siteHeader';
+import Footer from '../../_layouts/siteFooter';
 import useRegister from '@/hooks/useRegister';
 import Captcha from '@/components/captcha/Captcha';
 import type { IPageInfo } from '@/interfaces';

@@ -1,4 +1,4 @@
-import EmptyLayout from '../layouts/emptyLayout';
+import EmptyLayout from '../_layouts/emptyLayout';
 import React from 'react';
 import { Props } from '@/types/layout';
 import { locales } from '@/lib/constant/locales';

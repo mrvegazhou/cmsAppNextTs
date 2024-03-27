@@ -71,8 +71,9 @@ import classNames from 'classnames';
 import { useAtomValue } from 'jotai'
 import { userDataAtom } from "@/store/userData";
 import { useAtom } from 'jotai';
-import { writeArticleNoteAtom } from '@/store/articleData';
+import { canEditAtom, writeArticleNoteAtom } from '@/store/articleData';
 import { IArticleNote as Thread, IArticleNoteComment as Comment } from '@/types';
+
 
 export const INSERT_INLINE_COMMAND: LexicalCommand<void> = createCommand(
   'INSERT_INLINE_COMMAND',
@@ -692,6 +693,7 @@ export default function CommentPlugin({
   const {yjsDocMap} = collabContext;
 
   const [articleNoteInfo, setArticleNoteInfo] = useAtom(writeArticleNoteAtom);
+  const canEdit = useAtomValue(canEditAtom);
 
   useEffect(() => {
     if (providerFactory) {
@@ -753,7 +755,11 @@ export default function CommentPlugin({
           });
         }
       }
-      setArticleNoteInfo(commentStore.getComments());
+      // 判断是不是本人 本人才可以存储到localstorage
+      if (canEdit) {
+        setArticleNoteInfo(commentStore.getComments());
+      }
+      
     },
     [commentStore, editor, markNodeMap],
   );

@@ -25,7 +25,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 // import LoadPage from '@/app/[locale]/load/load';
 // import ErrorPage from '@/app/[locale]/error/error';
 import useToast from '@/hooks/useToast';
-import Header from '../../layouts/siteHeader';
+import Header from '../../_layouts/siteHeader';
 // import FooterPage from '@/app/[locale]/footer';
 import { useSearchParams } from 'next/navigation';
 // import PostHome from '@/app/[locale]/home/post';
@@ -33,7 +33,7 @@ import { useSearchParams } from 'next/navigation';
 import type { ReadonlyURLSearchParams } from 'next/dist/client/components/navigation';
 // import LeftHome from '@/app/[locale]/home/left';
 // import RightHome from '@/app/[locale]/home/right';
-// import Nodata from '@/app/[locale]/common/nodata/nodata';
+// import Nodata from '@/app/[locale]/_common/nodata/nodata';
 import { useTranslations } from 'next-intl';
 
 

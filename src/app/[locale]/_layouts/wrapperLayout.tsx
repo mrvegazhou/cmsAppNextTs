@@ -13,10 +13,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { type ReactNode, useState, Suspense } from 'react';
 import type Bootstrap from 'bootstrap';
 import { AppContext } from '@/contexts/app';
-import ToastWrapper from '../common/toast/wrapper';
-import ModalWrapper from '../common/modal/wrapper';
+import ToastWrapper from '../_common/toast/wrapper';
+import ModalWrapper from '../_common/modal/wrapper';
 import { Provider as JotaiProvider } from 'jotai';
-import LoadPage from '../common/load/load';
+import LoadPage from '../_common/load/load';
 
 
 dayjs.extend(duration);

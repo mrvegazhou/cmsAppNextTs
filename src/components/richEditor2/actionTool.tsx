@@ -13,7 +13,8 @@ import CommentPlugin from './plugins/CommentPlugin';
 import {createWebsocketProvider} from './collaboration';
 import { useAtomValue } from 'jotai';
 import { collabTokenInfoAtom } from '@/store/articleData';
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $generateHtmlFromNodes } from '@lexical/html';
+import { canEditAtom } from "@/store/articleData";
 
 const scrollTo = (again: boolean) => {
   const curEl = document.getElementById('richEditorHeader');
@@ -36,7 +37,7 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
     const [modal, showModal] = useModal();
     
     const clearEditorContent = useCallback(() => {
-        showModal('清理编辑内容', (onClose) => (
+        showModal(t('clearEditor'), (onClose) => (
             <ShowClearDialog editor={editor} onClose={onClose} />
         ));
     }, [editor, showModal]);
@@ -68,36 +69,7 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
 
     // 显示标注按钮
     const collabTokenInfo = useAtomValue(collabTokenInfoAtom);
-    
-
-    const test = () => {
-      editor.update(() => {
-        console.log($generateHtmlFromNodes(editor));
-        console.log(JSON.stringify(editor.getEditorState()));
-        
-        const parser = new DOMParser();
-        const dom = parser.parseFromString('<p class="PlaygroundEditorTheme__paragraph" dir="ltr"><u><s><span class="PlaygroundEditorTheme__textUnderlineStrikethrough" style="white-space: pre-wrap;">ttttt</span></s></u></p><p class="PlaygroundEditorTheme__paragraph" dir="ltr"><span style="white-space: pre-wrap;">xxxxxx</span></p><p class="PlaygroundEditorTheme__paragraph" dir="ltr"><span style="white-space: pre-wrap;">xxxxxx</span></p>', 'text/html');
-        const nodes = $generateNodesFromDOM(editor, dom);
-        console.log(nodes[1].exportDOM(editor));
-        
-      });
-
-
-      editor.update(() => {
-        // In the browser you can use the native DOMParser API to parse the HTML string.
-        const parser = new DOMParser();
-        const dom = parser.parseFromString('<p class="PlaygroundEditorTheme__paragraph" dir="ltr"><u><s><span class="PlaygroundEditorTheme__textUnderlineStrikethrough" style="white-space: pre-wrap;">ttttt</span></s></u></p><p class="PlaygroundEditorTheme__paragraph" dir="ltr"><span style="white-space: pre-wrap;">xxxxxx</span></p><p class="PlaygroundEditorTheme__paragraph" dir="ltr"><span style="white-space: pre-wrap;">xxxxxx</span></p>', 'text/html');
-      
-        // Once you have the DOM instance it's easy to generate LexicalNodes.
-        const nodes = $generateNodesFromDOM(editor, dom);
-      
-        // Select the root
-        $getRoot().select();
-        // const selection = $getSelection();
-        // Insert them at a selection.
-        // $insertNodes(nodes);
-      });
-    };
+    const canEditIdent = useAtomValue(canEditAtom);
 
     const CommentContent = useMemo(() => {
       return (
@@ -110,10 +82,20 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
         (<CommentPlugin />)
       );
     }, [collabTokenInfo.isCollab]);
+
+    const test = () => {
+      editor.update(() => {
+        console.log($generateHtmlFromNodes(editor));
+        console.log("-----------");
+        console.log(JSON.stringify(editor.getEditorState()));
+        
+      });
+    };
     
 
     return (
         <div className="fixed-bottom text-center border-top bg-white w-100">
+          <div onClick={test}>测试</div>
             <div id='xxx' className="d-inline-flex justify-content-around align-items-center mx-auto flex-nowrap" style={{height:"52px", maxWidth:"1000px", width: "1000px"}}>
                 <div className="justify-content-start align-items-center d-flex flex-nowrap w-50">
                   <small className="me-2 pe-2 text-secondary">{t('wordsCount')}:{wordsNum}</small>
@@ -138,10 +120,9 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
                     }}
                   />
                   {/* 清空编辑 */}
-                  <ClearEditor class="ms-3" clearFn={clearEditorContent} isEmpty={isEditorEmpty} />
+                  <ClearEditor isDisabled class="ms-3" clearFn={clearEditorContent} isEmpty={isEditorEmpty} />
                   {/* 保存到草稿 */}
-                  <SubmitEditor class="ms-3"></SubmitEditor>
-                  <div onClick={test}>测试</div>
+                  <SubmitEditor isDisabled={canEditIdent} class="ms-3"></SubmitEditor>
                 </div>
             </div>
             {modal}
@@ -159,11 +140,11 @@ export function ShowClearDialog({
     editor: LexicalEditor;
     onClose: () => void;
   }): JSX.Element {
-    
+    const t = useTranslations('ArticleEditPage');
     return (
       <>
         <div className="mb-3 text-center">
-          确定要清除编辑内容吗?
+          {t('isClearEditContent')}
         </div>
         <div className='form-row text-center mt-4 mb-3'>
           <button type="button" onClick={() => {
@@ -172,8 +153,8 @@ export function ShowClearDialog({
             onClose();
             scrollTo(true);
           }} 
-            className="btn btn-outline-primary me-4">确认</button>
-          <button type="button" onClick={() => {editor.focus();onClose();}} className="btn btn-outline-secondary">取消</button>
+            className="btn btn-outline-primary me-4">{t('btnConfirm')}</button>
+          <button type="button" onClick={() => {editor.focus();onClose();}} className="btn btn-outline-secondary">{t('btnCancel')}</button>
         </div>
       </>
     );

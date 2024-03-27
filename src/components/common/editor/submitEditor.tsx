@@ -13,9 +13,11 @@ import { getUserAgent } from "@/lib/tool";
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import { $generateHtmlFromNodes } from '@lexical/html';
+import { CLIENT_TPYES } from "@/lib/constant";
 
 interface propsType {
     class: string;
+    isDisabled: boolean;
 }
 
 const SubmitEditor: FC<propsType> = props => {
@@ -65,11 +67,11 @@ const SubmitEditor: FC<propsType> = props => {
         const os = getUserAgent();
         let sourceType = "";
         if (os.isAndroid || os.isPhone) {
-            sourceType = "wap";
+            sourceType = CLIENT_TPYES.WAP;
         } else if (os.isTablet) {
-            sourceType = "tablet";
+            sourceType = CLIENT_TPYES.TABLET;
         } else if (os.isPc) {
-            sourceType = "pc";
+            sourceType = CLIENT_TPYES.PC;
         }
         let tags = (articleData.tags).map((item)=>{
             return item.id;
@@ -151,9 +153,9 @@ const SubmitEditor: FC<propsType> = props => {
                         return {...prev, id: articleId};
                     });
                 }
-                show({ type: 'SUCCESS', message: "保存草稿成功" });
+                show({ type: 'SUCCESS', message: t('saveArticleSuccess') });
             } else {
-                show({ type: 'DANGER', message: "保存草稿失败" });
+                show({ type: 'DANGER', message:  t('saveArticleErr') });
                 return;
             }
         }).catch((e) => {
@@ -164,14 +166,13 @@ const SubmitEditor: FC<propsType> = props => {
 
     return (
         <>
-            <button type="button" className={classNames(props.class, "btn btn-outline-primary")}
+            <button type="button" className={classNames(props.class, "btn btn-outline-primary", {"disabled": props.isDisabled})}
                 onClick={saveDrafts}
                 title={t('saveDraftsErr')}
             >
                 <small>{t('saveToDrafts')}</small>
             </button>
-            <button type="button" className={classNames(props.class, "btn btn-outline-primary")}
-            >
+            <button type="button" className={classNames(props.class, "btn btn-outline-primary", {"disabled": props.isDisabled})}>
                 <small>{t('saveArticle')}</small>
             </button>
         </>

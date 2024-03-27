@@ -52,3 +52,7 @@ export type TMetadata = {
   referer: string | null;
   locale: string;
 };
+
+export type HexObject = {
+  [key: string]: number[];
+};

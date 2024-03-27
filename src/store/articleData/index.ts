@@ -28,6 +28,17 @@ export const writeArticleAtom = atomWithStorage<IArticleInit>('writeArticleData'
 
 export const collabTokenInfoAtom =  atom<ICollabTokenInfo>({} as ICollabTokenInfo );
 
+// 判断协作过程是否可以操作
+export const canEditAtom = atom(
+  (get) => {
+    const info = get(collabTokenInfoAtom);
+    // 如果不是协作状态 返回true
+    if (!info.isCollab) return true;
+    // 协作状态 并且 作者不是本人
+    return info.isCollab && !info.isMe;
+  }
+)
+
 export type Comments = Array<IArticleNote | IArticleNoteComment>;
 export const writeArticleNoteInitValue = [] as Comments;
 
@@ -46,3 +57,4 @@ export const writeArticleNoteAtom =
     defaultStorage, 
     {getOnInit: true}
 );
+

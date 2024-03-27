@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot, CLEAR_EDITOR_COMMAND, $isElementNode, $isDecoratorNode, $insertNodes} from 'lexical';
 import { $generateNodesFromDOM } from '@lexical/html';
-import { ARTICLE_PERSONAL_IMAGE_URL } from "@/lib/constant";
+import { ARTICLE_PERSONAL_IMAGE_URL, CLIENT_TPYES, SAVE_TYPE } from "@/lib/constant";
 import { ITag } from "@/interfaces";
 import ContentComp from "@/app/[locale]/(cms)/article/[id]/articleContent";
 
@@ -115,13 +115,13 @@ const HistoryEditor = (props: propsType) => {
                             {historyList.map((item, idx) => {
                                 const timeStr = dayjs(item.createTime).format("YYYY-MM-DD HH:mm:ss");
                                 let desc = "";
-                                let saveType = item.saveType==1 ? "手动保存" : "自动保存";
-                                if (item.sourceType=="wap") {
-                                    desc = "手机客户端";
-                                } else if (item.sourceType=="pc") {
-                                    desc = "电脑端";
-                                } else if (item.sourceType=="tablet") {
-                                    desc = "平板端";
+                                let saveType = item.saveType==SAVE_TYPE.MANUAL ? t('manualSave') : t('autoSave');
+                                if (item.sourceType==CLIENT_TPYES.WAP) {
+                                    desc = t('wapClient');
+                                } else if (item.sourceType==CLIENT_TPYES.PC) {
+                                    desc = t('pcClient');
+                                } else if (item.sourceType==CLIENT_TPYES.TABLET) {
+                                    desc = t('tabletClient');
                                 }
                                 desc += saveType;
                                 return (
@@ -145,10 +145,10 @@ const HistoryEditor = (props: propsType) => {
 
     return (
         <>
-            <div onClick={showHistory}>历史记录</div>
+            <div onClick={showHistory}>{t('historyLogs')}</div>
 
             <Modal
-                title="历史编辑列表"
+                title={t('historyEditList')}
                 isOpen={open}
                 onClosed={()=>{setOpen(false);}}
                 type="light"

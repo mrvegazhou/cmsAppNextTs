@@ -1,7 +1,7 @@
 import { use } from "react";
 import Metadata from '@/lib/metadata';
 import LoginPage from './login';
-import ResetPage from '../../common/reset/reset';
+import ResetPage from '../../_common/reset/reset';
 import { Metadata as MetadataNext } from 'next';
 import { getMetadata } from '@/lib/tool';
 import { createTranslator } from 'next-intl';

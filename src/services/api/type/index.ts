@@ -2,7 +2,7 @@ import type { TBody } from '@/types';
 import { createConfig, handleReqMiddleware } from '@/lib/api';
 import type { IData, IType, ITypeAndPType } from '@/interfaces';
 import { 
-    APP_TYPE_LIST, APP_TYPE_PID, APP_TYPE_ID
+    APP_TYPE_LIST, APP_TYPE_PID, APP_TYPE_ID, API_URL
 } from '@/lib/constant'
 
 const API_BASE_URL = API_URL;
@@ -10,7 +10,7 @@ const API_BASE_URL = API_URL;
 export const getTypeList = (
     params: TBody<{ name: string }>
 ): Promise<Response | IData<{ typeList: IType[] }>> => {
-    let config = createConfig(params, { method: 'POST' });
+    let config = createConfig(params, { method: 'POST', baseURL: API_BASE_URL });
     const url = config.baseURL + APP_TYPE_LIST;
     return fetch(url, config).then(
         handleReqMiddleware
@@ -27,7 +27,7 @@ export const getTypeListQueryConf = {
 export const getTypeListByPid = (
     params: TBody<{ pid: number }>
 ): Promise<Response | IData<{ typeList: IType[] }>> => {
-    let config = createConfig(params, { method: 'POST' });
+    let config = createConfig(params, { method: 'POST', baseURL: API_BASE_URL });
     const url = config.baseURL + APP_TYPE_PID;
     return fetch(url, config).then(
         handleReqMiddleware
@@ -37,7 +37,7 @@ export const getTypeListByPid = (
 export const getTypeInfoById = (
     params: TBody<{ id: number }>
 ): Promise<Response | IData<{ typeInfo: ITypeAndPType }>> => {
-    let config = createConfig(params, { method: 'POST' });
+    let config = createConfig(params, { method: 'POST', baseURL: API_BASE_URL });
     const url = config.baseURL + APP_TYPE_ID;
     return fetch(url, config).then(
         handleReqMiddleware

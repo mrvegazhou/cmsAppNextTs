@@ -16,6 +16,7 @@ export default {
     linkDesc: "描述",
     linkRmove: "移除",
 
+    imageTypeErr: "请上传正确类型图片",
     imageUpload: "上传图片",
     imageUploadErr: "上传失败",
     imageUploadLimit: "图片大小限制在",
@@ -43,5 +44,14 @@ export default {
     prompt: "请填写完整",
     optional: "可选填",
     confirm: "确认",
-    submit: "提交"
+    submit: "提交",
+
+    localUpload: '本地上传',
+    currentUsage: '当前使用',
+    imgLib: '图片库',
+    position: '位置',
+    left: '左',
+    right: '右',
+    fullWidth: '全宽',
+    displayCaption: '是否显示标题'
 };

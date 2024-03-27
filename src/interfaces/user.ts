@@ -9,6 +9,7 @@ export interface IUser extends IBase {
   email: string;
   avatarUrl?: string;
   about?: string;
+  id?: number;
 }
 
 export interface IUserList {

@@ -71,7 +71,6 @@ const Avatar: FC<propsType> = props => {
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
         const JWT = USER_TOKEN.get();
-        console.log("77777");
         
         const token = JWT.token;
         const retoken = JWT.refreshToken;

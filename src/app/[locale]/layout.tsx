@@ -1,6 +1,6 @@
 import React from 'react';
 import { Props } from '@/types/layout';
-import MainLayout from './layouts/mainLayout';
+import MainLayout from './_layouts/mainLayout';
 
 export default function Layout({ children, params: { locale } }: Props) {
     console.log(locale, "222===locale===");

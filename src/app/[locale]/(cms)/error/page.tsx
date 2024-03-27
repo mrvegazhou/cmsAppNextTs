@@ -1,6 +1,6 @@
 import { getLocale } from 'next-intl/server';
 import Metadata from '@/lib/metadata';
-import ErrorPage from '../../common/error/error';
+import ErrorPage from '../../_common/error/error';
 
 export default async function Page({
     params = {},

@@ -4,7 +4,7 @@ import CryptoJS from 'crypto-js';
 import dayjs from 'dayjs';
 import type { Metadata } from 'next';
 import type { IError, IUser } from '@/interfaces';
-import type { TBody, TMetadata } from '@/types';
+import type { HexObject, TBody, TMetadata } from '@/types';
 import punycode from 'punycode';
 import qs from 'query-string'
 import { type CookieSerializeOptions, serialize } from "cookie";
@@ -294,6 +294,50 @@ export const loadImage = (src: string, getBase64?: boolean): Promise<[HTMLImageE
         }
       }  
   })
+}
+
+function readBuffer(file: File, start = 0, end = 2) { 
+  return new Promise((resolve, reject) => { 
+    const reader = new FileReader(); 
+    reader.onload = () => { 
+      resolve(reader.result); 
+    }; 
+    reader.onerror = reject; 
+    reader.readAsArrayBuffer(file.slice(start, end)); 
+  }); 
+} 
+// 判断是否为图片
+export const isImageType = async (file: File) => {
+  if (!file.type.startsWith('image/')) return false;
+  let flag = false;
+  const magicNumbers: HexObject = {
+    'jpeg': [0xFF, 0xD8, 0xFF],
+    'png': [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+    'gif': [0x47, 0x49, 0x46, 0x38],
+    'bmp': [0x42, 0x4D],
+    'webp': [0x52, 0x49, 0x46, 0x46]
+  };
+  for (const key in magicNumbers) {
+    const buffers: any = await readBuffer(file, 0, magicNumbers[key].length);
+    let uint8Array = new Uint8Array(buffers);
+    if (magicNumbers[key].every((el, index) => el === uint8Array[index])) {
+      flag = true;
+      break;
+    } else {
+      flag = false;
+    }
+  }
+  return flag;
+};
+
+// 
+export const isFormDataEmpty = (formData: FormData) => {
+  for (const entry of formData.entries()) {
+    if (entry[0] || entry[1]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 export const handleDrop = (event: React.SyntheticEvent<Element> | React.DragEvent<HTMLDivElement> | React.ChangeEvent<Element> | React.KeyboardEvent<Element> | React.MouseEvent<Element>) => {

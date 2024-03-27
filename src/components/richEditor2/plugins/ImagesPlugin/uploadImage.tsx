@@ -15,7 +15,7 @@ import LoaderComp from '@/components/loader/loader';
 import Image from 'next/image'
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { BASE_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
-import { handleDrop, loadImage, convertBytesToKB } from '@/lib/tool';
+import { handleDrop, loadImage, convertBytesToKB, isImageType, isFormDataEmpty } from '@/lib/tool';
 import { uploadArticleImages } from '@/services/api';
 import type { IImageList, IImage, IData, IArticleUploadImages } from '@/interfaces';
 import type { TBody } from '@/types';
@@ -25,11 +25,12 @@ import { getPersonalImageList, getPersonalImageListConf } from '@/services/api/i
 import { useMap } from 'ahooks';
 import { useAtom } from "jotai";
 import { writeArticleAtom } from "@/store/articleData";
-import {
-    InlineImagePayload,
-} from '../../nodes/InlineImageNode';
+import { InlineImagePayload } from '../../nodes/InlineImageNode';
+import { canEditAtom } from '@/store/articleData';
+import { useAtomValue } from 'jotai';
 
-export type ImageProps = ImagePayload & { dataSrc?: string; deleteImage?: Function; fileName: string; position?: Position};
+
+export type ImageProps = ImagePayload & { deleteImage?: Function; fileName: string; position?: Position};
 export type InsertInlineImagePayload = Readonly<InlineImagePayload>;
 export type Props = {
     /**
@@ -69,8 +70,12 @@ const IMAGE_HEIGHT = 300;
 
 // 弹出框里添加图片信息
 const ImageUploader = forwardRef((props: Props, ref) => {
-    const [articleData, setArticleData] = useAtom(writeArticleAtom);
+
     const t = useTranslations('RichEditor');
+    const canEdit = useAtomValue(canEditAtom);
+
+    const [articleData, setArticleData] = useAtom(writeArticleAtom);
+
     let initState = {
         loading: false,
         images: [],
@@ -86,7 +91,6 @@ const ImageUploader = forwardRef((props: Props, ref) => {
     // 图片分页
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
-    const [imgList, setImgList] = useState<IImage[]>([]);
 
     const [drop, setDrop] = useState(false);
     const fileUploadRef = useRef<HTMLInputElement | null>(null);
@@ -212,21 +216,35 @@ const ImageUploader = forwardRef((props: Props, ref) => {
         }));
 
         const fd = new FormData();
-        files.forEach((file: File, i: number) => {
+        for (const key in files) {
+            let flag = await isImageType(files[key]);
+            if (!flag) break;
             // 判断上传文件大小
-            if ( convertBytesToKB(file.size) > MAX_FILE_SIZE_IN_KB ) {
+            if ( convertBytesToKB(files[key].size) > MAX_FILE_SIZE_IN_KB ) {
                 show({
                     type: 'DANGER',
                     message: t('imageUploadLimit') + MAX_FILE_SIZE_IN_KB + "KB",
                 });
                 return;
             }
-            fd.append("file"+i, file);
-        });
-        
+            fd.append("file"+key, files[key]);
+        }
+        // 如果上传图片类型为错误
+        if (isFormDataEmpty(fd)) {
+            show({
+                type: 'DANGER',
+                message: t('imageTypeErr')
+            });
+            setImgState((prev) => ({
+                ...prev,
+                loading: false
+            }));
+            return;
+        }
+
         let arrImgs = await Promise.all(files.map(async (file) => {
             const src = window.URL.createObjectURL(file);
-            let [img] = await loadImage(src, false);
+            let [img, dataURL] = await loadImage(src, true);
             let radio = img.height / pHeight;
             let newHeight = img.height;
             let newWidth = img.width;
@@ -239,20 +257,22 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                     newHeight = Math.floor(newHeight / (img.width / newWidth));
                 }
             }
+            
             return {
-                src: src,
+                src: dataURL!,
                 fileName: file.name,
                 height: newHeight,
                 width: newWidth,
-                altText: altText
+                altText: altText,
+                position: position,
+                showCaption: showCaption
             };
         }));
-
         setImgState((prev) => ({
             ...prev,
             images: arrImgs,
             formData: fd,
-            loading: false
+            loading: false,
         }));
 
         // @ts-ignore
@@ -277,49 +297,54 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             const { multi } = props;    
             let articleId = articleData.id;    
             if (formData) {
-                uploadArticleImageMutation.mutateAsync({ 
-                    data: {
-                        formData,
-                        type: 1,
-                        articleId: articleId ?? 0
-                    }
-                }).then(res => {
-                    if(res.status==200) {
-                        let arrImgs = imgState.images.map((image, i) => {
-                            if(image.fileName==res.data.fileName) {
-                                if ((articleId==null || articleId==0) && res.data.articleId!=0) {
-                                    setArticleData(prev => {
-                                        return {...prev, id: res.data.articleId}
-                                    });
+                if (!canEdit) {
+                    // 插入图片
+                    props.insertImg(e, imgState.images[0]);
+                } else {
+                    uploadArticleImageMutation.mutateAsync({ 
+                        data: {
+                            formData,
+                            type: 1,
+                            articleId: articleId ?? 0
+                        }
+                    }).then(res => {
+                        if(res.status==200) {
+                            let arrImgs = imgState.images.map((image, i) => {
+                                if(image.fileName==res.data.fileName) {
+                                    if ((articleId==null || articleId==0) && res.data.articleId!=0) {
+                                        setArticleData(prev => {
+                                            return {...prev, id: res.data.articleId}
+                                        });
+                                    }
+                                    let src = BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
+                                    return {
+                                        src: src,
+                                        fileName: image.fileName,
+                                        width: image.width,
+                                        altText: altText,
+                                        height: image.height,
+                                        position: position,
+                                        showCaption: showCaption
+                                    }
                                 }
-                                let src = BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
-                                return {
-                                    src: src,
-                                    fileName: image.fileName,
-                                    width: image.width,
-                                    altText: altText,
-                                    height: image.height,
-                                    position: position,
-                                    showCaption: showCaption
-                                }
-                            }
-                        });
-                        let newObj = Object.assign({}, imgState, {images: arrImgs});
-                        setImgState(newObj);
-                        // 插入图片
-                        props.insertImg(e, newObj.images[0]);
-                    } else {
+                            });
+                            let newObj = Object.assign({}, imgState, {images: arrImgs});
+                            setImgState(newObj);
+                            // 插入图片
+                            props.insertImg(e, newObj.images[0]);
+                        } else {
+                            show({
+                                type: 'DANGER',
+                                message: t('imageUploadErr')
+                            });
+                        }
+                    }).catch(err => {
                         show({
                             type: 'DANGER',
                             message: t('imageUploadErr')
                         });
-                    }
-                }).catch(err => {
-                    show({
-                        type: 'DANGER',
-                        message: t('imageUploadErr')
                     });
-                });
+                }
             }
         } else {
             _uploadFileByNet();
@@ -376,13 +401,13 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             <div className='d-flex'>
                 <div className='col-2 d-flex flex-column align-items-left'>
                     <div onClick={()=>{setLeftMenu('local');}} className={classNames('cursor-pointer text-left ps-2 me-3 mb-3 py-1', {'active': leftMenu=='local'})}>
-                        本地上传
+                        {t('localUpload')}
                     </div>
                     <div onClick={()=>{setLeftMenu('local');}} className={classNames('cursor-pointer text-left ps-2 me-3 mb-3 py-1', {'active': leftMenu=='current'})}>
-                        当前使用
+                        {t('currentUsage')}
                     </div>
                     <div onClick={()=>{setLeftMenu('net');}} className={classNames('cursor-pointer text-left ps-2 me-3 mb-3 py-1', {'active': leftMenu=='net'})}>
-                        图片库
+                        {t('imgLib')}
                     </div>
                 </div>
                 <div className="d-flex" style={{height: '220px'}}>
@@ -438,17 +463,17 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                         {props.inline && (
                             <>
                             <div className="form-group row mt-3">
-                                <label className="col-sm-3 col-form-label text-end">位置</label>
+                                <label className="col-sm-3 col-form-label text-end">{t('position')}</label>
                                 <div className="col-sm-8">
                                     <select className="form-select" aria-label="Default select example" onChange={handlePositionChange}>
-                                        <option value="left">左</option>
-                                        <option value="right">右</option>
-                                        <option value="full">全宽</option>
+                                        <option value="left">{t('left')}</option>
+                                        <option value="right">{t('right')}</option>
+                                        <option value="full">{t('fullWidth')}</option>
                                     </select>
                                 </div>
                             </div>
                             <div className="form-group row mt-3">
-                                <label className="col-sm-3 col-form-label text-end">是否显示标题</label>
+                                <label className="col-sm-3 col-form-label text-end">{t('displayCaption')}</label>
                                 <div className="col-sm-8">
                                     <input className="form-check-input" 
                                         type="checkbox"

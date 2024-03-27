@@ -15,7 +15,7 @@ import LoginForgetNav from './loginForgetNav';
 import Captcha from '@/components/captcha/Captcha';
 import useLogin from '@/hooks/useLogin';
 import Modal from '@/components/modal';
-
+import useClickOutside from '@/hooks/useClick/useClickOutside';
 
 const LoginNav = () => {
 
@@ -39,7 +39,6 @@ export default memo(LoginNav);
 
 export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
     
-
     // 显示忘记密码
     const [showForgetPwd, setShowForgetPwd] = useState(false);
     // 显示注册
@@ -50,6 +49,10 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
     useEffect(() => {        
         resetLoginFormModal();
     }, []);
+
+    useEffect(() => {
+        setOpen(props.isOpen!);
+    }, [props.isOpen]);
 
     const {
         t,

@@ -1,6 +1,6 @@
 import Metadata from '@/lib/metadata';
 import RegisterPage from './register';
-import ResetPage from '../../common/reset/reset';
+import ResetPage from '../../_common/reset/reset';
 import { Metadata as MetadataNext } from 'next';
 import { getMetadata } from '@/lib/tool';
 // import RegisterH5Page from '@/app/[locale]/register/h5';

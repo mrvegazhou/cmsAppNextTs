@@ -1,9 +1,8 @@
 import merge from "lodash/merge";
 import configureRefreshFetch from "@/lib/api/refreshFetch/configureRefreshFetch";
 import fetchJSON from "@/lib/api/refreshFetch/fetchJson";
-import { ResponseError } from "./response";
-import { USER_TOKEN } from "@/lib/constant/cookie";
 import { REFRESH_TOKEN as REFRESH_TOKEN_URL } from "@/lib/constant";
+import { USER_TOKEN } from "@/lib/constant/cookie";
 
 const fetchJSONWithToken = (url: string, options: RequestInit = {}) => {
   const token = USER_TOKEN.get().token;
@@ -24,18 +23,17 @@ const shouldRefreshToken = (response: Response) => {
   return response.status === 401;
 };
 
-const refreshToken = () => {
-  const token = USER_TOKEN.get();
-  if (typeof token.refreshToken=='undefined' || typeof token.token=='undefined') {
-   throw "redirect login: error refresh token";
+const refreshToken = (token: string, refreshToken: string) => {
+  if (typeof refreshToken=='undefined' || typeof token=='undefined') {    
+    throw "401: error refresh token";
   }
   return fetchJSONWithToken(REFRESH_TOKEN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token.token}`,
+      "Authorization": `Bearer ${token}`,
     },
-    body: JSON.stringify({ refreshToken:  token.refreshToken }),
+    body: JSON.stringify({ refreshToken:  refreshToken }),
   })
     .then((response) => {
       // @ts-ignore

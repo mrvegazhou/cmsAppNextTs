@@ -10,6 +10,7 @@ interface propsType {
     class: string;
     clearFn: Function;
     isEmpty: boolean;
+    isDisabled: boolean;
 }
 
 const ClearEditor: FC<propsType> = props => {
@@ -18,6 +19,10 @@ const ClearEditor: FC<propsType> = props => {
     const [, setArticleData] = useAtom(writeArticleAtom);
     
     const clearEditorClick = useCallback(() => {
+        if (props.isDisabled) {
+            console.log("协作时不是本人的文章");
+            return;
+        }
         const clear = props.clearFn;
         if ( typeof clear === 'function' ) {
             clear();
@@ -27,7 +32,7 @@ const ClearEditor: FC<propsType> = props => {
 
     return (
         <>
-            <button type="button" className={classNames(props.class, "btn btn-outline-danger")}
+            <button type="button" className={classNames(props.class, "btn btn-outline-danger", {"disabled": props.isDisabled})}
                 onClick={() => clearEditorClick()}
                 disabled={props.isEmpty}
             >

@@ -17,6 +17,8 @@ import {
     ARTICLE_DARFT_INFO,
     API_URL
 } from '@/lib/constant'
+import { fetch as refreshFetch } from "@/lib/api/refreshFetch";
+
 
 const API_BASE_URL = API_URL;
 
@@ -123,11 +125,12 @@ export const inviteCollab = (
   );
 };
 
+// 检查collab token是否允许协同操作
 export const checkCollab = (
   params: TBody<{token: string}>
 ): Promise<Response | IData<ICollabTokenInfo>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + CHECK_COLLAB, config).then(
+  return refreshFetch(config.baseURL + CHECK_COLLAB, config).then(
     handleReqMiddleware
   );
 };

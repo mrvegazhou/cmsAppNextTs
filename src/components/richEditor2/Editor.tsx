@@ -63,6 +63,7 @@ import ArticleHeader from '@/app/[locale]/(cms)/article/articleHeader';
 import { useAtom } from "jotai";
 import { collabTokenInfoAtom } from '@/store/articleData';
 
+
 const Editor = forwardRef((prop, ref): JSX.Element => {
   const {historyState} = useSharedHistoryContext();
   const {

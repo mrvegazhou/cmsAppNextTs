@@ -4,6 +4,15 @@ export default {
     enterArticleTitle: "输入文章标题...",
     goHome: "返回首页",
 
+    wapClient: "手机客户端",
+    pcClient: "电脑端",
+    tabletClient: '平板端',
+    autoSave: '自动保存',
+    manualSave: '手动保存',
+    historyLogs: '历史记录',
+    historyEditList: '历史编辑列表',
+    isClearEditContent: '确定要清除编辑内容吗?',
+
     saveToDrafts: "保存至草稿箱",
     saveDraftsErr: "需填写标题、文章内容、标签",
     wordsCount: "字数",
@@ -33,6 +42,9 @@ export default {
     articleTagErr: "文章需要设置标签",
     articleTypeErr: "文章需要设置分类",
 
+    saveArticleSuccess: '保存文章成功',
+    saveArticleErr: '保存文章失败',
+    
     saveDraftSuccess: "保存草稿成功",
     saveDraftErr: "保存草稿失败",
     copySuccess: "复制成功",
