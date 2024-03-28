@@ -95,7 +95,6 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
 
     return (
         <div className="fixed-bottom text-center border-top bg-white w-100">
-          <div onClick={test}>测试</div>
             <div id='xxx' className="d-inline-flex justify-content-around align-items-center mx-auto flex-nowrap" style={{height:"52px", maxWidth:"1000px", width: "1000px"}}>
                 <div className="justify-content-start align-items-center d-flex flex-nowrap w-50">
                   <small className="me-2 pe-2 text-secondary">{t('wordsCount')}:{wordsNum}</small>

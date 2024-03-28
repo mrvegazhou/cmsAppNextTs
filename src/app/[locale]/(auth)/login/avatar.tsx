@@ -57,8 +57,6 @@ const Avatar: FC<propsType> = props => {
                 const res = await refreshToken({
                     data: { refreshToken: reToken }
                 }) as IData<any>;
-                console.log(res, '==s==');
-                
                 if (res.status != 200) {
                     const locale = params.locale;
                     let path = '/login';

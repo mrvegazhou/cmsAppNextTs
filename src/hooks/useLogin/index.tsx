@@ -9,7 +9,7 @@ import type JSEncrypt from 'jsencrypt';
 import { useTranslations } from 'next-intl';
 import useSyncState from '@/hooks/useState';
 import { PWD_STRENGTH, USER_TOKEN } from '@/lib/constant';
-import { isEmail, isPassword, isPasswordLen, getJsEncrypt, aesDecryptStr } from '@/lib/tool';
+import { isEmail, isPassword, isPasswordLen, getJsEncrypt } from '@/lib/tool';
 import {
     loginByEmail,
     getPasswordPublicKey
@@ -21,7 +21,7 @@ import type {
 import useToast from '@/hooks/useToast';
 import type { TBody } from '@/types';
 import { useSetAtom } from 'jotai'
-import { userDataAtom } from "@/store/userData";
+import { loginAtom, userDataAtom } from "@/store/userData";
 import { useSearchParams, useRouter } from 'next/navigation'
 import dayjs from 'dayjs';
 
@@ -31,6 +31,8 @@ const useLogin = (close: (()=>void) | null = null) => {
     const router = useRouter();
     const t = useTranslations('LoginPage');
     const setUserData = useSetAtom(userDataAtom);
+    // 401显示登录弹窗的atom
+    const setLoginIdent = useSetAtom(loginAtom);
 
     const [disableLogin, setDisableLogin] = useState(false);
     const [email, setEmail] = useSyncState("");
@@ -109,8 +111,6 @@ const useLogin = (close: (()=>void) | null = null) => {
   
     // 提交登录 密码12345A@a
     const onSubmit = useCallback(async () => {
-      // console.log(dayjs(1759318552).format('YYYY-MM-DD HH:mm:ss'), dayjs(1759318552).diff(Date.now(), 'seconds'));
-      // return
       try {
         checkForm();
         setDisableLogin(true);
@@ -155,8 +155,7 @@ const useLogin = (close: (()=>void) | null = null) => {
           message: t('loginCompleted'),
           type: 'SUCCESS',
         });
-console.log(loginRes.data.token , "==loginRes.data.token ==");
-
+        setLoginIdent(false);
         setShowCaptcha(false);
         USER_TOKEN.set({token: loginRes.data.token as string, refreshToken: loginRes.data.refreshToken as string});
         setJToken(loginRes.data.token);

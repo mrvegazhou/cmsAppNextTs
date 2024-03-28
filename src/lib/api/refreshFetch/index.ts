@@ -1,12 +1,12 @@
 import merge from "lodash/merge";
 import configureRefreshFetch from "@/lib/api/refreshFetch/configureRefreshFetch";
 import fetchJSON from "@/lib/api/refreshFetch/fetchJson";
-import { REFRESH_TOKEN as REFRESH_TOKEN_URL } from "@/lib/constant";
+import { API_URL, REFRESH_TOKEN as REFRESH_TOKEN_URL } from "@/lib/constant";
 import { USER_TOKEN } from "@/lib/constant/cookie";
+
 
 const fetchJSONWithToken = (url: string, options: RequestInit = {}) => {
   const token = USER_TOKEN.get().token;
-  
   let optionsWithToken = options;
   if (token != null && token != "") {
     optionsWithToken = merge({}, options, {
@@ -27,7 +27,7 @@ const refreshToken = (token: string, refreshToken: string) => {
     throw "401: error refresh token";
   }
   
-  return fetchJSONWithToken(REFRESH_TOKEN_URL, {
+  return fetchJSONWithToken(API_URL + REFRESH_TOKEN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

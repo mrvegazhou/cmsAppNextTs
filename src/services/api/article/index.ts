@@ -43,7 +43,7 @@ export const doArticleLike = (
       'Accept': 'application/json',
   }});
   const url = config.baseURL + ARTICLE_LIKE;
-  return fetch(url, config).then(
+  return refreshFetch(url, config).then(
     handleReqMiddleware
   );
 };
@@ -59,7 +59,7 @@ export const doArticleUnlike = (
       'Accept': 'application/json',
   }});
   const url = config.baseURL + ARTICLE_UNLIKE;
-  return fetch(url, config).then(
+  return refreshFetch(url, config).then(
     handleReqMiddleware
   );
 };
@@ -69,7 +69,7 @@ export const getArticleToolBarData = (
 ): Promise<Response | IData<any>> => {
   let config = createConfig(params, { method: 'POST', baseURL: API_BASE_URL});
   const url = config.baseURL + ARTICLE_TOOLBAR_DATA;
-  return fetch(url, config).then(
+  return refreshFetch(url, config).then(
     handleReqMiddleware
   );
 };
@@ -86,7 +86,7 @@ export const uploadArticleImages = (
     body: formData,
   });
   const url = config.baseURL + ARTICLE_UPLOAD_IMAGE;
-  return fetch(url, config).then(
+  return refreshFetch(url, config).then(
     handleReqMiddleware
   );
 };
@@ -95,7 +95,7 @@ export const collabViewList = (
   params?: TBody
 ): Promise<Response | IData<IArticleCollabView>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + COLLAB_VIEW, config).then(
+  return refreshFetch(config.baseURL + COLLAB_VIEW, config).then(
     handleReqMiddleware
   );
 };
@@ -111,7 +111,7 @@ export const exitCollab = (
       'Accept': 'application/json',
   }});
   const url = config.baseURL + EXIT_COLLAB;
-  return fetch(url, config).then(
+  return refreshFetch(url, config).then(
     handleReqMiddleware
   );
 };
@@ -120,7 +120,7 @@ export const inviteCollab = (
   params?: TBody<{userIds: number[]; article: number; expireName: string}>
 ): Promise<Response | IData<string>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + INVITE_COLLAB, config).then(
+  return refreshFetch(config.baseURL + INVITE_COLLAB, config).then(
     handleReqMiddleware
   );
 };
@@ -139,7 +139,7 @@ export const saveArticleDraft = (
   params: TBody<IArticleDraft>
 ): Promise<Response | IData<IArticle>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + SAVE_DRAFT, config).then(
+  return refreshFetch(config.baseURL + SAVE_DRAFT, config).then(
     handleReqMiddleware
   );
 };
@@ -148,7 +148,7 @@ export const saveArticle = (
   params: TBody<IArticle>
 ): Promise<Response | IData<IArticle>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + SAVE_ARTICLE, config).then(
+  return refreshFetch(config.baseURL + SAVE_ARTICLE, config).then(
     handleReqMiddleware
   );
 };
@@ -157,7 +157,7 @@ export const getDraftHistoryList = (
   params: TBody<IArticleId>
 ): Promise<Response | IData<IArticleDraft[]>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + ARTICLE_DARFT_HISTORY, config).then(
+  return refreshFetch(config.baseURL + ARTICLE_DARFT_HISTORY, config).then(
     handleReqMiddleware
   );
 };
@@ -166,7 +166,7 @@ export const getDraftHistoryInfo = (
   params: TBody<{id: number}>
 ): Promise<Response | IData<IArticleDraft>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + ARTICLE_DARFT_INFO, config).then(
+  return refreshFetch(config.baseURL + ARTICLE_DARFT_INFO, config).then(
     handleReqMiddleware
   );
 };

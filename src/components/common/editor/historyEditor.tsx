@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import { useTranslations } from 'next-intl';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { writeArticleAtom } from "@/store/articleData";
 import { IArticleInit } from "@/interfaces";
 import useToast from '@/hooks/useToast';
@@ -19,6 +19,7 @@ import { $generateNodesFromDOM } from '@lexical/html';
 import { ARTICLE_PERSONAL_IMAGE_URL, CLIENT_TPYES, SAVE_TYPE } from "@/lib/constant";
 import { ITag } from "@/interfaces";
 import ContentComp from "@/app/[locale]/(cms)/article/[id]/articleContent";
+import { showLoginModalAtom } from "@/store/userData";
 
 interface propsType {
     class?: string;
@@ -33,11 +34,12 @@ const HistoryEditor = (props: propsType) => {
 
     const [editor] = useLexicalComposerContext();
 
+    const showLoginModal = useSetAtom(showLoginModalAtom);
+
     const historyListMutation = useMutation({
         mutationFn: async (variables: TBody<IArticleId>) => {
             return (await getDraftHistoryList(variables)) as IData<IArticleDraft[]>;
-        },
-        retry: 3
+        }
     });
 
     const showHistory = () => {
@@ -56,14 +58,21 @@ const HistoryEditor = (props: propsType) => {
             if (res.status == 200) {
                 setHistoryList(res.data);
             }
+        }).catch(err => {
+            console.log(err, '==s==');
+            
+            if (typeof err == 'string' && err.startsWith('401')) {
+                setOpen(false);
+                showLoginModal('401');
+            }
         });
     };
 
     const historyInfoMutation = useMutation({
         mutationFn: async (variables: TBody<{id: number}>) => {
             return (await getDraftHistoryInfo(variables)) as IData<IArticleDraft>;
-        }, 
-        retry: 3
+        }
+        // retry: 3
     });
     const getHistoryInfo = (id: number) => {
         historyInfoMutation.mutateAsync({
@@ -103,7 +112,9 @@ const HistoryEditor = (props: propsType) => {
                 });
                 editor.focus();
             }
-        });
+        }).catch(err => {
+            console.log("catch: ", err);
+        });        
     };
 
     const HistoryContent = useCallback((): JSX.Element => {

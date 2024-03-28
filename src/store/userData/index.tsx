@@ -25,11 +25,13 @@ export default useUserData;
 
 // 判断是否需要展示登录
 export const loginAtom = atom<boolean>(false);
-export const showLoginModal = atom(
+export const showLoginModalAtom = atom(
   (get) => get(loginAtom),
   (get, set, newValue: string) => {
     if (newValue=='401' || newValue.startsWith('401')) {
       set(loginAtom, true);
+    } else {
+      set(loginAtom, false);
     }
   }
 )

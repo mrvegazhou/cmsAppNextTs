@@ -28,7 +28,7 @@ import { getCurrentArticleInfo } from "@/services/api";
 import { IArticle, IData } from "@/interfaces";
 import { useRouter } from 'next/navigation';
 import { useSetAtom } from "jotai";
-import { showLoginModal, loginAtom } from "@/store/userData";
+import { showLoginModalAtom, loginAtom } from "@/store/userData";
 
 interface propsType {
   metadata: TMetadata;
@@ -38,7 +38,7 @@ const NewArticlePage: FC<propsType> = props => {
   let userData = useAtomValue(userDataAtom);
   const router = useRouter();
 
-  const setShowLoginModal = useSetAtom(showLoginModal);
+  const setShowLoginModal = useSetAtom(showLoginModalAtom);
   const [islogin, setLoginModal] = useAtom(loginAtom);
 
   const canEdit = useAtomValue(canEditAtom);

@@ -34,7 +34,6 @@ type Configuration = {
         if (shouldRefreshToken(response)) {
               if (refreshingTokenPromise === null) {
                 refreshingTokenPromise = new Promise<void>((resolve, reject) => {
-                  console.log(token, "===token===w");
                   refreshToken(token.token!, token.refreshToken!)
                     .then(() => {
                       refreshingTokenPromise = null
