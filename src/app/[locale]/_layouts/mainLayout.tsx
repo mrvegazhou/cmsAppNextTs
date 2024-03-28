@@ -7,7 +7,6 @@ import Wrapper from './wrapperLayout';
 export default function MainLayout({ children, params: { locale } }: Props) {
     
     const messages = useMessages();
-    console.log(locale, "===MainLayout locale===");
     return (
         <NextIntlClientProvider locale={locale} messages={messages}>
             <Wrapper locale={locale!}>

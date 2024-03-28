@@ -127,7 +127,7 @@ const useLoginForget = (email: string) => {
             if (!isPasswordLen(newPassword)) {
                 throw t('passwordLengthSupport');
             }
-            if (isPassword(newPassword)<3) {
+            if (!isPassword(newPassword).isValid) {
                 throw t('passwordError');
             }
             if (newPassword!=newConfirmPassword) {

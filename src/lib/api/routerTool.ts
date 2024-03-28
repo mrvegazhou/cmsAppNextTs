@@ -36,8 +36,7 @@ export const authMiddleware = (
     | RequestCookies
     | ReadonlyRequestCookies
 ): string | undefined => {
-  const tokenStr =
-    "cookies" in req ? req.cookies[TOKEN_NAME] : req.get(TOKEN_NAME)?.value;
+  const tokenStr = "cookies" in req ? req.cookies[TOKEN_NAME] : req.get(TOKEN_NAME)?.value;  
   return tokenStr
     ? aesDecryptStr(tokenStr, process.env.TOKEN_SECRET as string)
     : undefined;

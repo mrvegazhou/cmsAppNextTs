@@ -28,7 +28,7 @@ const Avatar: FC<propsType> = props => {
             await logout({});
         }
     });
-    const logoutOnClick = async (e: MouseEvent<HTMLAnchorElement>) => {
+    const logoutOnClick = useCallback(async (e: MouseEvent<HTMLAnchorElement>) => {
         try {
             e.stopPropagation();
             e.preventDefault();
@@ -45,7 +45,7 @@ const Avatar: FC<propsType> = props => {
                 message: e,
             });
         }
-    }
+    }, []);
 
     const router = useRouter();
     const params = useParams();
@@ -57,6 +57,8 @@ const Avatar: FC<propsType> = props => {
                 const res = await refreshToken({
                     data: { refreshToken: reToken }
                 }) as IData<any>;
+                console.log(res, '==s==');
+                
                 if (res.status != 200) {
                     const locale = params.locale;
                     let path = '/login';
@@ -64,6 +66,13 @@ const Avatar: FC<propsType> = props => {
                         path = `/${locale}/login`;
                     }
                     router.push(path);
+                } else {
+                    // 更新token
+                    const token = res.data.token;
+                    const refreshToken = res.data.refreshToken;
+                    if ( token!="" && refreshToken!="" ) {
+                        USER_TOKEN.set({token, refreshToken})
+                    }
                 }
             }
     }, []);
@@ -71,17 +80,16 @@ const Avatar: FC<propsType> = props => {
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
         const JWT = USER_TOKEN.get();
-        
         const token = JWT.token;
         const retoken = JWT.refreshToken;
         if ((token != 'undefined' && retoken != 'undefined') && (token && retoken)) {
+            // token过期时间与当前时间相差多少秒
             const tokenSeconds = decodeJwtExpToSeconds(token);
             if (!tokenSeconds || tokenSeconds <= 0) {
                 validateTokens(retoken);
             } else {
                 // 加了定时器去自动更新token 是否有必要？
-                const currentTime = Math.floor(Date.now() / 1000);
-                const timeToExpire = (tokenSeconds - currentTime - REFRESH_TOKEN_BUFFER) * 1000;
+                const timeToExpire = tokenSeconds - REFRESH_TOKEN_BUFFER;
                 timer = setTimeout(() => {
                     validateTokens(retoken);
                 }, Math.max(0, timeToExpire));

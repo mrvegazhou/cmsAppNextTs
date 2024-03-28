@@ -1,14 +1,15 @@
 import {
     type ChangeEvent,
     useState,
-    useRef
+    useRef,
+    useCallback
 } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import type JSEncrypt from 'jsencrypt';
 import { useTranslations } from 'next-intl';
 import useSyncState from '@/hooks/useState';
-import { USER_TOKEN } from '@/lib/constant';
-import { isEmail, isPassword, isPasswordLen, getJsEncrypt } from '@/lib/tool';
+import { PWD_STRENGTH, USER_TOKEN } from '@/lib/constant';
+import { isEmail, isPassword, isPasswordLen, getJsEncrypt, aesDecryptStr } from '@/lib/tool';
 import {
     loginByEmail,
     getPasswordPublicKey
@@ -22,6 +23,7 @@ import type { TBody } from '@/types';
 import { useSetAtom } from 'jotai'
 import { userDataAtom } from "@/store/userData";
 import { useSearchParams, useRouter } from 'next/navigation'
+import dayjs from 'dayjs';
 
 
 const useLogin = (close: (()=>void) | null = null) => {
@@ -33,7 +35,7 @@ const useLogin = (close: (()=>void) | null = null) => {
     const [disableLogin, setDisableLogin] = useState(false);
     const [email, setEmail] = useSyncState("");
     const [password, setPassword] = useSyncState("");
-    const [strength, setStrength] = useState<number>(0);
+    const [strength, setStrength] = useState<number>(PWD_STRENGTH.WEAK);
     const [showCaptcha, setShowCaptcha] = useState(false);
 
     const jsEncryptRef = useRef<JSEncrypt>();
@@ -46,18 +48,18 @@ const useLogin = (close: (()=>void) | null = null) => {
 
     const [jToken, setJToken] = useState("");
   
-    function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
       let name = e.target.name;
       if(name=="email") {
         setEmail(e.target.value);
       } else if(name=="password") {
         setPassword(e.target.value, function (data: string) {
-          setStrength(isPassword(data));
+          setStrength(isPassword(data).strength);
         });
       }
-    }
+    }, []);
   
-    function checkForm() {
+    const checkForm = useCallback(() => {
       if (!email) {
         throw t('enterNotNullEmail');
       } else if (!isEmail(email)) {
@@ -67,10 +69,10 @@ const useLogin = (close: (()=>void) | null = null) => {
         throw t('enterNotNullPassword');
       } else if (!isPasswordLen(password)) {
         throw t('passwordLengthSupport');
-      } else if (isPassword(password)<3) {
+      } else if (!isPassword(password).isValid) {
         throw t('passwordError');
       }
-    }
+    }, [email, password]);
   
     const loginByEmailMutation = useMutation({
       mutationFn: async (variables: TBody<ILoginByEmailBody>) => {
@@ -78,7 +80,7 @@ const useLogin = (close: (()=>void) | null = null) => {
       }
     });
   
-    async function getEncryptedPassword(password: string) {
+    const getEncryptedPassword = useCallback(async (password: string) => {
       try {
         const res = await getPasswordPublicKey() as IData<string>;
         
@@ -103,9 +105,12 @@ const useLogin = (close: (()=>void) | null = null) => {
           message: t('encryptPasswordFailed'),
         });
       }
-    }
+    }, [jsEncryptRef]);
   
-    async function onSubmit() {
+    // 提交登录 密码12345A@a
+    const onSubmit = useCallback(async () => {
+      // console.log(dayjs(1759318552).format('YYYY-MM-DD HH:mm:ss'), dayjs(1759318552).diff(Date.now(), 'seconds'));
+      // return
       try {
         checkForm();
         setDisableLogin(true);
@@ -128,9 +133,9 @@ const useLogin = (close: (()=>void) | null = null) => {
           });
           return;
         }
-        
-        let loginRes = await loginByEmailMutation.mutateAsync({data: body}) as IData<any>;
 
+        let loginRes = await loginByEmailMutation.mutateAsync({data: body}) as IData<any>;
+        
         if (loginRes.status != 200 || typeof loginRes.data=="undefined") {
 
             if (typeof loginRes.data != "undefined" && loginRes.data.captchaVerify == true) {
@@ -150,6 +155,8 @@ const useLogin = (close: (()=>void) | null = null) => {
           message: t('loginCompleted'),
           type: 'SUCCESS',
         });
+console.log(loginRes.data.token , "==loginRes.data.token ==");
+
         setShowCaptcha(false);
         USER_TOKEN.set({token: loginRes.data.token as string, refreshToken: loginRes.data.refreshToken as string});
         setJToken(loginRes.data.token);
@@ -159,6 +166,9 @@ const useLogin = (close: (()=>void) | null = null) => {
         const backURL = searchParams.get('back');
         if (backURL) {
           router.push(backURL);
+        }
+        if(close) {
+          close();
         }
       } catch (e: any) {
         loginByEmailMutation.reset();
@@ -170,11 +180,8 @@ const useLogin = (close: (()=>void) | null = null) => {
         });
       } finally {
         setDisableLogin(false);
-        if(close) {
-          close();
-        }
       }
-    }
+    }, [email, password, close]);
 
     return {
         t,

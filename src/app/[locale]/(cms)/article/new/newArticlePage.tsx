@@ -3,7 +3,7 @@ import { FC, useRef, useEffect } from "react";
 import { useTranslations } from 'next-intl';
 import type { TBody, TMetadata } from '@/types';
 import Footer from '../../../_layouts/siteFooter';
-import { writeArticleInitValue } from "@/store/articleData";
+import { canEditAtom, writeArticleInitValue } from "@/store/articleData";
 import { useAtom, useAtomValue } from 'jotai'
 import { userDataAtom } from "@/store/userData";
 import { getLocale } from 'next-intl/server';
@@ -40,18 +40,22 @@ const NewArticlePage: FC<propsType> = props => {
 
   const setShowLoginModal = useSetAtom(showLoginModal);
   const [islogin, setLoginModal] = useAtom(loginAtom);
+
+  const canEdit = useAtomValue(canEditAtom);
+  console.log(canEdit);
   
-  const getArticleInfo = async (id: number) => {
-    const articleInfo = await getCurrentArticleInfo({
-        data: {articleId: id}
-    }) as IData<any>;
-    if( articleInfo?.status==200 ) {
-      return articleInfo.data;
-    } else if ( articleInfo.status==401 ) {
-      // useErrRouter();
-    }
-    return null;
-  }
+  
+  // const getArticleInfo = async (id: number) => {
+  //   const articleInfo = await getCurrentArticleInfo({
+  //       data: {articleId: id}
+  //   }) as IData<any>;
+  //   if( articleInfo?.status==200 ) {
+  //     return articleInfo.data;
+  //   } else if ( articleInfo.status==401 ) {
+  //     // useErrRouter();
+  //   }
+  //   return null;
+  // }
   
   const test = async () => {
     // try {
@@ -62,7 +66,7 @@ const NewArticlePage: FC<propsType> = props => {
     // }
 
     // setLoginModal(!islogin);
-    setShowLoginModal("401");
+    // setShowLoginModal("401");
 
   };
 

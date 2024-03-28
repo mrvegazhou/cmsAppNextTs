@@ -1,5 +1,5 @@
 import { StaticImageData } from 'next/image';
-import * as jose from 'jose';
+import { jwtDecode } from "jwt-decode";
 import CryptoJS from 'crypto-js';
 import dayjs from 'dayjs';
 import type { Metadata } from 'next';
@@ -10,7 +10,7 @@ import qs from 'query-string'
 import { type CookieSerializeOptions, serialize } from "cookie";
 
 export const aesEncryptStr = (str: string, key: string, IV: string = '') => {
-    str = (str + '').replace(/\n*$/g, '').replace(/\n/g, ''); 
+    str = (str + '').replace(/\n*$/g, '').replace(/\n/g, '');
     return CryptoJS.AES.encrypt(str, CryptoJS.enc.Utf8.parse(key), {
         iv: CryptoJS.enc.Utf8.parse(IV),
         mode: CryptoJS.mode.CBC,
@@ -19,7 +19,7 @@ export const aesEncryptStr = (str: string, key: string, IV: string = '') => {
 };
   
 export const aesDecryptStr = (str: string, key: string, IV: string = '') => {
-    str = (str + '').replace(/\n*$/g, '').replace(/\n/g, ''); 
+    str = (str + '').replace(/\n*$/g, '').replace(/\n/g, '');
     let newKey = CryptoJS.enc.Utf8.parse(key);
 	  var iv = CryptoJS.enc.Utf8.parse(IV);
     const decrypt = CryptoJS.AES.decrypt(str, newKey, {
@@ -30,8 +30,8 @@ export const aesDecryptStr = (str: string, key: string, IV: string = '') => {
     return decrypt.toString(CryptoJS.enc.Utf8);
 };
 
-export const decodeJwtExpToSeconds = (jwt: string): number | undefined => {
-    return jwtExpToSeconds(jose.decodeJwt(jwt).exp);
+export const decodeJwtExpToSeconds = (jwt: string): number | undefined => {  
+    return jwtExpToSeconds(jwtDecode(jwt).exp);
 };
 
 export const jwtExpToSeconds = (
@@ -40,7 +40,7 @@ export const jwtExpToSeconds = (
     if (!exp) {
         return;
     }
-    return dayjs(exp).diff(dayjs(), 'seconds');
+    return dayjs(Date.now()).diff(exp, 'seconds');
 };
 
 export const isNull = (value: string | undefined | null) => {
@@ -64,22 +64,35 @@ export const isPasswordLen = (pwd: string) => {
   return true;
 };
 
-export const isPassword = (pwd: string) => {
-  var reg1 = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\~\!\@\#\$\%\^\&\*\(\)\_\+])[A-Za-z\d\~\!\@\#\$\%\^\&\*\(\)\_\+]{6,20}$/
-  var reg2 = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,20}$/
-  var reg3 = /^(?=.*[a-z])(?=.*\d)(?=.*[\~\!\@\#\$\%\^\&\*\(\)\_\+])[a-z\d\~\!\@\#\$\%\^\&\*\(\)\_\+]{6,20}$/
-  var reg4 = /^(?=.*[a-z])(?=.*\d)[a-z\d]{6,20}$/
-  if (reg1.test(pwd)) {
-    //高级密码
-    return 3;
-  } else if (reg2.test(pwd) || reg3.test(pwd)) {
-    //中级密码
-    return 2;
-  } else if (reg4.test(pwd)) {
-    //低级密码
-    return 1;
+// 验证密码正确和强弱
+export const isPassword = (pwd: string, len: number = 6) => {
+  let isValid = false;
+  // 检查密码长度
+  const lengthRequirement = pwd.length >= len; 
+  if (!lengthRequirement) {  
+    return {  
+      isValid: isValid,  
+      strength: PWD_STRENGTH.WEAK,   
+    };  
   }
-  return 0;
+  // 检查是否包含大写字母、数字和特殊字符  
+  const hasUpperCase = /[A-Z]/.test(pwd);
+  const hasNumber = /\d/.test(pwd);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+  let strength = PWD_STRENGTH.WEAK;
+  if (hasUpperCase && hasNumber) {  
+    strength = PWD_STRENGTH.MEDIUM;
+    if (hasSpecialChar) {  
+      strength = PWD_STRENGTH.STRONG;  
+    }
+  } else if (hasSpecialChar && (hasUpperCase || hasNumber)) {
+    strength = PWD_STRENGTH.MEDIUM;  
+  }
+  const hasLowerCase = /[a-z]/.test(pwd);
+  return {
+    isValid: lengthRequirement && (hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar),
+    strength 
+  };
 };
 
 export const nonNull = (value: string | undefined | null) => {
@@ -204,6 +217,7 @@ export function isFunction(val: unknown): val is Function {
 
 import type JSEncrypt from 'jsencrypt';
 import { MutableRefObject } from 'react';
+import { PWD_STRENGTH } from './constant';
 
 export async function getJsEncrypt(jsEncryptRef: MutableRefObject<any | undefined>): Promise<JSEncrypt> {
   let jsEncrypt;

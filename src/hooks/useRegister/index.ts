@@ -46,7 +46,7 @@ const useRegister = () => {
             setRegCode(e.target.value);
         } else if( name=="regPassword" ) {
             setRegPassword(e.target.value, function (data: any) {
-                setStrength(isPassword(data));
+                setStrength(isPassword(data).strength);
             });
         } else if( name=="regConfirmPassword" ) {
             setRegConfirmPassword(e.target.value);
@@ -99,7 +99,7 @@ const useRegister = () => {
             if (!isPasswordLen(regPassword)) {
                 throw t('passwordLengthSupport');
             }
-            if (isPassword(regPassword)<3) {
+            if (!isPassword(regPassword).isValid) {
                 throw t('passwordError');
             }
             if (regPassword!=regConfirmPassword) {

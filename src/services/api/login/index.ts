@@ -28,7 +28,7 @@ export const loginByEmail = (
     baseURL: API_BASE_URL,
   });
   const url = config.baseURL + LOGIN_BY_EMAIL;
-  return refreshFetch(url, config).then(handleReqMiddleware);
+  return fetch(url, config).then(handleReqMiddleware);
 };
 
 export const sendEmailCode = (
@@ -54,7 +54,7 @@ export const refreshToken = (
 ): Promise<Response | IData<any>> => {
   let config = createConfig(params, { method: "POST", baseURL: API_BASE_URL });
   const url = config.baseURL + REFRESH_TOKEN;
-  return fetch(url, config).then(handleReqMiddleware);
+  return refreshFetch(url, config).then(handleReqMiddleware);
 };
 
 export const getPasswordPublicKey = (
@@ -71,7 +71,7 @@ export const logout = (params: TBody): Promise<Response | void> => {
     method: "POST",
     baseURL: API_BASE_URL,
   });
-  return fetch(config.baseURL + LOGOUT_BY_EAMIL, config).then(
+  return refreshFetch(config.baseURL + LOGOUT_BY_EAMIL, config).then(
     handleReqMiddleware
   );
 };

@@ -24,7 +24,7 @@ export default {
     notRegistered: "Not registered yet?",
     enterValidCaptcha: "Please enter a valid captcha",
     tryRefreshCaptcha: "Please try refreshing the captcha",
-    passwordLengthSupport: "Password length must be between 6 and 20 characters",
+    passwordLengthSupport: "The minimum password length is 6 characters",
     passwordError: "Password length must be between 6 and 20 characters，Must include at least one uppercase letter and special characters !@#$%^&*()_+ one of them.",
     confirmPasswordError: "Confirmed password and new password do not match.",
     enterNotNullPassword: "Password connot be empty",

@@ -52,7 +52,7 @@ export default async function Page({
       metadata.set('page', "");
       return (<RegisterPage metadata={JSON.parse(JSON.stringify(metadata))} pageInfo={pageInfo}/>);
     } catch (e) {
-        return <ResetPage error={e} />;
+        return <ResetPage error={JSON.parse(JSON.stringify(e))} />;
     }
 }
 

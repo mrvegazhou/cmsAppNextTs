@@ -32,6 +32,7 @@ export const collabTokenInfoAtom =  atom<ICollabTokenInfo>({} as ICollabTokenInf
 export const canEditAtom = atom(
   (get) => {
     const info = get(collabTokenInfoAtom);
+    
     // 如果不是协作状态 返回true
     if (!info.isCollab) return true;
     // 协作状态 并且 作者不是本人

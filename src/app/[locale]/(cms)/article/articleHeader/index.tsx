@@ -34,6 +34,7 @@ export default function ArticleHeader(props: {
 
   const [saveLocalState, setSaveLocalState] = useState<string>();
   const canEdit = useAtomValue(canEditAtom);
+  
   const [articleData, setArticleData] = useAtom(writeArticleAtom);
 
   const [editor] = useLexicalComposerContext();

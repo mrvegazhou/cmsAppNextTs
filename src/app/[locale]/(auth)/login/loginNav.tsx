@@ -8,23 +8,25 @@ import {
     memo,
     useRef,
     forwardRef,
-    useImperativeHandle
+    useImperativeHandle,
+    useMemo
 } from 'react';
 import RegisterNav from '../register/registerNav';
 import LoginForgetNav from './loginForgetNav';
 import Captcha from '@/components/captcha/Captcha';
 import useLogin from '@/hooks/useLogin';
 import Modal from '@/components/modal';
-import useClickOutside from '@/hooks/useClick/useClickOutside';
+import { PWD_STRENGTH } from '@/lib/constant';
+
 
 const LoginNav = () => {
 
     let loginRef = useRef();
 
-    const showLoginModal = () => {
+    const showLoginModal = useCallback(() => {
         // @ts-ignore
         loginRef.current && loginRef.current.setOpen(true);
-    };
+    }, [loginRef]);
 
     return (
       <>
@@ -72,45 +74,76 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
 
 
     const [open, setOpen] = useState<boolean>(false);
-    useImperativeHandle(ref, () => ({ setOpen: setOpen }));
-    // 关闭modal
-    function onClickCloseModal() {
-        setOpen(false);
-    }
 
-    function clearInput() {
+    useImperativeHandle(ref, () => ({ setOpen: setOpen }));
+    
+    // 关闭modal
+    const onClickCloseModal = useCallback(() => {
+        setOpen(false);
+    }, []);
+
+    const clearInput = useCallback(() => {
         // @ts-ignore
         emailInputRef.current && (emailInputRef.current.value = '');
         // @ts-ignore
         passwordInputRef.current && (passwordInputRef.current.value = '');
         setEmail("");
         setPassword("");
-    }
+    }, []);
   
-    function resetLoginFormModal() {
+    const resetLoginFormModal = useCallback(() => {
         clearInput();
         setShowLoginForm(true);
         setShowRegister(false);
         setShowForgetPwd(false);
         setStrength(0);
         setOpen(false);
-    }
+    }, []);
 
-    function showForgetPwdModal() {
+    const showForgetPwdModal = useCallback(() => {
         setShowForgetPwd(true);
         setShowLoginForm(false);
-    }
+    }, []);
     
-    function showRegisterModal() {
+    const showRegisterModal = useCallback(() => {
         setShowRegister(true);
         setShowLoginForm(false);
-    }
+    }, []);
 
-    function goBack(e: MouseEvent<HTMLButtonElement>) {
+    const goBack = useCallback((e: MouseEvent<HTMLButtonElement>) => {
         setShowLoginForm(true);
         setShowForgetPwd(false);
         setShowRegister(false);
-    }
+    }, []);
+
+    const showPasswordStrength = useMemo(() => {
+        let divStr = null;
+        if (strength>0) {
+            if (strength==PWD_STRENGTH.WEAK) {
+                divStr = <div className='w-15 border border-2 border-secondary'></div>;
+            } else if (strength==PWD_STRENGTH.MEDIUM) {
+                divStr = <>
+                            <div className='w-15 border border-2 border-secondary'></div>
+                            <div className='w-15 border border-2 border-warning mx-1'></div>
+                        </>
+            } else if (strength==PWD_STRENGTH.STRONG) {
+                divStr = <>
+                            <div className='w-15 border border-2 border-secondary'></div>
+                            <div className='w-15 border border-2 border-warning mx-1'></div>
+                            <div className='w-15 border border-2 border-danger'></div>
+                        </>
+            } else {
+                return <></>;
+            }
+            return (
+                <div className="row" style={{margin:"10px 0 0 3px"}}>
+                    {divStr}
+                </div>
+            );
+        } else {
+            return (<></>);
+        }
+    }, [strength]);
 
     return (
         <Modal
@@ -139,14 +172,8 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
                     <div className="form-group row mt-4">
                         <label className="col-sm-3 col-form-label">{t('password')}</label>
                         <div className="col-sm-8">
-                        <input name="password" ref={passwordInputRef} defaultValue={password} type="password" className="form-control col-sm-10" onChange={handleChange}/>
-                        {strength>0 && (
-                            <div className="row" style={{margin:"10px 0 0 3px"}}>
-                                {strength==1 && <div className='w-15 border border-2 border-secondary'></div>}
-                                {strength==2 && (<><div className='w-15 border border-2 border-secondary'></div><div className='w-15 border border-2 border-warning mx-1'></div></>)}
-                                {strength==3 && (<><div className='w-15 border border-2 border-secondary'></div><div className='w-15 border border-2 border-warning mx-1'></div><div className='w-15 border border-2 border-danger'></div></>)}
-                            </div>
-                        )}
+                            <input name="password" ref={passwordInputRef} defaultValue={password} type="password" className="form-control col-sm-10" onChange={handleChange}/>
+                            {showPasswordStrength}
                         </div>
                     </div>
                     { showCaptcha && (

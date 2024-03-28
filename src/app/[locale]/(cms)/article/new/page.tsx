@@ -16,6 +16,7 @@ export default async function Page({
     
     try {
         const locale = await getLocale();
+        
         const token = authMiddleware(cookies());
         const metadata = new Metadata();
         metadata.setReferer('origin');
@@ -26,6 +27,7 @@ export default async function Page({
             <NewArticlePage metadata={JSON.parse(JSON.stringify(metadata))} />
         );
     } catch (e) {
+        console.log(e);
         return <>{JSON.stringify(e)}</>;
     }
 }

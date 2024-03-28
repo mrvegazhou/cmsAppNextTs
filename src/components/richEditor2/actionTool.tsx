@@ -120,9 +120,9 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
                     }}
                   />
                   {/* 清空编辑 */}
-                  <ClearEditor isDisabled class="ms-3" clearFn={clearEditorContent} isEmpty={isEditorEmpty} />
+                  <ClearEditor isDisabled={!canEditIdent} class="ms-3" clearFn={clearEditorContent} isEmpty={isEditorEmpty} />
                   {/* 保存到草稿 */}
-                  <SubmitEditor isDisabled={canEditIdent} class="ms-3"></SubmitEditor>
+                  <SubmitEditor isDisabled={!canEditIdent} class="ms-3"></SubmitEditor>
                 </div>
             </div>
             {modal}

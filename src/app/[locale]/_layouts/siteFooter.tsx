@@ -15,7 +15,6 @@ const year = new Date().getFullYear();
 
 export default function Footer({ metadata }: { metadata: TMetadata }) {
   const showLoginModalIdent = useAtomValue(loginAtom);
-  console.log(showLoginModalIdent, "===showLoginModalIdent==");
 
   useEffect(() => {
   }, [])

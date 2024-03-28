@@ -92,9 +92,6 @@ dependencies:
   html-react-parser:
     specifier: ^5.1.8
     version: 5.1.9(@types/react@18.2.69)(react@18.2.0)
-  jose:
-    specifier: ^5.2.3
-    version: 5.2.3
   jotai:
     specifier: ^2.7.1
     version: 2.7.1(@types/react@18.2.69)(react@18.2.0)
@@ -107,6 +104,9 @@ dependencies:
   jsencrypt:
     specifier: ^3.3.2
     version: 3.3.2
+  jwt-decode:
+    specifier: ^4.0.0
+    version: 4.0.0
   katex:
     specifier: ^0.16.9
     version: 0.16.9
@@ -2463,10 +2463,6 @@ packages:
       '@pkgjs/parseargs': 0.11.0
     dev: true
 
-  /jose@5.2.3:
-    resolution: {integrity: sha512-KUXdbctm1uHVL8BYhnyHkgp3zDX5KW8ZhAKVFEfUbU2P8Alpzjb+48hHvjOdQIyPshoblhzsuqOwEEAbtHVirA==, tarball: https://registry.npmmirror.com/jose/-/jose-5.2.3.tgz}
-    dev: false
-
   /jotai-tanstack-query@0.8.5(@tanstack/query-core@5.28.6)(jotai@2.7.1)(wonka@6.3.4):
     resolution: {integrity: sha512-cFq+1sE7Qkt7Kh9Db2KE8LXdbPiGwCiy8S5YSEnjUDxF59A4XhoXTDJBuPiMIA1dD1/yMsNKr1ADfN5CvscYZw==, tarball: https://registry.npmmirror.com/jotai-tanstack-query/-/jotai-tanstack-query-0.8.5.tgz}
     peerDependencies:
@@ -2546,6 +2542,11 @@ packages:
       object.assign: 4.1.5
       object.values: 1.2.0
     dev: true
+
+  /jwt-decode@4.0.0:
+    resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==, tarball: https://registry.npmmirror.com/jwt-decode/-/jwt-decode-4.0.0.tgz}
+    engines: {node: '>=18'}
+    dev: false
 
   /katex@0.16.9:
     resolution: {integrity: sha512-fsSYjWS0EEOwvy81j3vRA8TEAhQhKiqO+FQaKWp0m39qwOzHVBgAUBIXWj1pB+O2W3fIpNa6Y9KSKCVbfPhyAQ==, tarball: https://registry.npmmirror.com/katex/-/katex-0.16.9.tgz}

@@ -29,11 +29,17 @@ export const SAVE_TYPE = {
   MANUAL: 1,
   AUTO: 0,
 };
+// 密码强度
+export const PWD_STRENGTH = {
+  WEAK: 1,
+  MEDIUM: 2,
+  STRONG: 3,
+};
 
 // 上传图片限制
 export const MAX_FILE_SIZE_IN_KB = 10000;
 
-export const REFRESH_TOKEN_BUFFER = 10;
+export const REFRESH_TOKEN_BUFFER = 3600;
 
 export const COOKIE_EXPIRES = 365;
 export const TOKEN_SECRET = "TOKEN_SECRET";

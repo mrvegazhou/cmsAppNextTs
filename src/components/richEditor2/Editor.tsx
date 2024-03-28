@@ -177,9 +177,9 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
   });
   const checkCollabFunc = async () => {
     const search = window.location.search;
-    const params = new URLSearchParams(search);
+    const params = new URLSearchParams(search); 
     const token = params.get('t');
-    if (token=="") return;
+    if (token=="" || token==null || typeof token=='undefined') return;
     await checkCollabMutation.mutateAsync({data:{token: token ?? ""}}).then(res => {
       if (res.status == 200) {
         setCollabTokenInfo(prev => {

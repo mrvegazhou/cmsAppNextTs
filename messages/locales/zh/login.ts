@@ -24,7 +24,7 @@ export default {
     notRegistered: "还未注册？",
     enterValidCaptcha: "请输入正确验证码",
     tryRefreshCaptcha: "请尝试刷新验证码",
-    passwordLengthSupport: "密码长度支持最小6位，最大20位",
+    passwordLengthSupport: "密码长度支持最小6位",
     passwordError: "密码长度支持6到20位，需最少一个大写字母和特殊字符!@#$%^&*()_+中的一个",
     confirmPasswordError: "确认密码和新密码不一致",
     enterNotNullPassword: "密码不能为空",
