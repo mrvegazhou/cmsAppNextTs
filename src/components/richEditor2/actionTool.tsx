@@ -13,7 +13,7 @@ import CommentPlugin from './plugins/CommentPlugin';
 import {createWebsocketProvider} from './collaboration';
 import { useAtomValue } from 'jotai';
 import { collabTokenInfoAtom } from '@/store/articleData';
-import { $generateHtmlFromNodes } from '@lexical/html';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { canEditAtom } from "@/store/articleData";
 
 const scrollTo = (again: boolean) => {
@@ -77,7 +77,7 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
         (<CommentPlugin 
           roomName={collabTokenInfo.roomName!}
           // @ts-ignore
-          providerFactory={(id: string, yjsDocMap: Map<string, Doc>) => createWebsocketProvider(collabTokenInfo.roomName!, yjsDocMap, collabTokenInfo.token!, "comment")} />
+          providerFactory={(id: string, yjsDocMap: Map<string, Doc>) => createWebsocketProvider(collabTokenInfo.roomName!, yjsDocMap, collabTokenInfo.token!, "comment", collabTokenInfo.user)} />
         ) :
         (<CommentPlugin />)
       );
@@ -86,9 +86,8 @@ const ActionTool = forwardRef((prop, ref): JSX.Element => {
     const test = () => {
       editor.update(() => {
         console.log($generateHtmlFromNodes(editor));
-        console.log("-----------");
         console.log(JSON.stringify(editor.getEditorState()));
-        
+        // $generateNodesFromDOM
       });
     };
     

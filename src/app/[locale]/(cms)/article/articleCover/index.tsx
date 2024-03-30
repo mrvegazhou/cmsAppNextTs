@@ -3,8 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@tanstack/react-query';
 import type { IData, IImageState, IArticleUploadImage, IArticleImgRes } from '@/interfaces';
-import { useAtom } from 'jotai'
-import { writeArticleAtom } from "@/store/articleData";
+import { useAtom, useAtomValue } from 'jotai'
+import { canEditAtom, writeArticleAtom } from "@/store/articleData";
 import type { TBody } from '@/types';
 import { BASE_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
 import { handleDrop, convertBytesToKB, loadImage } from "@/lib/tool";
@@ -16,9 +16,11 @@ import classNames from "classnames";
 import { initCoverImage } from "@/store/articleData";
 
 const ArticleCover = (props:{init: boolean}) => {
-    const t = useTranslations('RichEditor');
+    const t = useTranslations('ArticleEditPage');
     const { show } = useToast();
     const [articleData, setArticleData] = useAtom(writeArticleAtom);
+
+    const canEdit = useAtomValue(canEditAtom);
 
     let initState = {
         loading: false,
@@ -50,6 +52,7 @@ const ArticleCover = (props:{init: boolean}) => {
 
     const fileUploadRef = useRef<HTMLInputElement | null>(null);
     const onFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!canEdit) return;
         if (imgState.loading) return;
         handleDrop(e);
 
@@ -146,7 +149,7 @@ const ArticleCover = (props:{init: boolean}) => {
         <>
             <LoaderComp loading={uploadArticleCoverMutation.isPending} className='d-flex flex-column' style={{width:'152px'}}>
             <>
-            <label className={classNames("add-img-label", {"cursor-pointer": !imgState.image.src})}>
+            <label className={classNames("add-img-label", {"cursor-pointer": !imgState.image.src, "disabled cursor-not-allowed pe-none": !canEdit})}>
                 <input type="file" accept=".jpeg, .jpg, .png" multiple={false} className="d-none" onChange={onFileUpload} ref={fileUploadRef} />
                 {imgState.image.src ? (
                     <div className="add-cover-img">
@@ -158,13 +161,13 @@ const ArticleCover = (props:{init: boolean}) => {
                         <svg width="14" height="14" viewBox="0 0 24 24" className="me-2" fill="currentColor">
                             <path fillRule="evenodd" d="M13.25 3.25a1.25 1.25 0 1 0-2.5 0v7.5h-7.5a1.25 1.25 0 1 0 0 2.5h7.5v7.5a1.25 1.25 0 1 0 2.5 0v-7.5h7.5a1.25 1.25 0 0 0 0-2.5h-7.5v-7.5Z" clipRule="evenodd"></path>
                         </svg>
-                        添加文章封面
+                        {t('addCoverImage')}
                     </div>
                 )}
             </label>
             </>
             </LoaderComp>
-            <small className="text-muted mt-1">图片上传格式支持 JPEG、JPG、PNG</small>
+            <small className="text-muted mt-1">{t('imageSupportType')}</small>
         </>
     );
 };

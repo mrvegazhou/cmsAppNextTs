@@ -9,7 +9,7 @@ export default function ErrorPage({ error = '未知错误' }: { error?: any }) {
   function onClickReturn() {
     history.back();
   }
-
+  
   return (
     <>
       <div className="col px-0 vh-100">

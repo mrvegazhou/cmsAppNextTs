@@ -66,10 +66,6 @@ export default {
 
     editComment: "编写标注",
 
-    // 文章设置
-    requestData: "请求数据中...",
-    noData: "没有相关数据",
-
     // 编辑器
     formatCenter: "中心对齐",
     formatStart: "开始对齐",
@@ -125,5 +121,22 @@ export default {
     confirm: "确认",
     discard: "取消",
     excalidraw: "流程图",
-    save: "保存"
+    save: "保存",
+    confirmDelete: "确定要删除",
+    articleNote: "标注",
+    articleNoteComment: "评论",
+
+    // 文章设置
+    cover: "封面",
+    addCoverImage: "添加文章封面",
+    imageSupportType: "图片上传格式支持 JPEG、JPG、PNG",
+    setting: "设置",
+    genDir: "生成目录",
+    category: "分类",
+    tags: "标签",
+    abstract: "摘要",
+    requestData: "请求数据中...",
+    noData: "没有相关数据",
+    selectCategory: "请选择分类",
+    loginPrompt: "请登录后再发布文章",
 };

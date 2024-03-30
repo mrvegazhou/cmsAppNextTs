@@ -11,6 +11,7 @@ import PlaygroundNodes from './nodes/PlaygroundNodes';
 import PlaygroundEditorTheme from './themes/PlaygroundEditorTheme';
 import { SkeletonLayout } from "@/components/skeleton/layout";
 import "./index.scss";
+import { TMetadata } from '@/types';
 
 function prepopulatedRichText() {
     const root = $getRoot();
@@ -19,9 +20,13 @@ function prepopulatedRichText() {
     }
 }
 
-const App = forwardRef((prop, ref): JSX.Element => {
+interface propsType {
+  metadata: TMetadata;
+}
+
+const App = forwardRef((prop: propsType, ref): JSX.Element => {
     const {
-        settings: {isCollab, emptyEditor, measureTypingPerf},
+        settings: {isCollab, emptyEditor},
     } = useSettings();
 
     const initialConfig = {
@@ -60,7 +65,7 @@ const App = forwardRef((prop, ref): JSX.Element => {
                 <SharedAutocompleteContext>
 
                   <div className="editor-shell">
-                    <Editor />
+                    <Editor metadata={prop.metadata}/>
                   </div>
                   
                 </SharedAutocompleteContext>

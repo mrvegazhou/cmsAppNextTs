@@ -14,8 +14,8 @@ import Steps from "@/components/steps/steps";
 import LoaderComp from '@/components/loader/loader';
 import dayjs from 'dayjs';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getRoot, CLEAR_EDITOR_COMMAND, $isElementNode, $isDecoratorNode, $insertNodes} from 'lexical';
-import { $generateNodesFromDOM } from '@lexical/html';
+import { CLEAR_EDITOR_COMMAND } from 'lexical';
+import { $generateHtmlFromNodes } from '@lexical/html';
 import { ARTICLE_PERSONAL_IMAGE_URL, CLIENT_TPYES, SAVE_TYPE } from "@/lib/constant";
 import { ITag } from "@/interfaces";
 import ContentComp from "@/app/[locale]/(cms)/article/[id]/articleContent";
@@ -26,9 +26,12 @@ interface propsType {
 }
 
 const HistoryEditor = (props: propsType) => {
-    const { show } = useToast();
+    // 当前选中的
+    const [selected, setSelected] = useState("");
     const t = useTranslations('ArticleEditPage');
-    const [articleData, setArticleData] = useAtom(writeArticleAtom);
+    const [articleLocalData, setArticleLocalData] = useAtom(writeArticleAtom);
+    const [articleInfo, setArticleInfo] = useState<IArticleInit | null>(null);
+
     const [open, setOpen] = useState<boolean>(false);
     const [historyList, setHistoryList] = useState<IArticleDraft[]>([]);
 
@@ -43,24 +46,22 @@ const HistoryEditor = (props: propsType) => {
     });
 
     const showHistory = () => {
-        setArticleData(prev => {
+        setArticleLocalData(prev => {
             return {...prev, id: 194}
         })
         setOpen(!open);
-        if (!articleData.id) {
+        if (!articleLocalData.id) {
             return;
         }
         historyListMutation.mutateAsync({
             data: {
-                articleId: articleData.id
+                articleId: articleLocalData.id
             }
         }).then(res => {
             if (res.status == 200) {
                 setHistoryList(res.data);
             }
         }).catch(err => {
-            console.log(err, '==s==');
-            
             if (typeof err == 'string' && err.startsWith('401')) {
                 setOpen(false);
                 showLoginModal('401');
@@ -75,54 +76,84 @@ const HistoryEditor = (props: propsType) => {
         // retry: 3
     });
     const getHistoryInfo = (id: number) => {
-        historyInfoMutation.mutateAsync({
-            data: {
-                id: id
-            }
-        }).then(res => {
+        setSelected("history-"+id);
+        historyInfoMutation.mutateAsync({data: { id: id }}).then(res => {
             if (res.status == 200) {
                 let data = res.data;
-                const createTime = dayjs(data.createTime);
-                let newVal: IArticleInit = {
-                    id: data.articleId,
-                    title: data.title,
-                    content: data.content,
-                    tags: data.tags as ITag[],
-                    typeId: data.typeId,
-                    coverImage: {name:'', width:0, height:0, tag:'', src: ARTICLE_PERSONAL_IMAGE_URL + data.coverUrl},
-                    description: data.description,
-                    createTime: createTime.format("YYYY-MM-DD HH:mm:ss"),
-                    isSetCatalog: data.isSetCatalog
-                } as IArticleInit;
-                setArticleData({...newVal});
-                // 清空
-                editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
+                setEditorContent(data.content);
                 // 填充历史内容
                 editor.update(() => {
-                    const parse = new DOMParser()
-                    const text = parse.parseFromString(data.content, 'text/html')
-                    const nodes = $generateNodesFromDOM(editor, text)
-                    const root = $getRoot()
-                    nodes.forEach((node, i) => {
-                        if ($isElementNode(node) || $isDecoratorNode(node)) {
-                            root.append(node)
-                        }
-                    });
-                    $insertNodes(nodes);
+                    const createTime = dayjs(data.createTime);
+                    let articleDraftInfo: IArticleInit = {
+                        id: data.articleId,
+                        title: data.title,
+                        content: data.content,
+                        tags: data.tags as ITag[],
+                        typeId: data.typeId,
+                        coverImage: {name:'', width:0, height:0, tag:'', src: ARTICLE_PERSONAL_IMAGE_URL + data.coverUrl},
+                        description: data.description,
+                        createTime: createTime.format("YYYY-MM-DD HH:mm:ss"),
+                        isSetCatalog: data.isSetCatalog
+                    } as IArticleInit;
+                    if (data.content) {
+                        const htmlContent = $generateHtmlFromNodes(editor);
+                        setArticleInfo(prev => {
+                            return { ...articleDraftInfo, content: htmlContent };
+                        });
+                    }
                 });
-                editor.focus();
+                
             }
         }).catch(err => {
             console.log("catch: ", err);
-        });        
+            if (typeof err == 'string' && err.startsWith('401')) {
+                setOpen(false);
+                showLoginModal('401');
+            }
+        });    
+    };
+
+    const showLocalArticleInfo = () => {
+        setSelected("now");
+        setEditorContent(articleLocalData.content);
+        editor.update(() => {
+            const htmlContent = $generateHtmlFromNodes(editor);
+            setArticleInfo(prev => {
+                return { ...articleInfo!, content: htmlContent };
+            });
+        });
+    };
+
+    // 
+    const setEditorContent = (content: string) => {
+        editor.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
+        const savedState = JSON.parse(content);
+        const newState = editor.parseEditorState(savedState);
+        editor.setEditorState(newState);
+    };
+
+    // 使用
+    const done = () => {
+        if (selected=="") return;
+        setArticleLocalData(prev => {
+            return {...prev, ...articleInfo, createTime: dayjs(Date.now()).format("YYYY-MM-DD HH:mm:ss")};
+        });
+        editor.focus();
     };
 
     const HistoryContent = useCallback((): JSX.Element => {
         return (
             <div className="row">
                 <div className="col-3 overflow-scroll text-nowrap bg-white">
-                    <LoaderComp className="d-flex justify-content-start align-items-center" loading={historyListMutation.isIdle}>
+                    <LoaderComp className="d-flex justify-content-start align-items-center" loading={historyListMutation.isPending}>
                         <Steps direction="vertical" progressDot style={{ padding: '20px 0' }}>
+                            <Steps.Step 
+                                selected={selected=="now" ? "text-body" : ""}
+                                title={dayjs(articleLocalData.createTime).format("YYYY-MM-DD HH:mm:ss")} 
+                                description="当前内容" 
+                                className={"cursor-pointer"} 
+                                onClick={showLocalArticleInfo} 
+                            />
                             {historyList.map((item, idx) => {
                                 const timeStr = dayjs(item.createTime).format("YYYY-MM-DD HH:mm:ss");
                                 let desc = "";
@@ -136,7 +167,12 @@ const HistoryEditor = (props: propsType) => {
                                 }
                                 desc += saveType;
                                 return (
-                                    <Steps.Step key={idx} title={timeStr} description={desc} className="cursor-pointer" onClick={() => getHistoryInfo(item.id!)} />
+                                    <Steps.Step 
+                                        key={idx} 
+                                        title={timeStr} 
+                                        description={desc} 
+                                        selected={selected=="history-"+item.id ? "text-body" : ""}
+                                        className="cursor-pointer" onClick={() => getHistoryInfo(item.id!)} />
                                 );
                             })}
                         </Steps>
@@ -146,18 +182,17 @@ const HistoryEditor = (props: propsType) => {
                     <div className="d-flex" style={{height:'100%'}}>
                         <div className="vr"></div>
                     </div>
-                    <div className="ms-3 overflow-scroll">
-                        <ContentComp content={articleData.content} />
+                    <div className="overflow-scroll ps-2">
+                        <ContentComp content={articleInfo!=null ? articleInfo.content : ""} />
                     </div>
                 </div>
             </div>
         );
-    }, [historyList, articleData]);
+    }, [historyList, articleInfo]);
 
     return (
         <>
             <div onClick={showHistory}>{t('historyLogs')}</div>
-
             <Modal
                 title={t('historyEditList')}
                 isOpen={open}
@@ -167,6 +202,9 @@ const HistoryEditor = (props: propsType) => {
                 minWidth={860}
             >
                 <HistoryContent />
+                <div className="position-absolute bottom-0 end-0 pe-4 pb-4">
+                    <button disabled={selected==""} type="button" className="btn btn-outline-primary" onClick={done}>使用</button>
+                </div>
             </Modal>
         </>
     );

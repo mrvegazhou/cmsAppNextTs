@@ -57,13 +57,16 @@ export default function ArticleHeader(props: {
 
   useInterval(() => {
     if (!canEdit) return;
-    setSaveLocalState(t('savingStatus'));
+    const diffMinute = dayjs(Date.now()).diff(articleData.createTime, 'minute');
+
     if (articleData.createTime) {
       // 小于五分钟不执行
-      if (dayjs(articleData.createTime).diff(Date.now(), 'minute') <= 5) {
+      if (diffMinute <= 1) {
         return;
       }
     }
+    setSaveLocalState(t('savingStatus'));
+
     let newContent = handleSaveNodes();
     // 检查缓存的内容和目前的内容是否相等
     const os = getUserAgent();
@@ -76,14 +79,21 @@ export default function ArticleHeader(props: {
       sourceType = CLIENT_TPYES.PC;
     }
     // 
-    if (dayjs(articleData.createTime).diff(Date.now(), 'minute') >= 15) {
+    if (diffMinute >= 3) {
+      let tags = (articleData.tags).map((item)=>{
+        return item.id;
+      });
+      let uniqueTags = tags.filter((value, index, self) => {  
+        return self.indexOf(value) === index;  
+      });
       let draftInfo = {
         articleId: articleData.id,
         title: articleData.title,
         content: articleData.content,
+        description: articleData.description,
         coverUrl: articleData.coverImage.src,
         isSetCatalog: articleData.isSetCatalog,
-        tags: articleData.tags,
+        tags: uniqueTags,
         typeId: articleData.typeId,
         sourceType: sourceType,
         saveType: SAVE_TYPE.AUTO
@@ -95,7 +105,6 @@ export default function ArticleHeader(props: {
               return { ...pre, id: res.data.id };
             });
           }
-          console.log(res, "===draft====");
         });
       }
     }

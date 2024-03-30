@@ -20,8 +20,8 @@ import type {
 } from '@/interfaces';
 import useToast from '@/hooks/useToast';
 import type { TBody } from '@/types';
-import { useSetAtom } from 'jotai'
-import { loginAtom, userDataAtom } from "@/store/userData";
+import { useAtomValue, useSetAtom } from 'jotai'
+import { goBackAtom, loginAtom, userDataAtom } from "@/store/userData";
 import { useSearchParams, useRouter } from 'next/navigation'
 import dayjs from 'dayjs';
 
@@ -33,6 +33,7 @@ const useLogin = (close: (()=>void) | null = null) => {
     const setUserData = useSetAtom(userDataAtom);
     // 401显示登录弹窗的atom
     const setLoginIdent = useSetAtom(loginAtom);
+    const goBackURL = useAtomValue(goBackAtom);
 
     const [disableLogin, setDisableLogin] = useState(false);
     const [email, setEmail] = useSyncState("");
@@ -109,7 +110,7 @@ const useLogin = (close: (()=>void) | null = null) => {
       }
     }, [jsEncryptRef]);
   
-    // 提交登录 密码12345A@a
+    // 提交登录 密码 12345A@a
     const onSubmit = useCallback(async () => {
       try {
         checkForm();
@@ -161,8 +162,13 @@ const useLogin = (close: (()=>void) | null = null) => {
         setJToken(loginRes.data.token);
         setUserData(loginRes.data.userInfo);
         setDisableLogin(false);
-        // 如果需要返回上一页面
-        const backURL = searchParams.get('back');
+        // 如果需要返回上一页面 判断是否地址栏里携带和存储在jotai里
+        let backURL = searchParams.get('back');
+        console.log(backURL, "==backURL==");
+        
+        if (backURL=="" || null==backURL) {
+          backURL = goBackURL;
+        }
         if (backURL) {
           router.push(backURL);
         }

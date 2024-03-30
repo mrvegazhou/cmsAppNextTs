@@ -9,6 +9,7 @@ code {
     position: relative;
     line-height: 1.7;
     font-weight: 400;
+    overflow: visible;
     .mask{
         position: relative;filter: blur(2px);user-select: none;
     }

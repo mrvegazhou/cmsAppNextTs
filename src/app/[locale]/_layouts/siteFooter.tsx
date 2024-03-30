@@ -2,10 +2,11 @@
 import { useEffect } from 'react';
 import type { TMetadata } from '@/types';
 import dynamic from 'next/dynamic';
-import { showLoginModalAtom } from '@/store/userData';
+import { loginPageAtom, showLoginModalAtom } from '@/store/userData';
 import { useAtomValue } from 'jotai';
 import { LoginModal } from '../(auth)/login/loginNav';
-import { loginAtom } from '@/store/userData';
+import { loginAtom } from '@/store/userData'; 
+import { useRouter, useParams } from 'next/navigation';
 
 const year = new Date().getFullYear();
 
@@ -14,15 +15,18 @@ const year = new Date().getFullYear();
 // });
 
 export default function Footer({ metadata }: { metadata: TMetadata }) {
-  const showLoginModalIdent = useAtomValue(loginAtom);
-  console.log(showLoginModalIdent, "==showLoginModalIdent==");
+  const loginModalIdent = useAtomValue(loginAtom);
+  const loginPageIdent = useAtomValue(loginPageAtom);
   
   useEffect(() => {
-  }, [])
+    if (loginPageIdent) {
+
+    }
+  }, [loginPageIdent])
 
   return <>
     <FooterComp metadata={metadata} />
-    <LoginModal isOpen={showLoginModalIdent} />
+    <LoginModal isOpen={loginModalIdent} />
   </>;
 }
 

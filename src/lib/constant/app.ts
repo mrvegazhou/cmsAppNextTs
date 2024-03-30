@@ -27,7 +27,7 @@ export const CLIENT_TPYES = {
 // 文章保存方式
 export const SAVE_TYPE = {
   MANUAL: 1,
-  AUTO: 0,
+  AUTO: 2,
 };
 // 密码强度
 export const PWD_STRENGTH = {

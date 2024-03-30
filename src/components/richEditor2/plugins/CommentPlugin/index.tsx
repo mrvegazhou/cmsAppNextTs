@@ -73,6 +73,8 @@ import { userDataAtom } from "@/store/userData";
 import { useAtom } from 'jotai';
 import { canEditAtom, writeArticleNoteAtom } from '@/store/articleData';
 import { IArticleNote as Thread, IArticleNoteComment as Comment } from '@/types';
+import { useClickAway } from 'ahooks';
+import { AppContext } from '@/contexts/app';
 
 
 export const INSERT_INLINE_COMMAND: LexicalCommand<void> = createCommand(
@@ -397,22 +399,27 @@ function ShowDeleteCommentOrThreadDialog({
   onClose: () => void;
   thread?: Thread;
 }): JSX.Element {
+  
+  const t = useTranslations('ArticleEditPage');
+
   return (
     <>
-      Are you sure you want to delete this {commentOrThread.type}?
-      <div className="Modal__content">
+      <p>{t('confirmDelete')}{commentOrThread.type=="thread" ? t('articleNote') : t('articleNoteComment')}?</p>
+      <div className="d-flex justify-content-center">
         <button
+          type="button" className="btn-sm btn btn-secondary me-4"
           onClick={() => {
             deleteCommentOrThread(commentOrThread, thread);
             onClose();
           }}>
-          Delete
-        </button>{' '}
+          {t('btnCancel')}
+        </button>
         <button
+          type="button" className="btn-sm btn btn-primary"
           onClick={() => {
             onClose();
           }}>
-          Cancel
+          {t('btnConfirm')}
         </button>
       </div>
     </>
@@ -929,6 +936,35 @@ export default function CommentPlugin({
     );
   }, [editor, markNodeMap]);
 
+  // 点击offcanvas以外的元素隐藏offcanvas
+  const offCanvsRef = useRef<HTMLDivElement>(null);
+  const clickOffCavasRef = useRef<HTMLDivElement>(null); 
+  const context = React.useContext(AppContext);
+  useEffect(() => {
+    const instance = (
+      context.bootstrap ?? window.bootstrap
+    );
+    if (instance && offCanvsRef.current) {
+      new instance.Offcanvas(offCanvsRef.current);
+    }
+    // 组件卸载时销毁 Offcanvas
+    return () => {
+      if (offCanvsRef.current) {
+        const offcanvas = instance.Offcanvas.getInstance(offCanvsRef.current);
+        if (offcanvas) {
+          offcanvas.dispose();
+        }
+      }
+    };
+  }, []);
+  useClickAway(() => {
+    const instance = ( context.bootstrap ?? window.bootstrap );
+    if (offCanvsRef.current) {
+      // @ts-ignore
+      instance.Offcanvas.getInstance(offCanvsRef.current).hide();
+    }
+  }, [offCanvsRef, clickOffCavasRef]);
+
   return (
     <>
       {/* 显示标注的提交框 */}
@@ -942,10 +978,10 @@ export default function CommentPlugin({
           document.body,
         )}
       
-        <div className='text-decoration-none' data-bs-toggle="offcanvas" data-bs-target="#offcanvasComments">
+        <div ref={clickOffCavasRef} className='text-decoration-none' data-bs-toggle="offcanvas" data-bs-target="#offcanvasComments">
           {t('articleComment')}
         </div>
-        <div className="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" id="offcanvasComments">
+        <div ref={offCanvsRef} className="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" id="offcanvasComments">
             <div className="offcanvas-header">
                 <h6 className="offcanvas-title text-nowrap" id="offcanvasExampleLabel">
                   {t('articleComment')}  <small className='text-secondary'>{commentStore.isCollaborative() && "["+t('articleCommentCollab')+"]"}</small>

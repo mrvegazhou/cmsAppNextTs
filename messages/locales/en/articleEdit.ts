@@ -65,10 +65,6 @@ export default {
 
     editComment: "Type a comment...",
 
-    // 文章设置
-    requestData: "Requesting data...",
-    noData: "No data",
-
     // 编辑器
     formatCenter: "Center Align",
     formatStart: "Start Align",
@@ -124,5 +120,23 @@ export default {
     confirm: "Confirm",
     discard: "Discard",
     excalidraw: "Excalidraw",
-    save: "Save"
+    save: "Save",
+    confirmDelete: "Are you sure you want to delete this ",
+    articleNote: "note",
+    articleNoteComment: "comment",
+
+    // 文章设置
+    cover: "Cover",
+    addCoverImage: "Add article cover",
+    imageSupportType: "Image upload format supports JPEG, JPG, PNG",
+    setting: "Set article attributes",
+    genDir: "Generate article directory",
+    category: "Category",
+    tags: "TAGS",
+    abstract: "Abstract",
+    requestData: "Requesting data...",
+    noData: "No data",
+    selectCategory: "Please select a category",
+    loginPrompt: "Please log in before publishing the article",
+
 }

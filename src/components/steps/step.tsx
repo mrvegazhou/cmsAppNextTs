@@ -11,6 +11,7 @@ export interface StepProps extends IProps, Omit<HTMLDivProps, 'title'> {
   stepNumber?: string;
   adjustMarginRight?: number;
   icon?: string;
+  selected?: string;
 }
 
 export default function Step(props: StepProps) {
@@ -38,6 +39,7 @@ export default function Step(props: StepProps) {
     .filter(Boolean)
     .join(' ')
     .trim();
+  
   const stepItemStyle: CSSProperties = { ...style };
   const stepItemDotStyle: CSSProperties = {};
   if (itemWidth) {
@@ -83,8 +85,8 @@ export default function Step(props: StepProps) {
         </div>
       </div>
       <div className={[`${prefixCls}-item-main`, !!icon && 'is-icon-main'].filter(Boolean).join(' ').trim()}>
-        <div className={`${prefixCls}-item-title`}>{title}</div>
-        {description && <div className={`${prefixCls}-item-description`}>{description}</div>}
+        <div className={`${prefixCls}-item-title ${props.selected}`}>{title}</div>
+        {description && <div className={`${prefixCls}-item-description ${props.selected}`}>{description}</div>}
       </div>
     </div>
   );

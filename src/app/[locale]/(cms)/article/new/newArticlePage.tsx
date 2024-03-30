@@ -35,6 +35,8 @@ interface propsType {
 }
 
 const NewArticlePage: FC<propsType> = props => {
+  const t = useTranslations('ArticleEditPage');
+
   let userData = useAtomValue(userDataAtom);
   const router = useRouter();
 
@@ -42,7 +44,7 @@ const NewArticlePage: FC<propsType> = props => {
   const [islogin, setLoginModal] = useAtom(loginAtom);
 
   const canEdit = useAtomValue(canEditAtom);
-  console.log(canEdit);
+  console.log(canEdit, "===canEdit==");
   
   
   // const getArticleInfo = async (id: number) => {
@@ -92,7 +94,7 @@ const NewArticlePage: FC<propsType> = props => {
             {/* <NavbarPage metadata={props.metadata} fixedTop={true} /> */}
             <ContentLayout metadata={props.metadata} className="bg-white">
               <div className="w-100 d-flex justify-content-center align-items-center text-secondary">
-                请登录后再发布文章
+                {t('loginPrompt')}
               </div>
             </ContentLayout>
             <Footer metadata={props.metadata} />
@@ -115,7 +117,7 @@ const NewArticleEditor: FC<propsType> = props => {
   return (
     <>
       <div className="w-100 px-0 mx-0">
-        <RichEditor/>
+        <RichEditor metadata={props.metadata} />
         <ArticleSetting />
       </div>
       <div className="d-flex flex-row " style={{ marginBottom: '500px' }}>

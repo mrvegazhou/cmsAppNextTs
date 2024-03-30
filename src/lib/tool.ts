@@ -399,13 +399,29 @@ export const GetImageFile = async (imageUrl: string, fileName: string) => {
 }
 
 // 获取当前地址
-export const GetCurrentUrl = () => {
+export const GetCurrentUrl = (hasSearchParams: boolean = false) => {
   const urlParams = new URL(window.location.href);
   const pathname = urlParams?.pathname;
   let url = document.location.toString();
   let arrUrl = url.split("//");
   let host = window.location.host;
-  return `${arrUrl[0]}//${host}${pathname}`;
+  if (!hasSearchParams) {
+    return `${arrUrl[0]}//${host}${pathname}`;
+  } else {
+    const search = window.location.search;
+    return `${arrUrl[0]}//${host}${pathname}//${search}`;
+  }
+};
+
+export const GetCurrentPath = () => {
+  const urlParams = new URL(window.location.href);
+  const pathname = urlParams?.pathname;
+  const idx = pathname.indexOf('/', pathname.indexOf('/') + 1);
+  const pathStr = pathname.substring(0, idx);
+  let url = document.location.toString();
+  let arrUrl = url.split("//");
+  let host = window.location.host;
+  return `${arrUrl[0]}//${host}${pathStr}`;
 };
 
 interface Dictionary<T> {

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import type { IData, IType, ITypeAndPType } from '@/interfaces';
 import type { TBody } from '@/types';
 import { getTypeList, getTypeListByPid, getTypeInfoById, getTypeListQueryConf } from "@/services/api";
@@ -12,7 +13,8 @@ const queryKey = 'typeList';
 const queryKey2 = 'typeList2';
 
 const ArticleType = (props: {init: boolean}) => {
-    
+    const t = useTranslations('ArticleEditPage');
+
     const [articleData, setArticleData] = useAtom(writeArticleAtom);
 
     const [value, setValue] = useState<number | undefined>();
@@ -141,7 +143,7 @@ const ArticleType = (props: {init: boolean}) => {
                 option={option}
                 loading={loading}
                 onSearch={handleSearch}
-                placeholder={(getAppTypeListQuery.isError || getAppTypeListQuery.isLoading) ? '请求数据中...' : '请选择分类'}
+                placeholder={(getAppTypeListQuery.isError || getAppTypeListQuery.isLoading) ? t('requestData') : t('selectCategory')}
                 style={{ width: 180 }}
                 onChange={(value) => {
                     let val = value as number;

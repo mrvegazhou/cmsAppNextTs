@@ -101,6 +101,7 @@ export interface ICollabTokenInfo {
   isCollab: boolean;
   token?: string;
   isMe?: boolean;
+  user?: string;
 }
 
 // 文章atom store初始化

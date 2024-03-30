@@ -14,7 +14,7 @@ export default async function Page({
     const metadata = new Metadata();
     metadata.setReferer('origin');
     metadata.setLocale(locale);
-
+    
     return (
         <ErrorPage />
     );

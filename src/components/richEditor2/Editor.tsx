@@ -56,15 +56,23 @@ import classNames from 'classnames';
 
 import { useMutation } from '@tanstack/react-query';
 import { checkCollab } from "@/services/api";
-import type { TBody } from '@/types';
+import type { TBody, TMetadata } from '@/types';
 import { IData, ICollabTokenInfo } from '@/interfaces';
 import ArticleHeader from '@/app/[locale]/(cms)/article/articleHeader';
 
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { collabTokenInfoAtom } from '@/store/articleData';
+import { useRouter } from "next/navigation";
+import { staticRouter } from '@/lib/constant/router';
+import { goBackAtom } from '@/store/userData';
+import { GetCurrentUrl } from '@/lib/tool';
+import { USER_TOKEN } from '@/lib/constant';
 
 
-const Editor = forwardRef((prop, ref): JSX.Element => {
+interface propsType {
+  metadata: TMetadata;
+}
+const Editor = forwardRef((prop: propsType, ref): JSX.Element => {
   const {historyState} = useSharedHistoryContext();
   const {
     settings: {
@@ -169,6 +177,8 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
   // }, [editor]);
 
   // 检查collab token是否允许协同操作
+  const router = useRouter();
+  const setGoBackURL = useSetAtom(goBackAtom);
   const [collabTokenInfo, setCollabTokenInfo] = useAtom(collabTokenInfoAtom);
   const checkCollabMutation = useMutation({
     mutationFn: async (variables: TBody<{token: string}>) => {
@@ -186,12 +196,25 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
           return {...prev, ...res.data};
         });
       }
-    });
+    }).catch(err => {
+      let locale = prop.metadata.locale;
+      if (locale!="") locale = "/"+locale
+      if (err.status==401) {
+        // 跳转到登录页
+        setGoBackURL(GetCurrentUrl(true));
+        router.push(locale+staticRouter.login)
+      }
+    })
   };
   useEffect(() => {
     setCollabTokenInfo({isCollab});
-    checkCollabFunc();
+    try {
+      checkCollabFunc();
+    } catch (err) {
+    }
+    
   }, []);
+  console.log(collabTokenInfo, "==collabTokenInfo==");
   
   const CollaborationContent = React.useMemo(() => {
     return (
@@ -201,7 +224,7 @@ const Editor = forwardRef((prop, ref): JSX.Element => {
           cursorColor={collabTokenInfo.cursorColor!}
           username={collabTokenInfo.userName!}
           // @ts-ignore
-          providerFactory={(id: string, yjsDocMap: Map<string, Doc>) => createWebsocketProvider(id, yjsDocMap, collabTokenInfo.token!, "main")}
+          providerFactory={(id: string, yjsDocMap: Map<string, Doc>) => createWebsocketProvider(id, yjsDocMap, collabTokenInfo.token!, "main", collabTokenInfo.user)}
           initialEditorState={null}
           shouldBootstrap={true}
         />

@@ -8,7 +8,7 @@
 import { WebsocketProvider } from "y-websocket";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { Doc } from 'yjs';
-
+import { GetCurrentPath } from '@/lib/tool';
 
 const WEBSOCKET_ENDPOINT = 'ws://localhost:1234';
 const WEBSOCKET_SLUG = 'collab';
@@ -18,24 +18,46 @@ export function createWebsocketProvider(
   id: string,
   yjsDocMap: Map<string, Doc>,
   token: string,
-  type: string
+  type: string,
+  user: string
   // token: string
 ): WebsocketProvider {
-  const doc = new Doc();
+  if (token=="" || user=="" || id=="" || type=="") {
+    const href = GetCurrentPath();
+    window.location.href = href+"/error";
+    // @ts-ignore
+    return null;
+  } else {
+    const doc = new Doc();
     // @ts-ignore
     yjsDocMap.set(id, doc);
     const provider = new WebsocketProvider(
       WEBSOCKET_ENDPOINT,
       WEBSOCKET_SLUG + '/' + id + '/' + type,
       doc,
-      { connect: false, params: {t: token} },
+      { connect: false, params: {t: token, v: user} },
     );
     new IndexeddbPersistence(
       id,
       // @ts-ignore
       doc
     );
+    // provider.on('connect', () => {  
+    //   console.log('WebSocket connected');  
+    // });  
+      
+    // provider.on('disconnect', (code, reason) => {  
+    //   console.log(typeof code, typeof reason,  "===disconnect===");
+    //   console.log('WebSocket disconnected', code, reason);  
+    // });  
+      
+    // provider.on('error', (error) => {  
+    //   console.log(typeof error, "===error===");
+      
+    //   console.error('WebSocket error', error);  
+    // });
     return provider;
+  }
 }
 
 // import * as Y from "yjs";
