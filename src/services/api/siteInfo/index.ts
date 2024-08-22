@@ -4,7 +4,7 @@ import type { IData } from '@/interfaces';
 
 import { 
   API_URL,
-    PAGE_INFO
+  PAGE_INFO
 } from '@/lib/constant'
 
 // 调试时方便统一修改地址

@@ -53,5 +53,6 @@ export default {
     left: '左',
     right: '右',
     fullWidth: '全宽',
-    displayCaption: '是否显示标题'
+    displayCaption: '是否显示标题',
+    addCaption: '添加标题'
 };

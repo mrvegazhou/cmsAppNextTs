@@ -25,13 +25,13 @@ const Share = () => {
   );
 
   return (
-      <>
-        <PopoverComp trigger="click" placement="right" content={content} id='333'>
+      <div>
+        <PopoverComp trigger="click" placement="right" content={content} usePortal={false} fixed={true} style={{position:'fixed'}}>
           <DivDom className={classNames([itemClassName, "text-center border"])}>
             <i className={classNames([iconClassName, "icon-fenxiangcopy"])}></i>
           </DivDom>
         </PopoverComp>
-      </>
+      </div>
   );
 };
 export default Share;

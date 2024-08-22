@@ -44,11 +44,6 @@ export const SettingsContext = ({
       ...options,
       [setting as string]: value,
     }));
-    if (DEFAULT_SETTINGS[setting] === value) {
-      setURLParam(setting, null);
-    } else {
-      setURLParam(setting, value);
-    }
   }, []);
 
   const contextValue = useMemo(() => {
@@ -61,21 +56,3 @@ export const SettingsContext = ({
 export const useSettings = (): SettingsContextShape => {
   return useContext(Context);
 };
-
-function setURLParam(param: SettingName, value: null | boolean) {
-  const url = new URL(window.location.href);
-  const params = new URLSearchParams(url.search);
-  if (value !== null) {
-    if (params.has(param)) {
-      params.set(param, String(value));
-    } else {
-      params.append(param, String(value));
-    }
-  } else {
-    if (params.has(param)) {
-      params.delete(param);
-    }
-  }
-  url.search = params.toString();
-  window.history.pushState(null, '', url.toString());
-}

@@ -1,25 +1,41 @@
-import { useState, useEffect, RefObject } from "react";
+import { useState, useEffect, useLayoutEffect, RefObject } from "react";
 import classNames from "classnames";
 import DividerComp from "@/components/divider/divider";
-// import MarkdownNavBarComp from '@/components/markdownNavbar/markdownNavBar';
+import CreateCatalog from "@/components/catalogNavbar";
+import './catalogue.scss'
+
 
 const Catalogue = ({navContent}:{navContent: RefObject<HTMLElement>}) => {
-    useEffect(() => {
+    const rebuildCatalog = () => {
+        let catalog = new CreateCatalog({
+          contentEl: 'articleContent',
+          catelogEl: 'catelogList',
+          linkClass: 'cms-catelog-link',
+          linkActiveClass: 'cms-catelog-link-active',
+          supplyTop: 20,
+          selector: ['h1', 'h2', 'h3'],
+          active: function (el: HTMLElement) {
+          }
+        });
+        catalog.rebuild();
+    };
+    useLayoutEffect(() => {
+        rebuildCatalog();
+    }, []);
 
-    });
-    const article = `
-# (H1标题)
-## (H2标题)
-### (H3标题)
-#### (H4标题)
-##### (H5标题)
-###### (H6标题)`;
+    const [show, setShow] = useState(true);
+
     return (
-        <div className={classNames(['shadow-sm bg-white mt-2 overflow-auto'])} >
-            <div style={{height:"500px"}}></div>
-          <DividerComp>目录</DividerComp>
-          {/* <MarkdownNavBarComp source={article} navContent={navContent} /> */}
-        </div>
+        <>
+            <div className={classNames(['mainBgColor overflow-auto catelogFrame'])} >
+                <DividerComp>
+                    <span className="title">
+                        目录 {show ? <i onClick={() => setShow(false)} className="iconfont icon-xiangshang cursor-pointer"></i> : <i onClick={() => setShow(true)} className="iconfont icon-xiangxia cursor-pointer"></i>}
+                    </span>
+                </DividerComp>
+                <div id="catelogList" className={classNames({"unfold": show})}></div>
+            </div>
+        </>
     );
 }
 export default Catalogue;

@@ -32,9 +32,12 @@ export interface ImagePayload {
   key?: NodeKey;
   maxWidth?: number;
   showCaption?: boolean;
+  resizable?: boolean;
   src: string;
   width?: number;
   captionsEnabled?: boolean;
+  dataRawWidth?: string | undefined;
+  dataRawHeight?: string | undefined;
 }
 
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
@@ -55,6 +58,9 @@ export type SerializedImageNode = Spread<
     showCaption: boolean;
     src: string;
     width?: number;
+    dataRawWidth?: string | undefined;
+    dataRawHeight?: string | undefined;
+    resizable?: boolean | undefined;
   },
   SerializedLexicalNode
 >;
@@ -69,6 +75,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __caption: LexicalEditor;
   // Captions cannot yet be used within editor cells
   __captionsEnabled: boolean;
+  __dataRawWidth: string | undefined;
+  __dataRawHeight: string | undefined;
+  __resizable: boolean | undefined;
 
   static getType(): string {
     return 'image';
@@ -85,11 +94,14 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__caption,
       node.__captionsEnabled,
       node.__key,
+      node.__dataRawWidth,
+      node.__dataRawHeight,
+      node.__resizable,
     );
   }
 
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const {altText, height, width, maxWidth, caption, src, showCaption} =
+    const {altText, height, width, maxWidth, caption, src, showCaption, dataRawWidth, dataRawHeight, resizable} =
       serializedNode;
     const node = $createImageNode({
       altText,
@@ -98,6 +110,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       showCaption,
       src,
       width,
+      dataRawWidth, 
+      dataRawHeight,
+      resizable
     });
     const nestedEditor = node.__caption;
     const editorState = nestedEditor.parseEditorState(caption.editorState);
@@ -113,6 +128,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     element.setAttribute('alt', this.__altText);
     element.setAttribute('width', this.__width.toString());
     element.setAttribute('height', this.__height.toString());
+    element.setAttribute('data-rawwidth', this.__dataRawWidth!.toString());
+    element.setAttribute('data-rawheight', this.__dataRawHeight!.toString());
     return {element};
   }
 
@@ -135,6 +152,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     caption?: LexicalEditor,
     captionsEnabled?: boolean,
     key?: NodeKey,
+    dataRawHeight?: string,
+    dataRawWidth?: string,
+    resizable?: boolean,
   ) {
     super(key);
     this.__src = src;
@@ -142,9 +162,12 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__maxWidth = maxWidth;
     this.__width = width || 'inherit';
     this.__height = height || 'inherit';
+    this.__dataRawHeight = dataRawHeight;
+    this.__dataRawWidth = dataRawWidth;
     this.__showCaption = showCaption || false;
     this.__caption = caption || createEditor();
     this.__captionsEnabled = captionsEnabled || captionsEnabled === undefined;
+    this.__resizable = resizable;
   }
 
   exportJSON(): SerializedImageNode {
@@ -158,6 +181,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       type: 'image',
       version: 1,
       width: this.__width === 'inherit' ? 0 : this.__width,
+      dataRawWidth: this.__dataRawWidth,
+      dataRawHeight: this.__dataRawHeight,
+      resizable: this.__resizable
     };
   }
 
@@ -212,7 +238,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
           showCaption={this.__showCaption}
           caption={this.__caption}
           captionsEnabled={this.__captionsEnabled}
-          resizable={true}
+          resizable={this.__resizable!}
+          dataRawWidth={this.__dataRawWidth}
+          dataRawHeight={this.__dataRawHeight}
         />
       </Suspense>
     );
@@ -229,6 +257,10 @@ export function $createImageNode({
   showCaption,
   caption,
   key,
+  dataRawWidth,
+  dataRawHeight,
+  resizable
+
 }: ImagePayload): ImageNode {
   return $applyNodeReplacement(
     new ImageNode(
@@ -241,6 +273,9 @@ export function $createImageNode({
       caption,
       captionsEnabled,
       key,
+      dataRawWidth,
+      dataRawHeight,
+      resizable
     ),
   );
 }

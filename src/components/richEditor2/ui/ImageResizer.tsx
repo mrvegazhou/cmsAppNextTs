@@ -7,7 +7,7 @@
  */
 
 import type {LexicalEditor} from 'lexical';
-
+import { useTranslations } from 'next-intl';
 import * as React from 'react';
 import {useRef} from 'react';
 
@@ -69,6 +69,8 @@ export default function ImageResizer({
     startX: 0,
     startY: 0,
   });
+  const t = useTranslations('RichEditor');
+
   const editorRootElement = editor.getRootElement();
   // Find max width, accounting for editor padding.
   const maxWidthContainer = maxWidth
@@ -257,7 +259,7 @@ export default function ImageResizer({
           onClick={() => {
             setShowCaption(!showCaption);
           }}>
-          添加标题
+          {t('addCaption')}
         </button>
       )}
       <div

@@ -120,21 +120,31 @@ export function InsertTableDialog({
     <>
         <div className="mb-3">
           <label className="form-label">行数</label>
-          <input type="number" placeholder={'# of rows (1-500)'} className="form-control" defaultValue={5}
+          <input type="number" placeholder={'# of rows (1-500)'} className="form-control" value={rows}
             onChange={(e) => {
               let num = e.target.value;
-              if ( !Number.isInteger(num) || Number(num)<=0 ) return;
-              setRows(num);
+              if (num=='') num = '0';
+              let tmp = parseInt(num);
+              if (isNaN(tmp) || tmp<0) {
+                return;
+              } else {
+                setRows(num=='0' ? '' : num);
+              }
             }} />
         </div>
         <div className="mb-3">
           <label className="form-label">列数</label>
-          <input type="number" placeholder={'# of columns (1-50)'} className="form-control" defaultValue={5}
+          <input type="number" placeholder={'# of columns (1-50)'} className="form-control" value={columns}
             onChange={
               (e) => {
                 let num = e.target.value;
-                if ( !Number.isInteger(num) || Number(num)<=0 ) return; 
-                setColumns(num);
+                if (num=='') num = '0';
+                let tmp = parseInt(num);
+                if (isNaN(tmp) || tmp<0) {
+                  return;
+                } else {
+                  setColumns(num=='0' ? '' : num);
+                }
             }} />
         </div>
         <div className='form-row text-center mt-4 mb-3'>

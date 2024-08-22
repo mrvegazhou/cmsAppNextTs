@@ -109,7 +109,7 @@ export const CHECK_COLLAB = "/article/collab/check";
 // 保存文章草稿
 export const SAVE_DRAFT = "/article/save/draft";
 // 提交文章
-export const SAVE_ARTICLE = "/article/save/aritcle";
+export const SAVE_ARTICLE = "/article/save/article";
 // 草稿列表
 export const ARTICLE_DARFT_HISTORY = "/article/draft/history";
 // 草稿信息

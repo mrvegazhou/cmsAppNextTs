@@ -22,6 +22,7 @@ export interface MenuItemProps<Tag extends TagType> extends IProps, React.HTMLPr
     disabled?: boolean;
     active?: boolean;
     iconClass?: string;
+    iconsize?: string;
     children?: React.ReactNode;
 }
 
@@ -54,7 +55,7 @@ function Internal<Tag extends TagType = 'a'>(props: MenuItemProps<Tag>, ref: Rea
             ref,
         } as any,
         <Fragment>
-            <i className={`iconfont ${iconClass}`}></i>
+            <i className={`iconfont ${iconClass}`} style={props.iconsize ? {fontSize: props.iconsize} : undefined}></i>
             <div
                 className={[prefixCls && `${prefixCls}-text`, !multiline && `${prefixCls}-multiline`]
                     .filter(Boolean)

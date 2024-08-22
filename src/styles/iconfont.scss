@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4212255 */
-  src: url('//at.alicdn.com/t/c/font_4212255_b7vxyj9riti.woff2?t=1711186799007') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4212255_b7vxyj9riti.woff?t=1711186799007') format('woff'),
-       url('//at.alicdn.com/t/c/font_4212255_b7vxyj9riti.ttf?t=1711186799007') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4212255_d6x5lw5g4zh.woff2?t=1723806145502') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4212255_d6x5lw5g4zh.woff?t=1723806145502') format('woff'),
+       url('//at.alicdn.com/t/c/font_4212255_d6x5lw5g4zh.ttf?t=1723806145502') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-biaoqingemoji:before {
+  content: "\e7bb";
+}
+
+.icon-more:before {
+  content: "\e710";
 }
 
 .icon-flowChart:before {

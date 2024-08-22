@@ -44,9 +44,7 @@ export type TEnv = {
 
 export type TMetadata = {
   all: {
-    [alias: string]: {
-      v: unknown;
-    };
+    [alias: string]: { v: unknown; };
   };
   env: TEnv;
   referer: string | null;
@@ -56,3 +54,8 @@ export type TMetadata = {
 export type HexObject = {
   [key: string]: number[];
 };
+
+export type Point = {
+  x: number;
+  y: number;
+}

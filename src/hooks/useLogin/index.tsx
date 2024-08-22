@@ -164,7 +164,6 @@ const useLogin = (close: (()=>void) | null = null) => {
         setDisableLogin(false);
         // 如果需要返回上一页面 判断是否地址栏里携带和存储在jotai里
         let backURL = searchParams.get('back');
-        console.log(backURL, "==backURL==");
         
         if (backURL=="" || null==backURL) {
           backURL = goBackURL;

@@ -14,7 +14,7 @@ import useToast from '@/hooks/useToast';
 import LoaderComp from '@/components/loader/loader';
 import Image from 'next/image'
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { BASE_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
+import { API_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
 import { handleDrop, loadImage, convertBytesToKB, isImageType, isFormDataEmpty } from '@/lib/tool';
 import { uploadArticleImages } from '@/services/api';
 import type { IImageList, IImage, IData, IArticleUploadImages } from '@/interfaces';
@@ -28,6 +28,7 @@ import { writeArticleAtom } from "@/store/articleData";
 import { InlineImagePayload } from '../../nodes/InlineImageNode';
 import { canEditAtom } from '@/store/articleData';
 import { useAtomValue } from 'jotai';
+import "./uploadImage.scss";
 
 
 export type ImageProps = ImagePayload & { deleteImage?: Function; fileName: string; position?: Position};
@@ -39,6 +40,7 @@ export type Props = {
     multi?: boolean;
     inline?: boolean;
     height?: number;
+    class?: string;
     onClose: () => void;
     insertImg: (e: MouseEvent<HTMLSpanElement> | null, img: ImagePayload | InlineImagePayload) => void;
 };
@@ -95,6 +97,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
     const [drop, setDrop] = useState(false);
     const fileUploadRef = useRef<HTMLInputElement | null>(null);
     const pHeight = props.height ?? IMAGE_HEIGHT;
+
     const { show } = useToast();
 
     const [imgState, setImgState] = useState<State>(initState);
@@ -120,7 +123,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                 setTotalPage(res.data.totalPage);
                 let imgs: IImage[] = [];
                 res.data.imgList.forEach((img, idx) => {
-                    img.src = BASE_URL + ARTICLE_PERSONAL_IMAGE_URL;
+                    img.src = API_URL + ARTICLE_PERSONAL_IMAGE_URL;
                     imgs.push(img);
                 });
                 return imgs;
@@ -177,7 +180,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
         let arrImgs: ImageProps[] = Array.from(checkedImgs).map((item) => {
             let image = item[1];
             let insert = {
-                src: BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + image.name,
+                src: API_URL + ARTICLE_PERSONAL_IMAGE_URL + image.name,
                 fileName: image.tag,
                 width: image.width,
                 altText: '',
@@ -241,7 +244,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             }));
             return;
         }
-
+        
         let arrImgs = await Promise.all(files.map(async (file) => {
             const src = window.URL.createObjectURL(file);
             let [img, dataURL] = await loadImage(src, true);
@@ -263,6 +266,8 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                 fileName: file.name,
                 height: newHeight,
                 width: newWidth,
+                dataRawWidth: img.width+"",
+                dataRawHeight: img.height+"",
                 altText: altText,
                 position: position,
                 showCaption: showCaption
@@ -295,7 +300,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
         if (leftMenu=='local') {
             let formData = imgState.formData;
             const { multi } = props;    
-            let articleId = articleData.id;    
+            let articleId = articleData.id;   
             if (formData) {
                 if (!canEdit) {
                     // 插入图片
@@ -316,13 +321,15 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                                             return {...prev, id: res.data.articleId}
                                         });
                                     }
-                                    let src = BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
+                                    let src = API_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
                                     return {
                                         src: src,
                                         fileName: image.fileName,
                                         width: image.width,
-                                        altText: altText,
                                         height: image.height,
+                                        dataRawWidth: image.dataRawWidth,
+                                        dataRawHeight: image.dataRawHeight,
+                                        altText: altText,
                                         position: position,
                                         showCaption: showCaption
                                     }
@@ -350,6 +357,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
             _uploadFileByNet();
         }
         props.onClose();
+        handleDrop(e);
     };
 
     const removeImage = (fileName: string | undefined) => {
@@ -397,7 +405,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
     };
 
     return (
-        <div className='richEditorImageUploader'>
+        <div className={classNames(props.class, "richEditorImageUploader")}>
             <div className='d-flex'>
                 <div className='col-2 d-flex flex-column align-items-left'>
                     <div onClick={()=>{setLeftMenu('local');}} className={classNames('cursor-pointer text-left ps-2 me-3 mb-3 py-1', {'active': leftMenu=='local'})}>

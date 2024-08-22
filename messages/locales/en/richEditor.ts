@@ -53,5 +53,6 @@ export default {
     left: 'Left',
     right: 'Right',
     fullWidth: 'Full width',
-    displayCaption: 'Is the caption displayed?'
+    displayCaption: 'Is the caption displayed?',
+    addCaption: 'Add Caption'
 };

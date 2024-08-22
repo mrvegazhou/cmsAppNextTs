@@ -1,4 +1,4 @@
-
+import { Point } from "./data";
 // 标注的评论
 export type IArticleNoteComment = {
     author: string;
@@ -15,4 +15,5 @@ export type IArticleNote = {
     id: string;
     quote: string;
     type: 'thread';
+    startEndPoints?: Point;
 };

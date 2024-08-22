@@ -17,6 +17,7 @@ import {TextNode} from 'lexical';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import "./index.scss"
 
 import {$createMentionNode} from '../../nodes/MentionNode';
 

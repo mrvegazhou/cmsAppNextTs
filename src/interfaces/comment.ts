@@ -1,12 +1,13 @@
 import type { IBase } from '@/interfaces';
 import type { TCommentReviewState } from '@/types';
 
-export interface IComment extends IBase {
+export interface IArticleComment extends IBase {
+  userId: number;
+  articleId: number;
   content: string;
   likeCount: number;
-  secret?: string;
-  reviewReason?: string;
-  reviewState: TCommentReviewState;
+  unlikeCount?: number;
+  ipAddr: string;
 }
 
 export interface ICreateCommentBody {
@@ -21,4 +22,15 @@ export interface IUpdateCommentReviewStatusBody {
 
 export interface ICommentStatistics {
   count: number;
+}
+
+export interface EmojiGroup {
+  name_zh: string;
+  name_en: string;
+  emojis: Emoji[];
+}
+export interface Emoji {
+  emoji: string
+  name_zh: string;
+  name_en: string
 }

@@ -9,11 +9,8 @@ import { userDataAtom } from "@/store/userData";
 import { getLocale } from 'next-intl/server';
 import ContentLayout from "@/app/[locale]/_layouts/contentLayout";
 import ArticleSetting from "../articleSetting";
-// import "./newArticlePage.scss"
 import RouteGuard from "@/app/[locale]/_common/routeGuard/index";
 import { staticRouter } from "@/lib/constant/router";
-// import RichEditor from "@/components/richEditor2/App";
-
 
 import dynamic from "next/dynamic";
 const RichEditor = dynamic(() => import("@/components/richEditor2/App"), {
@@ -21,7 +18,6 @@ const RichEditor = dynamic(() => import("@/components/richEditor2/App"), {
 });
 
 // import Calendar from "@/components/calendar";
-// import BadgeComp from "@/components/badge/badge";
 
 import { useMutation } from '@tanstack/react-query';
 import { getCurrentArticleInfo } from "@/services/api";
@@ -29,6 +25,13 @@ import { IArticle, IData } from "@/interfaces";
 import { useRouter } from 'next/navigation';
 import { useSetAtom } from "jotai";
 import { showLoginModalAtom, loginAtom } from "@/store/userData";
+
+
+import { createHeadlessEditor } from "@lexical/headless";
+import type { LexicalEditor } from 'lexical';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import {$isTextNode, $createNodeSelection, $setSelection, $getRoot} from 'lexical'
+
 
 interface propsType {
   metadata: TMetadata;
@@ -44,7 +47,7 @@ const NewArticlePage: FC<propsType> = props => {
   const [islogin, setLoginModal] = useAtom(loginAtom);
 
   const canEdit = useAtomValue(canEditAtom);
-  console.log(canEdit, "===canEdit==");
+  // console.log(canEdit, "===canEdit==");
   
   
   // const getArticleInfo = async (id: number) => {
@@ -59,7 +62,7 @@ const NewArticlePage: FC<propsType> = props => {
   //   return null;
   // }
   
-  const test = async () => {
+  const test = () => {
     // try {
     //   let info = await getArticleInfo(1);
     //   console.log(info, "---s---")
@@ -72,9 +75,6 @@ const NewArticlePage: FC<propsType> = props => {
 
   };
 
-  useEffect(() => {
-    
-  }, []);
 
   return (
     <>
@@ -110,13 +110,9 @@ const NewArticleEditor: FC<propsType> = props => {
 
   const t = useTranslations('ArticleEditPage');
 
-  useEffect(() => {
-
-}, []);
-
   return (
     <>
-      <div className="w-100 px-0 mx-0">
+      <div id='articlePage' className="w-100 px-0 mx-0">
         <RichEditor metadata={props.metadata} />
         <ArticleSetting />
       </div>

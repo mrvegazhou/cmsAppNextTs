@@ -12,38 +12,42 @@ import { IArticle, IData, IArticleToolBarData } from '@/interfaces';
 
 const NotFound = dynamic(() => import("@/app/[locale]/(cms)/article/[id]/404"), { ssr: false });
 
-// export async function generateMetadata({
-//     params: { id, locale },
-//     searchParams = {},
-//   }: {
-//     params: { id?: number; locale: string };
-//     searchParams: {};
-//   }): Promise<MetadataNext> {
+export async function generateMetadata({
+    params: { id, locale },
+    searchParams = {},
+  }: {
+    params: { id?: number; locale: string };
+    searchParams: {};
+  }): Promise<MetadataNext> {
     
-//     const t = createTranslator(await getMessages(locale));
-//     try {
-//         const token = authMiddleware(cookies());
+    // const t = createTranslator(await getMessages(locale));
+    // try {
+    //     const token = authMiddleware(cookies());
 
-//         return getMetadata({
-//             title: "title",
-//             authors: {
-//               url: 'www.baidu.com',
-//               name: "name",
-//             },
-//             creator: "createdBy",
-//             description: "description",
-//         });
-//     } catch (e) {
-//         return getMetadata({ title: t('ArticleIdPage.articleDetails') });
-//     }
-// }
+    //     return getMetadata({
+    //         title: "title",
+    //         authors: {
+    //           url: 'www.baidu.com',
+    //           name: "name",
+    //         },
+    //         creator: "createdBy",
+    //         description: "description",
+    //     });
+    // } catch (e) {
+    //     return getMetadata({ title: t('ArticleIdPage.articleDetails') });
+    // }
+    // 判断article id 是否存在
+    return {
+        title: "article title"
+    }
+}
 
-const getArticleInfo = async (id: number) => {
+const getArticleInfo = async (id: string) => {
     const articleInfo = await getCurrentArticleInfo({
         data: {articleId: id}
     }) as Response;
     let articleInfoRes = await articleInfo.json() as IData<IArticle>
-    if( articleInfoRes?.status==200 ) {
+    if( articleInfoRes?.status==200 && articleInfoRes?.data.id!=0) {
       return articleInfoRes.data;
     }
     return null;
@@ -55,40 +59,42 @@ const getArticleToolBar = async (id: number) => {
     if( toolBarRes?.status==200 ) {
       return toolBarRes.data;
     }
-    return {isLiked: false, isCollected: false, favorites: {} };
+    return {isLiked: false, isCollected: false, favorites: {}, isReport: false };
 }
 
 export default async function Page({
     params,
     searchParams = {},
 }: {
-params: { id?: number; locale: string };
-searchParams: { v?: 'h5' };
+    params: { id?: string; locale: string };
+    searchParams: { v?: 'h5' };
 }) {
-    let id = Number(params.id);
-    if (!id || isNaN(id)) {
-        return <NotFound locale={params.locale}/>
-    }
-    let articleInfo = await getArticleInfo(id);
-    if (articleInfo==null) {
-        return <NotFound locale={params.locale}/>
-    }
-
-    let toolBarData = await getArticleToolBar(id);
-
-    const metadata = new Metadata();
-    metadata.set('page', "xxxx");
-    metadata.set('postId', "ssss");
     try {
+        let id = params.id;
+        if (!id) {
+            return <NotFound locale={params.locale}/>
+        }
+        // U2FsdGVkX19Uh1my%2BjUGwh8%2BtZDFgLBq4fp8SNFq0Es%3D
+        let articleInfo = await getArticleInfo(decodeURIComponent(id));
+        if (articleInfo==null) {
+            return <NotFound locale={params.locale}/>
+        }
+
+        let toolBarData = await getArticleToolBar(articleInfo.id);
+
+        const metadata = new Metadata();
+        metadata.set('page', "xxxx");
+        metadata.set('postId', "ssss");
+
         return searchParams.v === 'h5' ? (
             <>
             h5
             </>
         ) : (
-            <ArticleIdPage metadata={JSON.parse(JSON.stringify(metadata))} articleInfo={articleInfo} toolBarData={toolBarData}/>
+            <ArticleIdPage metadata={JSON.parse(JSON.stringify(metadata))} articleInfo={articleInfo} />
         );
     } catch (e) {
-        return <ResetPage error={e} />;
+        return <ResetPage error={JSON.parse(JSON.stringify(e))} />;
     }
     
 }

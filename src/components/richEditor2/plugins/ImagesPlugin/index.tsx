@@ -45,10 +45,14 @@ export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> = createCo
 
 export function InsertImageDialog({
   activeEditor,
-  onClose
+  onClose,
+  height=160,
+  resizable = true
 }: {
   activeEditor: LexicalEditor;
   onClose: () => void;
+  height?: number;
+  resizable?: boolean;
 }): JSX.Element {
 
   const insertImg = (e: React.MouseEvent<HTMLSpanElement> | null, img: InsertImagePayload) => {
@@ -57,7 +61,10 @@ export function InsertImageDialog({
           src: img.src,
           altText: img.altText,
           width: img.width,
-          height: img.height
+          height: img.height,
+          dataRawWidth: img.dataRawWidth,
+          dataRawHeight: img.dataRawHeight,
+          resizable: resizable
       }
       activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, data);
     }
@@ -66,7 +73,7 @@ export function InsertImageDialog({
 
   return (
     <>
-      <ImageUploader multi={false} onClose={()=>{onClose();}} insertImg={insertImg} />
+      <ImageUploader multi={false} height={height} onClose={()=>{onClose();}} insertImg={insertImg} />
     </>
   );
 }

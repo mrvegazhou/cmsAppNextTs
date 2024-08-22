@@ -12,20 +12,31 @@ import type {
   LexicalCommand,
   LexicalEditor,
   NodeKey,
-  RangeSelection,
+  RangeSelection
 } from 'lexical';
 import type {Doc} from 'yjs';
 
 import './index.css';
-
 import {
+  MarkNode,
   $createMarkNode,
   $getMarkIDs,
   $isMarkNode,
   $unwrapMarkNode,
-  $wrapSelectionInMarkNode,
-  MarkNode,
-} from '@lexical/mark';
+  $wrapSelectionInMarkNode
+} from '../../nodes/CustomMarkNode';
+
+import {
+  $getNodeByKey,
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  CLEAR_EDITOR_COMMAND,
+  COMMAND_PRIORITY_EDITOR,
+  createCommand,
+  KEY_ESCAPE_COMMAND
+} from 'lexical';
+
 import {AutoFocusPlugin} from '@lexical/react/LexicalAutoFocusPlugin';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {useCollaborationContext} from '@lexical/react/LexicalCollaborationContext';
@@ -39,16 +50,7 @@ import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import {createDOMRange, createRectsFromDOMRange} from '@lexical/selection';
 import {$isRootTextContentEmpty, $rootTextContent} from '@lexical/text';
 import {mergeRegister, registerNestedElementResolver} from '@lexical/utils';
-import {
-  $getNodeByKey,
-  $getSelection,
-  $isRangeSelection,
-  $isTextNode,
-  CLEAR_EDITOR_COMMAND,
-  COMMAND_PRIORITY_EDITOR,
-  createCommand,
-  KEY_ESCAPE_COMMAND,
-} from 'lexical';
+
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import * as React from 'react';
 import useLayoutEffect from '../../shared/useLayoutEffect';
@@ -73,8 +75,7 @@ import { userDataAtom } from "@/store/userData";
 import { useAtom } from 'jotai';
 import { canEditAtom, writeArticleNoteAtom } from '@/store/articleData';
 import { IArticleNote as Thread, IArticleNoteComment as Comment } from '@/types';
-import { useClickAway } from 'ahooks';
-import { AppContext } from '@/contexts/app';
+// import { AppContext } from '@/contexts/app';
 
 
 export const INSERT_INLINE_COMMAND: LexicalCommand<void> = createCommand(
@@ -195,7 +196,7 @@ function CommentInputBox({
   const updateLocation = useCallback(() => {
     editor.getEditorState().read(() => {
       const selection = $getSelection();
-
+      
       if ($isRangeSelection(selection)) {
         selectionRef.current = selection.clone();
         const anchor = selection.anchor;
@@ -409,15 +410,17 @@ function ShowDeleteCommentOrThreadDialog({
         <button
           type="button" className="btn-sm btn btn-secondary me-4"
           onClick={() => {
-            deleteCommentOrThread(commentOrThread, thread);
             onClose();
           }}>
           {t('btnCancel')}
         </button>
         <button
           type="button" className="btn-sm btn btn-primary"
-          onClick={() => {
+          onClick={(event) => {
+            deleteCommentOrThread(commentOrThread, thread);
             onClose();
+            event.preventDefault();
+            event.stopPropagation();
           }}>
           {t('btnConfirm')}
         </button>
@@ -745,6 +748,7 @@ export default function CommentPlugin({
         // Remove ids from associated marks
         const id = thread !== undefined ? thread.id : comment.id;
         const markNodeKeys = markNodeMap.get(id);
+        
         if (markNodeKeys !== undefined) {
           // Do async to avoid causing a React infinite loop
           setTimeout(() => {
@@ -788,7 +792,7 @@ export default function CommentPlugin({
             // 所选内容是否向后选择
             const isBackward = selection.isBackward();
             const id = commentOrThread.id;
-            // Wrap content in a MarkNode
+
             $wrapSelectionInMarkNode(selection, isBackward, id);
           }
         });
@@ -841,44 +845,45 @@ export default function CommentPlugin({
           });
         },
       ),
-      editor.registerMutationListener(MarkNode, (mutations) => {
-        // 监听被销毁或者创建的MarkNode
-        editor.getEditorState().read(() => {
-          for (const [key, mutation] of mutations) {
-            const node: null | MarkNode = $getNodeByKey(key);
-            let ids: NodeKey[] = [];
-
-            if (mutation === 'destroyed') {
-              ids = markNodeKeysToIDs.get(key) || [];
-            } else if ($isMarkNode(node)) {
-              ids = node.getIDs();
-            }
-
-            for (let i = 0; i < ids.length; i++) {
-              const id = ids[i];
-              let markNodeKeys = markNodeMap.get(id);
-              markNodeKeysToIDs.set(key, ids);
+      editor.registerMutationListener(MarkNode,
+        (mutations) => {
+          editor.getEditorState().read(() => {
+            for (const [key, mutation] of mutations) {
+              const node: null | MarkNode = $getNodeByKey(key);
+              let ids: NodeKey[] = [];
 
               if (mutation === 'destroyed') {
-                if (markNodeKeys !== undefined) {
-                  markNodeKeys.delete(key);
-                  if (markNodeKeys.size === 0) {
-                    markNodeMap.delete(id);
+                ids = markNodeKeysToIDs.get(key) || [];
+              } else if ($isMarkNode(node)) {
+                ids = node.getIDs();
+              }
+
+              for (let i = 0; i < ids.length; i++) {
+                const id = ids[i];
+                let markNodeKeys = markNodeMap.get(id);
+                markNodeKeysToIDs.set(key, ids);
+
+                if (mutation === 'destroyed') {
+                  if (markNodeKeys !== undefined) {
+                    markNodeKeys.delete(key);
+                    if (markNodeKeys.size === 0) {
+                      markNodeMap.delete(id);
+                    }
                   }
-                }
-              } else {
-                if (markNodeKeys === undefined) {
-                  markNodeKeys = new Set();
-                  markNodeMap.set(id, markNodeKeys);
-                }
-                if (!markNodeKeys.has(key)) {
-                  markNodeKeys.add(key);
+                } else {
+                  if (markNodeKeys === undefined) {
+                    markNodeKeys = new Set();
+                    markNodeMap.set(id, markNodeKeys);
+                  }
+                  if (!markNodeKeys.has(key)) {
+                    markNodeKeys.add(key);
+                  }
                 }
               }
             }
-          }
-        });
-      }),
+          });
+      // @ts-ignore
+      }, {skipInitialization: false}),
       editor.registerUpdateListener(({editorState, tags}) => {
         editorState.read(() => {
           const selection = $getSelection();
@@ -891,6 +896,7 @@ export default function CommentPlugin({
             const anchorNode = selection.anchor.getNode();
 
             if ($isTextNode(anchorNode)) {
+              
               const commentIDs = $getMarkIDs(
                 anchorNode,
                 selection.anchor.offset,
@@ -937,33 +943,33 @@ export default function CommentPlugin({
   }, [editor, markNodeMap]);
 
   // 点击offcanvas以外的元素隐藏offcanvas
-  const offCanvsRef = useRef<HTMLDivElement>(null);
-  const clickOffCavasRef = useRef<HTMLDivElement>(null); 
-  const context = React.useContext(AppContext);
-  useEffect(() => {
-    const instance = (
-      context.bootstrap ?? window.bootstrap
-    );
-    if (instance && offCanvsRef.current) {
-      new instance.Offcanvas(offCanvsRef.current);
-    }
-    // 组件卸载时销毁 Offcanvas
-    return () => {
-      if (offCanvsRef.current) {
-        const offcanvas = instance.Offcanvas.getInstance(offCanvsRef.current);
-        if (offcanvas) {
-          offcanvas.dispose();
-        }
-      }
-    };
-  }, []);
-  useClickAway(() => {
-    const instance = ( context.bootstrap ?? window.bootstrap );
-    if (offCanvsRef.current) {
-      // @ts-ignore
-      instance.Offcanvas.getInstance(offCanvsRef.current).hide();
-    }
-  }, [offCanvsRef, clickOffCavasRef]);
+  // const offCanvsRef = useRef<HTMLDivElement>(null);
+  // const clickOffCavasRef = useRef<HTMLDivElement>(null); 
+  // const context = React.useContext(AppContext);
+  // useEffect(() => {
+  //   const instance = (
+  //     context.bootstrap ?? window.bootstrap
+  //   );
+  //   if (instance && offCanvsRef.current) {
+  //     new instance.Offcanvas(offCanvsRef.current);
+  //   }
+  //   // 组件卸载时销毁 Offcanvas
+  //   return () => {
+  //     if (offCanvsRef.current) {
+  //       const offcanvas = instance.Offcanvas.getInstance(offCanvsRef.current);
+  //       if (offcanvas) {
+  //         offcanvas.dispose();
+  //       }
+  //     }
+  //   };
+  // }, []);
+  // useClickAway(() => {
+  //   const instance = ( context.bootstrap ?? window.bootstrap );
+  //   if (offCanvsRef.current) {
+  //     // @ts-ignore
+  //     instance.Offcanvas.getInstance(offCanvsRef.current).hide();
+  //   }
+  // }, [offCanvsRef, clickOffCavasRef]);
 
   return (
     <>
@@ -978,10 +984,10 @@ export default function CommentPlugin({
           document.body,
         )}
       
-        <div ref={clickOffCavasRef} className='text-decoration-none' data-bs-toggle="offcanvas" data-bs-target="#offcanvasComments">
+        <div className='text-decoration-none' data-bs-toggle="offcanvas" data-bs-target="#offcanvasComments">
           {t('articleComment')}
         </div>
-        <div ref={offCanvsRef} className="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" id="offcanvasComments">
+        <div className="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" id="offcanvasComments">
             <div className="offcanvas-header">
                 <h6 className="offcanvas-title text-nowrap" id="offcanvasExampleLabel">
                   {t('articleComment')}  <small className='text-secondary'>{commentStore.isCollaborative() && "["+t('articleCommentCollab')+"]"}</small>

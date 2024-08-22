@@ -93,6 +93,8 @@ function LazyImage({
   width,
   height,
   maxWidth,
+  dataRawWidth,
+  dataRawHeight,
 }: {
   altText: string;
   className: string | null;
@@ -101,6 +103,8 @@ function LazyImage({
   maxWidth: number;
   src: string;
   width: 'inherit' | number;
+  dataRawWidth: string | undefined;
+  dataRawHeight: string | undefined;
 }): JSX.Element {
   useSuspenseImage(src);
   return (
@@ -114,6 +118,8 @@ function LazyImage({
         maxWidth,
         width,
       }}
+      data-rawwidth = {dataRawWidth}
+      data-rawheight = {dataRawHeight}
       draggable="false"
     />
   );
@@ -125,11 +131,13 @@ export default function ImageComponent({
   nodeKey,
   width,
   height,
+  dataRawWidth,
+  dataRawHeight,
   maxWidth,
   resizable,
   showCaption,
   caption,
-  captionsEnabled,
+  captionsEnabled
 }: {
   altText: string;
   caption: LexicalEditor;
@@ -141,6 +149,8 @@ export default function ImageComponent({
   src: string;
   width: 'inherit' | number;
   captionsEnabled: boolean;
+  dataRawWidth: string | undefined;
+  dataRawHeight: string | undefined;
 }): JSX.Element {
   const imageRef = useRef<null | HTMLImageElement>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -392,6 +402,8 @@ export default function ImageComponent({
             width={width}
             height={height}
             maxWidth={maxWidth}
+            dataRawWidth={dataRawWidth}
+            dataRawHeight={dataRawHeight}
           />
         </div>
         {showCaption && (

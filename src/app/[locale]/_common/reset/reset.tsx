@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-// import DeniedPage from '@/app/[locale]/403/denied';
-// import NotFoundPage from '@/app/[locale]/notfound/notfound';
-// import UnauthorizedPage from '@/app/[locale]/401/unauthorized';
+import DeniedPage from '@/app/[locale]/_common/403/denied';
+import NotFoundPage from '@/app/[locale]/_common/notfound/notfound';
+import UnauthorizedPage from '@/app/[locale]/_common/401/unauthorized';
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@tanstack/react-query';
 
@@ -32,7 +32,7 @@ export default function ResetPage({ error }: { error?: any }) {
       if (!error) return;
   
       let newInfo = { ...DEFAULT_INFO };
-     
+      
       if (typeof error === 'object') {
         
         if ('message' in error) {
@@ -55,7 +55,7 @@ export default function ResetPage({ error }: { error?: any }) {
           newInfo.status = status;
           newInfo.code = code;
         } else {
-          newInfo.message = error + '';
+          newInfo.message = JSON.stringify(error) + '';
         }
       } else if (typeof error === 'string') {
         newInfo.message = error;
@@ -72,17 +72,17 @@ export default function ResetPage({ error }: { error?: any }) {
       FORBIDDEN_STATUS,
       NOT_FOUND_STATUS,
     ].includes(info.status);
-
+    
     return (
       <>
-        {/* {isErrorStatus && info.status === UNAUTHORIZED_STATUS && (
+        {isErrorStatus && info.status === UNAUTHORIZED_STATUS && (
           <UnauthorizedPage />
         )}
         {isErrorStatus && info.status === FORBIDDEN_STATUS && <DeniedPage />}
         {isErrorStatus && info.status === NOT_FOUND_STATUS && <NotFoundPage />}
         {!isErrorStatus && (
           <DefaultPage loadingErrorDetails={loadingErrorDetails} info={info} />
-        )} */}
+        )}
       </>
     );
 }
@@ -124,7 +124,7 @@ const DefaultPage = ({
                   </div>
                 ) : (
                   <p className="text-danger">
-                    {t('details')}：{info.message}
+                    {t('details')}：{info.message=='{}' ? 'error' : info.message}
                   </p>
                 )}
   

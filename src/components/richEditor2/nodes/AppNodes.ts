@@ -12,7 +12,7 @@ import {CodeHighlightNode, CodeNode} from '@lexical/code';
 import {HashtagNode} from '@lexical/hashtag';
 import {AutoLinkNode, LinkNode} from '@lexical/link';
 import {ListItemNode, ListNode} from '@lexical/list';
-import {MarkNode} from '@lexical/mark';
+import { EmojiNode } from './EmojiNode';
 import {OverflowNode} from '@lexical/overflow';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
@@ -25,9 +25,9 @@ import {VideoIframeNode} from './VideoIframeNode';
 import {MentionNode} from './MentionNode';
 import {EquationNode} from './EquationNode';
 import {ExcalidrawNode} from './ExcalidrawNode';
+import { MarkNode } from './CustomMarkNode';
 
-
-const PlaygroundNodes: Array<Klass<LexicalNode>> = [
+const AppNodes: Array<Klass<LexicalNode>> = [
   HeadingNode,
   ListNode,
   ListItemNode,
@@ -46,7 +46,7 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   ImageNode,
   InlineImageNode,
   MentionNode,
-  // EmojiNode,
+  
   ExcalidrawNode,
   EquationNode,
   // AutocompleteNode,
@@ -64,5 +64,12 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   LayoutItemNode,
   VideoIframeNode
 ];
+export default AppNodes;
 
-export default PlaygroundNodes;
+
+export const SimpleAppNodes: Array<Klass<LexicalNode>> = [
+  MentionNode,
+  EmojiNode,
+  LinkNode,
+  ImageNode
+];

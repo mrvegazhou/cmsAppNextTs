@@ -14,7 +14,6 @@ import { type ReactNode, useState, Suspense } from 'react';
 import type Bootstrap from 'bootstrap';
 import { AppContext } from '@/contexts/app';
 import ToastWrapper from '../_common/toast/wrapper';
-import ModalWrapper from '../_common/modal/wrapper';
 import { Provider as JotaiProvider } from 'jotai';
 import LoadPage from '../_common/load/load';
 
@@ -56,9 +55,7 @@ export default function Wrapper({
             <QueryClientProvider client={queryClient}>
               <AppContext.Provider value={{ bootstrap }}>
                 <ToastWrapper>
-                  <ModalWrapper>
                     {children}
-                  </ModalWrapper>
                 </ToastWrapper>
               </AppContext.Provider>
               <ReactQueryDevtools initialIsOpen={false} />

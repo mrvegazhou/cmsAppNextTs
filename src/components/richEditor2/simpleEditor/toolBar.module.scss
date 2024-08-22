@@ -1,0 +1,82 @@
+.toolBar {
+    box-sizing: border-box;
+    margin: 8px 0px 0px;
+    min-width: 0px;
+    position: relative;
+    padding-top: 8px;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+    &::before {
+        display: block;
+        content: " ";
+        position: absolute;
+        inset: -50%;
+        pointer-events: none;
+        transform: scale(0.5, 0.5);
+        border-top: 1px solid rgb(235, 236, 237);
+    }
+    .imgEmoji {
+        box-sizing: border-box;
+        margin: 0px 0px 0px 3px;
+        min-width: 0px;
+        -webkit-box-align: center;
+        align-items: center;
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        align-content: center;
+        .emojiList {
+            box-sizing: border-box;
+            margin: 0px;
+            min-width: 0px;
+            position: relative;
+            flex-direction: row;
+            -webkit-box-align: center;
+            align-items: center;
+            display: flex;
+            margin-left: 9px;
+            .recentEmojis {
+                margin-left: 3px;
+                padding: 0 2px;
+                min-width: 0px;
+                max-width: 100%;
+                font-size: 20px;
+                cursor: pointer;
+                user-select: none;
+            }
+        }
+        .btn {
+            display: inline-block;
+            padding: 0px;
+            text-align: center;
+            cursor: pointer;
+            background: none transparent;
+            border: none;
+            border-radius: 0px;
+            height: auto;
+            color: rgb(132, 145, 165);
+            margin-right: 14px;
+            i {
+                font-size: 20px;
+                line-height: 20px;
+            }
+        }
+    }
+    .submit {
+        box-sizing: border-box;
+        margin: 0px;
+        min-width: 0px;
+        -webkit-box-align: center;
+        align-items: center;
+        display: flex;
+        font-size: 14px;
+        .gap {
+            font-size: 15px;
+            color: rgb(132, 145, 165);
+            margin-right: 16px;
+        }
+    }
+}

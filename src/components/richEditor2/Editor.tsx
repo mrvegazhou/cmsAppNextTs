@@ -2,13 +2,13 @@ import {AutoFocusPlugin} from '@lexical/react/LexicalAutoFocusPlugin';
 import {CheckListPlugin} from '@lexical/react/LexicalCheckListPlugin';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {CollaborationPlugin} from '@lexical/react/LexicalCollaborationPlugin';
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {createDOMRange} from '@lexical/selection';
 import {$getSelection} from 'lexical';
-import useLexicalEditable from '@lexical/react/useLexicalEditable';
+import {useLexicalEditable} from '@lexical/react/useLexicalEditable';
 import * as React from 'react';
 import {useEffect, useState, forwardRef} from 'react';
 import type { Doc } from 'yjs';
@@ -48,6 +48,7 @@ import MentionsPlugin from './plugins/MentionsPlugin';
 import CodeActionMenuPlugin from './plugins/CodeActionMenuPlugin';
 import EquationsPlugin from './plugins/EquationsPlugin';
 import ExcalidrawPlugin from './plugins/ExcalidrawPlugin';
+import TableHoverActionsPlugin from './plugins/TableHoverActionsPlugin';
 
 // ui
 import Placeholder from './ui/Placeholder';
@@ -126,6 +127,10 @@ const Editor = forwardRef((prop: propsType, ref): JSX.Element => {
     return editor.registerUpdateListener(
       () => {
         editor.getEditorState().read(() => {
+          // 如果可视高度大于窗口高度 显示滚动条
+          // if (document.body.clientHeight>window.innerHeight) {
+          //   document.documentElement.style.setProperty('overflow-y', 'auto');
+          // }
           if ( contentObj ) {
             try {
               const selection = $getSelection();
@@ -144,10 +149,19 @@ const Editor = forwardRef((prop: propsType, ref): JSX.Element => {
                 // @ts-ignore
                 const { bottom } = range.getBoundingClientRect();
                 let diff = Math.round(bottom - window.innerHeight + 80);
+
+                if (contentRef.current) {
+                  // @ts-ignore
+                  if (contentRef.current.scrollHeight>window.innerHeight) {
+                    document.documentElement.style.setProperty('overflow-y', 'auto');
+                  }
+                }
+
                 if (diff > 0) {
                   diff = diff > 28 ? diff : 28;
                   document.documentElement.scrollTop += diff;
                 }
+                
               }
             } catch(e) {
 
@@ -157,24 +171,6 @@ const Editor = forwardRef((prop: propsType, ref): JSX.Element => {
       },
     );
   }, [editor, isEditable]);
-
-  // 定时保存文章内容
-  // const record2Html = useDebounce((editorState: EditorState) => {
-  //   editorState.read(() => {
-  //     const htmlString = $generateHtmlFromNodes(editor, null);
-  //   });
-  // }, 2000);
-
-  // useEffect(() => {
-  //   const removeUpdateListener = editor.registerUpdateListener(
-  //     ({ editorState }) => {
-  //       record2Html(editorState);
-  //     }
-  //   );
-  //   return () => {
-  //     removeUpdateListener();
-  //   };
-  // }, [editor]);
 
   // 检查collab token是否允许协同操作
   const router = useRouter();
@@ -214,7 +210,6 @@ const Editor = forwardRef((prop: propsType, ref): JSX.Element => {
     }
     
   }, []);
-  console.log(collabTokenInfo, "==collabTokenInfo==");
   
   const CollaborationContent = React.useMemo(() => {
     return (
@@ -233,92 +228,115 @@ const Editor = forwardRef((prop: propsType, ref): JSX.Element => {
       )
     );
   }, [collabTokenInfo.isCollab]);
+
+  // ctrl+s 保存
+  const actionToolRef = React.useRef(null);
+  const handleCtrlS = (event: React.KeyboardEvent) => {
+    if (isEditable) {
+        var isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+        if (isMac) {
+          if (event.key === "s" && event.metaKey) {
+            // @ts-ignore
+            actionToolRef.current && actionToolRef.current.saveDrafts();
+          } else {
+            return;
+          }
+        } else {
+          if (event.key === "s" && event.ctrlKey) {
+            // @ts-ignore
+            actionToolRef.current && actionToolRef.current.saveDrafts();
+          } else {
+            return;
+          }
+        }
+        event.preventDefault();
+    }
+  };
   
   return (
     <>
-      <ArticleHeader checkCollabFunc={checkCollabFunc} />
+      <ArticleHeader checkCollabFunc={checkCollabFunc} metadata={prop.metadata} />
       <ToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
-      <div className={classNames('editor-container', {'mask': !isEditable})}>
-          <>
-            {!isEditable && (<div className="position-absolute top-50 start-50"><i className='iconfont icon-lock fs-2 opacity-25' /></div>)}
-            {CollaborationContent}
-            <RichTextPlugin
-              contentEditable={
-                <div className="editor-scroller" ref={contentRef} id="richEditor">
-                  <div className="editor" ref={onRef}>
-                    <ContentEditable />
-                  </div>
+      <div className={classNames('editor-container', {'mask': !isEditable})} id='editor-container' onKeyDown={handleCtrlS}>
+          {!isEditable && (<div className="position-absolute top-50 start-50"><i className='iconfont icon-lock fs-2 opacity-25' /></div>)}
+          {CollaborationContent}
+          <RichTextPlugin
+            contentEditable={
+              <div className="editor-scroller" ref={contentRef} id="richEditor">
+                <div className="editor" ref={onRef}>
+                  <ContentEditable />
                 </div>
-              }
-              placeholder={placeholder}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-            {/* <OnChangePlugin onChange={onChange} /> */}
-            {isMaxLength && <MaxLengthPlugin maxLength={10240} />}
-            <DragDropPaste />
-            <AutoFocusPlugin />
-            <TabIndentationPlugin />
-            <TabFocusPlugin />
-            <HorizontalRulePlugin />
-            <ListPlugin />
-            <CheckListPlugin />
-            {/* 限制列表indent */}
-            <ListMaxIndentLevelPlugin maxDepth={7} />
-            
-            <CodeHighlightPlugin />
-            <ImagesPlugin />
-            <InlineImagePlugin />
-            {/* 命令弹窗 */}
-            <ComponentPickerPlugin />
-            
-            {/* block拖拉 */}
-            {floatingAnchorElem && !isSmallWidthViewport && (
-              <>
-                <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
-                <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
-                {/* 链接浮层 */}
-                <FloatingLinkEditorPlugin
-                  anchorElem={floatingAnchorElem}
-                  isLinkEditMode={isLinkEditMode}
-                  setIsLinkEditMode={setIsLinkEditMode}
-                />
-                <TableCellActionMenuPlugin
-                  anchorElem={floatingAnchorElem}
-                  cellMerge={true}
-                />
-                <FloatingTextFormatToolbarPlugin
-                  anchorElem={floatingAnchorElem}
-                />
-              </>
-            )}
-            {/* 链接 */}
-            <LinkPlugin />
-            {/* 在本页面跳转到链接页 */}
-            {/* {!isEditable && <LexicalClickableLinkPlugin />} */}
-            {/* 自动生成链接 */}
-            {/* <AutoLinkPlugin /> */}
-            {/* makedown转化 */}
-            {/* <MarkdownShortcutPlugin /> */}
-            {/* 表格 */}
-            <TablePlugin
-              hasCellMerge={tableCellMerge}
-              hasCellBackgroundColor={tableCellBackgroundColor}
-            />
-            <TableCellResizer />
-            <div>{showTableOfContents && <TableOfContentsPlugin />}</div>
+              </div>
+            }
+            placeholder={placeholder}
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+          {/* <OnChangePlugin onChange={onChange} /> */}
+          {isMaxLength && <MaxLengthPlugin maxLength={10240} />}
+          <DragDropPaste />
+          <AutoFocusPlugin />
+          <TabIndentationPlugin />
+          <TabFocusPlugin />
+          <HorizontalRulePlugin />
+          <ListPlugin />
+          <CheckListPlugin />
+          {/* 限制列表indent */}
+          <ListMaxIndentLevelPlugin maxDepth={7} />
+          
+          <CodeHighlightPlugin />
+          <ImagesPlugin />
+          <InlineImagePlugin />
+          {/* 命令弹窗 */}
+          <ComponentPickerPlugin />
+          
+          {/* block拖拉 */}
+          {floatingAnchorElem && !isSmallWidthViewport && (
+            <>
+              <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+              <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
+              {/* 链接浮层 */}
+              <FloatingLinkEditorPlugin
+                anchorElem={floatingAnchorElem}
+                isLinkEditMode={isLinkEditMode}
+                setIsLinkEditMode={setIsLinkEditMode}
+              />
+              <TableCellActionMenuPlugin
+                anchorElem={floatingAnchorElem}
+                cellMerge={true}
+              />
+              <FloatingTextFormatToolbarPlugin
+                anchorElem={floatingAnchorElem}
+              />
+            </>
+          )}
+          {/* 链接 */}
+          <LinkPlugin />
+          {/* 在本页面跳转到链接页 */}
+          {/* {!isEditable && <LexicalClickableLinkPlugin />} */}
+          {/* 自动生成链接 */}
+          {/* <AutoLinkPlugin /> */}
+          {/* makedown转化 */}
+          {/* <MarkdownShortcutPlugin /> */}
+          {/* 表格 */}
+          <TablePlugin
+            hasCellMerge={tableCellMerge}
+            hasCellBackgroundColor={tableCellBackgroundColor}
+          />
+          <TableCellResizer />
+          <TableHoverActionsPlugin />
+          <div>{showTableOfContents && <TableOfContentsPlugin />}</div>
 
-            <LayoutPlugin />
-            {/* 视频iframe */}
-            <VideoIframePlugin />
-            {/* @提示 */}
-            <MentionsPlugin />
-            <ClearEditorPlugin />
-            <MarkdownShortcutPlugin />
-            <EquationsPlugin />
-            <ExcalidrawPlugin />
-          </>
+          <LayoutPlugin />
+          {/* 视频iframe */}
+          <VideoIframePlugin />
+          {/* @提示 */}
+          <MentionsPlugin />
+          <ClearEditorPlugin />
+          <MarkdownShortcutPlugin />
+          <EquationsPlugin />
+          <ExcalidrawPlugin />
       </div>
-      <ActionTool />
+      <ActionTool ref={actionToolRef}  metadata={prop.metadata} />
     </>
   );
 });

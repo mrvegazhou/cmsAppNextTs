@@ -53,8 +53,9 @@ function VideoIframeComponent({
           height="315"
           src={src}
           frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen={true}
+          sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"
           title="video"
         />
       </BlockWithAlignableContents>

@@ -40,17 +40,17 @@ export type blockTypeToBlockNameType = 'bullet' | 'check' | 'code'
 export const FUNC_BLOCK_TYPE_TO_BLOCKNAME = (): {[key: string]: string} => {
   const t = useTranslations('ArticleEditPage');
   return {
-    bullet: t('bulletList'), //'符号列表',
-    check: t('checkList'), //'清单',
-    code: t('codeBlock'), //'代码块',
+    paragraph: t('normal'), //'常规',
     h1: 'H1',
     h2: 'H2',
     h3: 'H3',
     h4: 'H4',
     h5: 'H5',
     h6: 'H6',
+    bullet: t('bulletList'), //'符号列表',
+    check: t('checkList'), //'清单',
+    code: t('codeBlock'), //'代码块',
     number: t('numberList'), //'编号列表',
-    paragraph: t('normal'), //'常规',
     quote: t('quote'), //'引用'
   }
 };
@@ -73,11 +73,14 @@ export default function BlockFormatDropDown({
     const formatParagraph = () => {
         editor.update(() => {
             const selection = $getSelection();
-            $setBlocksType(selection, () => $createParagraphNode());
+            if ($isRangeSelection(selection)) {
+              $setBlocksType(selection, () => $createParagraphNode());
+            }
         });
     };
 
     const formatHeading = (headingSize: HeadingTagType) => {
+        console.log(headingSize, '---headingSize--')
         if (blockType !== headingSize) {
             editor.update(() => {
                 const selection = $getSelection();
@@ -90,7 +93,7 @@ export default function BlockFormatDropDown({
         if (blockType !== 'bullet') {
             editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
         } else {
-            editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+            formatParagraph();
         }
     };
 
@@ -98,7 +101,7 @@ export default function BlockFormatDropDown({
         if (blockType !== 'check') {
             editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined);
         } else {
-            editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+            formatParagraph();
         }
     };
 
@@ -106,7 +109,7 @@ export default function BlockFormatDropDown({
         if (blockType !== 'number') {
             editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
         } else {
-            editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+            formatParagraph();
         }
     };
 
@@ -142,6 +145,16 @@ export default function BlockFormatDropDown({
     };
 
     const blockTypeToBlockFn: { [key: string]: any } = {
+        paragraph: {
+            iconClass: 'icon-paragraph icon-font opacity-75',
+            fn: formatParagraph,
+            type: ''
+        },
+        h: {
+            iconClass: '',
+            fn: '',
+            type: ''
+        },
         bullet: {
             iconClass: 'icon-unorderedList icon-font opacity-75',
             fn: formatBulletList,
@@ -157,19 +170,9 @@ export default function BlockFormatDropDown({
             fn: formatCode,
             type: ''
         },
-        h: {
-            iconClass: '',
-            fn: '',
-            type: ''
-        },
         number: {
             iconClass: 'icon-youxuliebiao icon-font opacity-75',
             fn: formatNumberedList,
-            type: ''
-        },
-        paragraph: {
-            iconClass: 'icon-paragraph icon-font opacity-75',
-            fn: formatParagraph,
             type: ''
         },
         quote: {
@@ -183,33 +186,33 @@ export default function BlockFormatDropDown({
         h1: {
             iconClass: '',
             fn: formatHeading,
-            type: blockType
+            type: 'h1'
         },
         h2: {
             iconClass: '',
             fn: formatHeading,
-            type: blockType
+            type: 'h2'
         },
         h3: {
             iconClass: '',
             fn: formatHeading,
-            type: blockType
+            type: 'h3'
         },
-        h4: {
-            iconClass: '',
-            fn: formatHeading,
-            type: blockType
-        },
-        h5: {
-            iconClass: '',
-            fn: formatHeading,
-            type: blockType
-        },
-        h6: {
-            iconClass: '',
-            fn: formatHeading,
-            type: blockType
-        }
+        // h4: {
+        //     iconClass: '',
+        //     fn: formatHeading,
+        //     type: blockType
+        // },
+        // h5: {
+        //     iconClass: '',
+        //     fn: formatHeading,
+        //     type: blockType
+        // },
+        // h6: {
+        //     iconClass: '',
+        //     fn: formatHeading,
+        //     type: blockType
+        // }
     }
 
     const executeCommand = (fn: Function, type: string) => {
@@ -222,7 +225,7 @@ export default function BlockFormatDropDown({
     const iconTitle = useCallback(() => {
         let icon = null;
         let name = '';
-        if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(blockType as string)) {
+        if (['h1', 'h2', 'h3'].includes(blockType as string)) {
             icon = blockType;
         } else {
             icon = <i className={classNames("iconfont fs-5", blockTypeToBlockFn[blockType].iconClass)}></i>
@@ -255,8 +258,8 @@ export default function BlockFormatDropDown({
                                                 <Menu.Item
                                                     key={key}
                                                     iconClass={value['iconClass']}
-                                                    active={active}
-                                                    onClick={() => { executeCommand(value.fn, value.type); setOpen(false) }}
+                                                    active={blockType==key}
+                                                    onClick={() => { executeCommand(value.fn, key); setOpen(false) }}
                                                     text={blockTypeToBlockName[key]} />
                                             );
                                         })}

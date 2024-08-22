@@ -1,6 +1,15 @@
 import type { TBody } from '@/types';
 import { createConfig, handleReqMiddleware } from '@/lib/api';
-import type { IData, IArticle, IArticleId, IArticleUploadImages, IArticleCollabView, ICollabTokenInfo, IArticleDraft } from '@/interfaces';
+import type { 
+  IData, 
+  IArticle, 
+  IArticleId, 
+  IArticleUploadImages, 
+  IArticleCollabView, 
+  ICollabTokenInfo, 
+  IArticleDraft, 
+  IArticleToolBarData 
+} from '@/interfaces';
 import { 
     CURRENT_ARTICLE_INFO,
     ARTICLE_LIKE,
@@ -25,7 +34,14 @@ const API_BASE_URL = API_URL;
 export const getCurrentArticleInfo = (
   params: TBody<IArticleId>
 ): Promise<Response | IData<IArticle>> => {
-  let config = createConfig(params, {method: 'POST', baseURL: API_BASE_URL});
+  let config = createConfig(params, {
+    method: 'POST', 
+    baseURL: API_BASE_URL,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+  });
   const url = config.baseURL + CURRENT_ARTICLE_INFO;
   return fetch(url, config).then(
     handleReqMiddleware
@@ -66,7 +82,7 @@ export const doArticleUnlike = (
 
 export const getArticleToolBarData = (
   params: TBody<IArticleId>
-): Promise<Response | IData<any>> => {
+): Promise<Response | IData<IArticleToolBarData>> => {
   let config = createConfig(params, { method: 'POST', baseURL: API_BASE_URL});
   const url = config.baseURL + ARTICLE_TOOLBAR_DATA;
   return refreshFetch(url, config).then(
@@ -84,7 +100,11 @@ export const uploadArticleImages = (
     method: 'POST',
     baseURL: API_BASE_URL,
     body: formData,
+    headers: {
+      'Accept': 'application/json'
+    }
   });
+  delete config.data;
   const url = config.baseURL + ARTICLE_UPLOAD_IMAGE;
   return refreshFetch(url, config).then(
     handleReqMiddleware
@@ -146,7 +166,7 @@ export const saveArticleDraft = (
 
 export const saveArticle = (
   params: TBody<IArticle>
-): Promise<Response | IData<IArticle>> => {
+): Promise<Response | IData<{articleId: string}>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
   return refreshFetch(config.baseURL + SAVE_ARTICLE, config).then(
     handleReqMiddleware

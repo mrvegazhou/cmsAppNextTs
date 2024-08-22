@@ -8,7 +8,7 @@ export interface IArticle extends IBase {
   authorId?: number;
   content: string;
   description: string;
-  tags: string;
+  tags: ITag[] | number[];
   typeId: number;
   coverUrl?: string;
   isSetCatalog: number;
@@ -19,6 +19,7 @@ export interface IArticle extends IBase {
   shareCount?: number;
   createTime?: string;
   updateTime?: string;
+  marks?: string;
 }
 
 export interface IArticleDraft {
@@ -35,6 +36,7 @@ export interface IArticleDraft {
   createTime?: string;
   sourceType?: string;
   saveType?: number;
+  marks?: string;
 }
 
 export interface IArticleFavorites {
@@ -47,11 +49,15 @@ export interface IArticleToolBarData {
   isLiked: boolean;
   isCollected: boolean;
   favorites: {[key:number]:IArticleFavorites};
-
+  isReport: boolean;
+  likeCount: number;
+  commentCount: number;
+  collectionCount: number;
+  shareCount: number;
 }
 
 export interface IArticleId {
-  articleId: number;
+  articleId: number | string;
 }
 
 export interface IArticleImgRes {
@@ -107,6 +113,7 @@ export interface ICollabTokenInfo {
 // 文章atom store初始化
 export interface IArticleInit {
   id: number | null;
+  articleIdStr?: string; // 文章id转字符串
   title: string;
   content: string;
   tags: ITag[];

@@ -7,7 +7,7 @@ import type { IData } from '@/interfaces';
 import { getTagList } from "@/services/api";
 import { ITag } from "@/interfaces";
 import Menu from '@/components/menu/Menu';
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { useAtom } from "jotai";
 import { writeArticleAtom } from "@/store/articleData";
 

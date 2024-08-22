@@ -11,13 +11,14 @@ import {
     useImperativeHandle,
     useMemo
 } from 'react';
+import { useAtomValue } from 'jotai';
 import RegisterNav from '../register/registerNav';
 import LoginForgetNav from './loginForgetNav';
 import Captcha from '@/components/captcha/Captcha';
 import useLogin from '@/hooks/useLogin';
 import Modal from '@/components/modal';
 import { PWD_STRENGTH } from '@/lib/constant';
-
+import { loginAtom } from '@/store/userData';
 
 const LoginNav = () => {
 
@@ -33,7 +34,7 @@ const LoginNav = () => {
         <a className="nav-link" role="button" onClick={showLoginModal}>
             <i className='iconfont icon-denglu fs-3 text-black-50'></i>
         </a>
-        <LoginModal ref={loginRef}/>
+        <LoginModal ref={loginRef} />
       </>
     );
 };
@@ -71,7 +72,6 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
         handleChange,
         onSubmit
     } = useLogin(()=>{ onClickCloseModal(); });
-
 
     const [open, setOpen] = useState<boolean>(false);
 
@@ -145,6 +145,11 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
         }
     }, [strength]);
 
+    const loginIdent = useAtomValue(loginAtom);
+    useEffect(() => {
+        setOpen(loginIdent);
+    }, [loginIdent]);
+    
     return (
         <Modal
             title={t('login')}

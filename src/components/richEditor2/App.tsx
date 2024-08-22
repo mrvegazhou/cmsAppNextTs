@@ -7,8 +7,8 @@ import {SharedHistoryContext} from './context/SharedHistoryContext';
 import {SharedAutocompleteContext} from './context/SharedAutocompleteContext';
 import {TableContext} from './plugins/TablePlugin';
 import {SettingsContext, useSettings} from './context/SettingsContext';
-import PlaygroundNodes from './nodes/PlaygroundNodes';
-import PlaygroundEditorTheme from './themes/PlaygroundEditorTheme';
+import AppNodes from './nodes/AppNodes';
+import PlaygroundEditorTheme from './themes/CmsEditorTheme';
 import { SkeletonLayout } from "@/components/skeleton/layout";
 import "./index.scss";
 import { TMetadata } from '@/types';
@@ -35,8 +35,8 @@ const App = forwardRef((prop: propsType, ref): JSX.Element => {
           : emptyEditor
           ? undefined
           : prepopulatedRichText,
-        namespace: 'Playground',
-        nodes: [...PlaygroundNodes],
+        namespace: 'AppEditor',
+        nodes: [...AppNodes],
         onError: (error: Error) => {
           throw error;
         },
@@ -63,11 +63,9 @@ const App = forwardRef((prop: propsType, ref): JSX.Element => {
             <SharedHistoryContext>
               <TableContext>
                 <SharedAutocompleteContext>
-
                   <div className="editor-shell">
                     <Editor metadata={prop.metadata}/>
                   </div>
-                  
                 </SharedAutocompleteContext>
               </TableContext>
             </SharedHistoryContext>

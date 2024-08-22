@@ -1,6 +1,6 @@
 import cookie from 'js-cookie';
 import { COOKIE_EXPIRES, TOKEN_NAME, REFRESH_TOKEN_NAME } from '@/lib/constant';
-import { aesEncryptStr, aesDecryptStr, decodeJwtExpToSeconds } from '@/lib/tool';
+import { aesEncryptStr, aesDecryptStr } from '@/lib/tool';
 import { TOKEN_SECRET } from '@/lib/constant/app';
 import { jwtDecode } from 'jwt-decode';
 
@@ -39,12 +39,12 @@ export const USER_TOKEN = {
          refreshToken = '';
       }
       return {token: token, refreshToken: refreshToken}
-    },
+   },
    //  get: () => ({
    //    token: cookie.get(TOKEN_NAME),
    //    refreshToken: cookie.get(REFRESH_TOKEN_NAME),
    // }),
-    get notEmpty() {
+   get notEmpty() {
        return this.get().token !== null;
    },
 };

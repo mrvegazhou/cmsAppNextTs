@@ -3,6 +3,7 @@ import Overlay, { OverlayProps } from '../overlay';
 import { IProps, noop } from '@/interfaces';
 import './style/index.css';
 import CallShow from './CallShow';
+import { PortalProps } from '../portal/portal';
 
 export type ButtonType = 'primary' | 'success' | 'warning' | 'danger' | 'light' | 'dark' | 'link';
 export interface ButtonProps extends IProps, React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
@@ -31,6 +32,7 @@ export interface ModalProps extends IProps, OverlayProps {
   width?: number;
   onCancel?: (evn: React.MouseEvent<HTMLButtonElement> & MouseEvent) => void;
   onConfirm?: (evn: React.MouseEvent<HTMLButtonElement> & MouseEvent) => void;
+  portalProps?: PortalProps;
 }
 
 const Modal: React.ForwardRefExoticComponent<ModalProps & React.RefAttributes<OverlayProps>> = React.forwardRef<
@@ -92,9 +94,10 @@ const Modal: React.ForwardRefExoticComponent<ModalProps & React.RefAttributes<Ov
     setIsOpen(false);
     setLoading(false);
   }
+
   return (
     <Overlay usePortal={usePortal} isOpen={isOpen} {...other} onClose={onClose} className={cls}>
-      <div className={`${prefixCls}-container`}>
+      <div className={`${prefixCls}-container`} id="w-modal">
         <div
           className={[
             `${prefixCls}-inner`,

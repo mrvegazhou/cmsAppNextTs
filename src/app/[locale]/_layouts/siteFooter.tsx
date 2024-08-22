@@ -26,17 +26,14 @@ export default function Footer({ metadata }: { metadata: TMetadata }) {
 
   return <>
     <FooterComp metadata={metadata} />
-    <LoginModal isOpen={loginModalIdent} />
   </>;
 }
 
 const FooterComp = ({ metadata }: { metadata: TMetadata }) => {
   const env = metadata.env;
-
-  
   
   return (
-    <>
+    <div className='mainBgColor' >
       {env.APP_ICP_NUM && env.APP_ICP_LINK ? (
         <footer className="py-4 small">
           <div className="d-flex flex-column align-items-center justify-content-center">
@@ -49,10 +46,10 @@ const FooterComp = ({ metadata }: { metadata: TMetadata }) => {
           </div>
         </footer>
       ) : (
-        <div className="py-4"></div>
+        <div className="py-4">footer</div>
       )}
 
       {/* <AnalysisDynamic metadata={metadata} /> */}
-    </>
+    </div>
   );
 };

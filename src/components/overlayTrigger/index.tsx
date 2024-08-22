@@ -22,6 +22,7 @@ export interface OverlayTriggerProps extends IProps, OverlayProps {
     children?: React.ReactNode | React.ReactElement;
     transitionName?: string;
     zIndex?: number;
+    fixed?: boolean;
 }
 
 export interface OverlayTriggerState {
@@ -162,6 +163,7 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
             popup: popupRef.current as HTMLElement | IBoundingClientRect,
             usePortal,
             autoAdjustOverflow,
+            fixed: other.fixed!,
         });
         setOverlayStyl({ ...styls, zIndex: zIndex.current });
         onVisibleChange(isOpen);
@@ -282,6 +284,7 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
             popup: popupRef.current as HTMLElement | IBoundingClientRect,
             usePortal,
             autoAdjustOverflow,
+            fixed: other.fixed!
         });
         setOverlayStyl({ ...styls, zIndex: zIndex.current });
     }

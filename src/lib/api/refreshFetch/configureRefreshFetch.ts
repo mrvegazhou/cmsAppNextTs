@@ -56,9 +56,7 @@ type Configuration = {
         } else {
           return response;
         }
-        // return response;
       }).catch(error => {
-        // console.log(error, 222)
         throw error
       })
     }

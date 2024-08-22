@@ -9,16 +9,19 @@
 import {useCallback, useMemo, useState} from 'react';
 import * as React from 'react';
 import Modal from '@/components/modal';
+import { PortalProps } from '@/components/portal/portal';
 
 
 export default function useModal(): [
   JSX.Element | null,
-  (title: string, showModal: (onClose: () => void) => JSX.Element, minWidth?:number,) => void,
+  (title: string, showModal: (onClose: () => void) => JSX.Element, minWidth?: number, cls?: string, portalProps?: PortalProps) => void,
 ] {
   const [modalContent, setModalContent] = useState<null | {
     content: JSX.Element;
     title: string;
     minWidth?: number;
+    cls?: string;
+    portalProps?: PortalProps;
   }>(null);
 
   const [open, setOpen] = useState(false);
@@ -32,7 +35,7 @@ export default function useModal(): [
     if (modalContent === null) {
       return null;
     }
-    const {title, content, minWidth} = modalContent;
+    const {title, content, minWidth, cls, portalProps} = modalContent;
     return (
       <Modal
         title={title}
@@ -41,6 +44,8 @@ export default function useModal(): [
         type="light"
         useButton={false}
         minWidth={minWidth ?? 350}
+        className={cls}
+        portalProps={portalProps}
       >
          {content}
       </Modal>
@@ -52,13 +57,17 @@ export default function useModal(): [
       title: string,
       // eslint-disable-next-line no-shadow
       getContent: (onClose: () => void) => JSX.Element,
-      minWidth?: number
+      minWidth?: number,
+      cls?: string,
+      portalProps?: PortalProps
     ) => {
       setOpen(true);
       setModalContent({
         title,
         content: getContent(onClose),
-        minWidth: minWidth
+        minWidth: minWidth,
+        cls: cls,
+        portalProps: portalProps
       });
     },
     [onClose],

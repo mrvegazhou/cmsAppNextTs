@@ -5,7 +5,7 @@ interface CatalogProps {
     supplyTop: number;
     selector: string[];
     active: Function | null;
-    contentEl: string | HTMLElement;
+    contentEl: any;
     catelogEl: string | HTMLElement;
 }
 interface TreeItem {
@@ -20,7 +20,7 @@ class CreateCatalog {
     contentEl: any;
     option: CatalogProps;
     $catelog: HTMLElement;
-    $content: HTMLElement|null;
+    $content: HTMLElement | null;
     // 点击跳转不触发scroll事件
     clickToScroll = false; 
     allCatelogs: any;
@@ -31,23 +31,30 @@ class CreateCatalog {
             linkActiveClass: 'cms-catelog-link-active',
             supplyTop: 0,
             selector: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-            active: null    // 激活时候回调
+            active: null,    // 激活时候回调
         };
         let option = Object.assign({}, defaultOpts, opts);
         // 内容元素
-        let $content: HTMLElement|null = this.contentEl = option.contentEl instanceof HTMLElement ? option.contentEl : document.getElementById(option.contentEl);
+        this.contentEl = option.contentEl;
+
+        let $content: HTMLElement | null = document.getElementById(this.contentEl);
+        if ($content==null && (option.contentEl instanceof HTMLElement)) {
+            $content = option.contentEl
+        }
 
         // 目录元素
         const $catelog = option.catelogEl instanceof HTMLElement ? option.catelogEl : document.getElementById(option.catelogEl);
        
         let allCatelogs = $content!.querySelectorAll(option.selector.join());
+
         let tree = this.getCatelogsTree(allCatelogs);
         this.option = option;
         // 点击跳转不触发scroll事件
         let clickToScroll = false;
         // @ts-ignore
         $catelog.innerHTML = this.generateHtmlTree(tree, { id: -1 });
-        $catelog!.setAttribute("class", "cms-catelog-list");
+        let cls = $catelog!.getAttribute('class');
+        $catelog!.setAttribute("class", cls + " cms-catelog-list");
 
         this.$catelog = $catelog!;
         this.$content = $content;
@@ -86,8 +93,6 @@ class CreateCatalog {
             }
             that.clickToScroll = false;
         });
-
-        this.allCatelogs = $content!.querySelectorAll(option.selector.join());
     }
 
 

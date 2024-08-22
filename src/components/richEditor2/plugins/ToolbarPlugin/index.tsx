@@ -55,7 +55,7 @@ import {
   REDO_COMMAND,
   UNDO_COMMAND
 } from 'lexical';
-import React, {Dispatch, useCallback, useEffect, useRef, useState} from 'react';
+import React, {Dispatch, useCallback, useEffect, useState} from 'react';
 import {IS_APPLE} from '../../shared/environment';
 
 import classNames from 'classnames';
@@ -117,10 +117,8 @@ export default function ToolbarPlugin({
   const [editor] = useLexicalComposerContext();
 
   const [activeEditor, setActiveEditor] = useState(editor);
-  const [blockType, setBlockType] =
-    useState<blockTypeToBlockNameType>('paragraph');
-  const [rootType, setRootType] =
-    useState<keyof typeof rootTypeToRootName>('root');
+  const [blockType, setBlockType] = useState<blockTypeToBlockNameType>('paragraph');
+  const [rootType, setRootType] = useState<keyof typeof rootTypeToRootName>('root');
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
     null,
   );
@@ -526,8 +524,10 @@ export default function ToolbarPlugin({
                       <InsertImageDialog
                         activeEditor={activeEditor}
                         onClose={onClose}
+                        height={300}
+                        resizable={true}
                       />
-                    ), 810);
+                    ), 810, 'zIndex');
                   }}
               />
               <Menu.Item

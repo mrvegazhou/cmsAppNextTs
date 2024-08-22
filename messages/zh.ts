@@ -5,10 +5,12 @@ import RichEditor from './locales/zh/richEditor';
 import OtherPage from './locales/zh/other';
 import Page from './locales/zh/page';
 import LoginPage from './locales/zh/login';
+import ArticleComment from './locales/zh/articleComment';
 
 const zh = {
     ArticleEditPage,
     ArticleIdPage,
+    ArticleComment,
     Navbar,
     RichEditor,
     OtherPage,

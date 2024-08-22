@@ -7,7 +7,7 @@ import { writeArticleAtom } from "@/store/articleData";
 import ArticleTag from "../articleTag";
 import ArticleType from "../aritcleType";
 import ArticleCover from "../articleCover";
-import { debounce } from "lodash"
+import { debounce } from "lodash-es"
 import ArticleCatalog from "../aritcleCatalog";
 
 const ArticleSetting = (props: {}) => {
@@ -29,7 +29,7 @@ const ArticleSetting = (props: {}) => {
 
     return (
         <>
-            <div className="card mx-auto my-5" style={{ maxWidth: '1000px' }}>
+            <div id="articleSetting" className="card mx-auto my-5" style={{ maxWidth: '1000px' }}>
                 <div className="card-header">
                     {t('setting')}
                 </div>

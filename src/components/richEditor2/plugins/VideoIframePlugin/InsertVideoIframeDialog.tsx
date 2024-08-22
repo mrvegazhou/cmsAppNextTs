@@ -1,11 +1,11 @@
 import {LexicalEditor} from 'lexical';
 import * as React from 'react';
 import {useState} from 'react';
-import { debounce } from "lodash"
+import { debounce } from "lodash-es"
 import {INSERT_VIDEOIFRAME_COMMAND} from './';
 import { SourceType } from '../../nodes/VideoIframeNode';
 
-const BILIBILI_URL = /^(?:https?:\/\/)?(?:www\.)?bilibili\.com\/video\/(\S+)\?(spm_id_from=|vd_source=)(?:\S+)?$/;
+const BILIBILI_URL = /^(?:https?:\/\/)?(?:www\.)?bilibili\.com\/video\/(\S+)\/\?(spm_id_from=|vd_source=)(?:\S+)?$/;
 const TENCENT_URL = /^(?:https?:\/\/)?(?:v\.)?qq\.com\/x\/cover\/(?:\S+)\/(\S+)\.html$/;
 
 const isBilibili = (url: string) => {
@@ -46,12 +46,14 @@ export default function InsertVideoIframeDialog({
                 if ( inputText == '' ) return;
                 if ( isBilibili(inputText) ) {
                     const { srcID } = getVideoSrc(inputText, BILIBILI_URL, 'BILIBILI');
-                    setEmbedResult({src: `//player.bilibili.com/player.html?vid=${srcID}&page=1&high_quality=1&danmaku=0`, srcType: 'BILIBILI' as SourceType});
+                    setEmbedResult({src: `//player.bilibili.com/player.html?bvid=${srcID}&page=1&high_quality=1&danmaku=0&autoplay=0`, srcType: 'BILIBILI' as SourceType});
                 }
                 if ( isTencent(inputText) ) {
                     const { srcID } = getVideoSrc(inputText, TENCENT_URL, 'TENCENT');
                     setEmbedResult({src: `https://v.qq.com/txp/iframe/player.html?vid=${srcID}`, srcType: 'TENCENT' as SourceType});
                 }
+                console.log(isBilibili(inputText), '--isBilibili(inputText)--');
+                
             }, 100),
         [],
     );

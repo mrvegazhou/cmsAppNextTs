@@ -1,31 +1,70 @@
 import styled from "styled-components";
-import Likes from "./like";
-import Collection from "./collection";
-import Comment from "./comment";
-import Share from "./share";
+import { useTranslations } from 'next-intl';
+import dynamic from "next/dynamic";
+
+const Likes = dynamic(() => import("./like"), {
+  ssr: false,
+});
+const Collection = dynamic(() => import("./collection"), {
+  ssr: false,
+});
+const Comment = dynamic(() => import("./comment"), {
+  ssr: false,
+});
+const Share = dynamic(() => import("./share"), {
+  ssr: false,
+});
+const Report = dynamic(() => import("./report"), {
+  ssr: false,
+});
+const ArticleComments = dynamic(() => import("../comments/index"), {
+  ssr: false,
+});
+
 
 const DivCom = styled.div`
     left:max(0px, calc(50vw - 680px));
     position:fixed;
     top:8rem;
-    height:280px;
     width:70px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items: center;
 `
 
 const ToolBar = () => {
-    return (
-        <>
-          <DivCom>
-            {/* 点赞信息 */}
-            <Likes />
-            {/* 评论 */}
-            <Comment />
-            {/* 收藏信息 */}
-            <Collection />
-            {/* 分享 */}
-            <Share />
-          </DivCom>
-        </>
-      );
+  const t = useTranslations('ArticleIdPage');
+
+  return (
+      <>
+        <DivCom>
+          {/* 点赞信息 */}
+          <Likes />
+          {/* 评论 */}
+          <a className="text-decoration-none" data-bs-toggle="offcanvas" href="#offcanvasArticleComments">
+          <Comment />
+          </a>
+          {/* 收藏信息 */}
+          <Collection />
+          {/* 分享 */}
+          <Share />
+        </DivCom>
+
+        <div className="offcanvas offcanvas-end" data-bs-scroll="true" aria-labelledby="offcanvasScrollingLabel" style={{width: '35%'}} data-bs-backdrop="false" id="offcanvasArticleComments">
+            <div className="offcanvas-header">
+                <h6 className="offcanvas-title" id="offcanvasExampleLabel">{t('comment')}</h6>
+                <div className="btn-close cursor-pointer" data-bs-dismiss="offcanvas" aria-label="Close"></div>
+            </div>
+            <div className="offcanvas-body">
+                <div id="xxx">
+                  <ArticleComments comments={[]}/>
+
+                </div>
+            </div>
+        </div>
+
+      </>
+    );
 };
 export default ToolBar;

@@ -25,23 +25,39 @@ import SearchBar from '../(home)/search/searchBar';
 import { IData, ISiteConfig, ISiteInfo } from '@/interfaces';
 
 
+const styles = `
+.show {
+  transition: 0.3s ease-in-out;
+  transform: translateY(0px);
+}
+.hide {
+  transform: translateY(-100px);
+}
+`;
+
 const Header = ({
   metadata,
   fixedTop = true,
+  canDisappear = true,
 }: {
   metadata: TMetadata;
   fixedTop?: boolean;
+  canDisappear?: boolean;
 }) => {
-  return <Navbar metadata={metadata} fixedTop={fixedTop} />;
+  return <Navbar metadata={metadata} fixedTop={fixedTop} canDisappear={canDisappear} />;
 };
 export default Header;
 
 const Navbar = ({
   metadata,
   fixedTop = true,
+  canDisappear = true,
+  mb = '0'
 }: {
   metadata: TMetadata;
   fixedTop?: boolean;
+  canDisappear?: boolean;
+  mb?: string;
 }) => {
 
   const t = useTranslations('Navbar');
@@ -62,49 +78,55 @@ const Navbar = ({
   //   let data = queryClient.getQueryData(["siteInfo"])
   // }
 
-  function clickCallback(event: React.MouseEvent<HTMLButtonElement>) {
-    // @ts-ignore
-    if (navRef.current.contains(event.target)) {
-      return;
+  const [isShow, setIsShow] = useState(true);
+  let lastScrollTop = 0;
+  const handleScroll = () => {
+    let scrollTop = document.documentElement.scrollTop || document.body.scrollTop; //滚动条滚动高度
+    if (scrollTop > lastScrollTop) {
+      setIsShow(false);
+    } else {
+      setIsShow(true);
     }
-    // @ts-ignore
-    searchRef.current.setShowSearchLayer(false);
-  }
-
+    lastScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  };
   useEffect(() => {
-    // @ts-ignore
-    document.addEventListener("click", clickCallback, false);
-    return () => {
-      // @ts-ignore
-      document.removeEventListener("click", clickCallback, false);
-    };
+    if (canDisappear) {
+      // 监听
+      window.addEventListener('scroll', handleScroll)
+      // 销毁
+      return () => window.removeEventListener('scroll', handleScroll)
+    }
   }, []);
 
   return (
-    <nav className={classNames('autohide navbar navbar-expand nav-bg', (fixedTop && 'fixed-top'))} style={{ maxHeight: "60px" }} ref={navRef}>
-      <div className="container-fluid bg-green-800">
-        {/* <Logo metadata={metadata} /> */}
-        <div className="d-flex flex-grow-1 align-items-center gap-4 justify-content-between d-none d-md-flex">
-          <ul className="navbar-nav">
-            <LinkNavItem href="/zh/article/new" name={t('homePage')} />
-            <MessageNavItem metadata={metadata} />
-            <FollowMessageNavItem
-              metadata={metadata}
-            />
-            <MoreNavItem
-              metadata={metadata}
-            />
-            <SearchBar ref={searchRef} />
-          </ul>
+    <>
+      <style jsx>{styles}</style>
+    
+      <nav className={classNames('navbar navbar-expand nav-bg', (fixedTop && 'fixed-top'), (!isShow && 'opacity-0'))} style={{ maxHeight: "60px", transition: 'opacity 0.8s ease-out'}} ref={navRef}>
+        <div className="container-fluid bg-green-800">
+          {/* <Logo metadata={metadata} /> */}
+          <div className="d-flex flex-grow-1 align-items-center gap-4 justify-content-between d-md-flex">
+            <ul className="navbar-nav">
+              <LinkNavItem href="/zh/article/new" name={t('homePage')} />
+              <MessageNavItem metadata={metadata} />
+              <FollowMessageNavItem
+                metadata={metadata}
+              />
+              <MoreNavItem
+                metadata={metadata}
+              />
+              <SearchBar ref={searchRef} />
+            </ul>
 
-          <div className="d-flex align-items-center justify-content-center justify-content-between me-3" style={{ width: "120px" }}>
-            {siteInfo?.userInfo == null ? (<LoginNav />) : (<Avatar />)}
-            <ColorModeItem />
-            <TranslateItem />
+            <div className="d-flex align-items-center justify-content-center justify-content-between me-3" style={{ width: "120px" }}>
+              {siteInfo?.userInfo == null ? (<LoginNav />) : (<Avatar />)}
+              <ColorModeItem />
+              <TranslateItem />
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 };
 

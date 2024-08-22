@@ -98,5 +98,6 @@ export function $createEmojiNode(
   emojiText: string,
 ): EmojiNode {
   const node = new EmojiNode(className, emojiText).setMode('token');
+  console.log(className, emojiText, "--createEmojiNode-")
   return $applyNodeReplacement(node);
 }

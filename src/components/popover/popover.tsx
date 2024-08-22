@@ -72,6 +72,8 @@ export interface PopoverProps extends OverlayTriggerProps {
   content?: React.ReactNode;
   visibleArrow?: boolean;
   onClick?: Function;
+  zIndex?: number;
+  fixed: boolean;
 }
 
 
@@ -86,6 +88,7 @@ const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
         placement = 'top',
         usePortal = true,
         visibleArrow = true,
+        fixed = false,
         className, 
         content,
         ...other
@@ -132,6 +135,7 @@ const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
                 {...other}
                 isOpen={isOpen}
                 placement={placement}
+                fixed={fixed}
                 overlay={
                     <div className={cls}>
                         {visibleArrow && renderArrow()}

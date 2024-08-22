@@ -10,7 +10,7 @@ import type {EditorThemeClasses} from 'lexical';
 
 import './StickyEditorTheme.css';
 
-import baseTheme from './PlaygroundEditorTheme';
+import baseTheme from './CmsEditorTheme';
 
 const theme: EditorThemeClasses = {
   ...baseTheme,

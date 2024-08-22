@@ -2,14 +2,18 @@ import type { TBody } from '@/types';
 import { createConfig, handleReqMiddleware } from '@/lib/api';
 import type { IData } from '@/interfaces';
 import { 
-    ARTICLE_IMAGE_LIST
+    ARTICLE_IMAGE_LIST,
+    API_URL
 } from '@/lib/constant'
+
+const API_BASE_URL = API_URL;
 
 export const getPersonalImageList = (
     params: TBody<{page: number}>
 ): Promise<Response | IData<any>> => {
     let config = createConfig(params, {
         method: 'POST', 
+        baseURL: API_BASE_URL,
         headers: {
           'Content-Type': 'application/json'
     }});

@@ -1,7 +1,9 @@
 .w-modal {
     z-index: 1001;
 }
-
+.zIndex {
+    z-index: 99990 !important;
+}
 .w-modal-inner {
     padding-bottom: 20px;
     background: #f9f9f9;

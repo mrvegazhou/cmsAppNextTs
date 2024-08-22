@@ -4,7 +4,7 @@ import {ResponseBody, ResponseError} from './response';
 const fetchJSON = (url: string | Request | URL, options: RequestInit) => {
   // The Content-Type header describes the type of the body so should be
   // omitted when there isn't one.
-  const fetchOptions = typeof (options.body) === 'undefined'
+  const fetchOptions = typeof (options.body) !== 'undefined'
     ? options
     : merge(
       {

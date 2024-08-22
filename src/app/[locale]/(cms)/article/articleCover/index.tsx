@@ -6,7 +6,7 @@ import type { IData, IImageState, IArticleUploadImage, IArticleImgRes } from '@/
 import { useAtom, useAtomValue } from 'jotai'
 import { canEditAtom, writeArticleAtom } from "@/store/articleData";
 import type { TBody } from '@/types';
-import { BASE_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
+import { API_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
 import { handleDrop, convertBytesToKB, loadImage } from "@/lib/tool";
 import useToast from '@/hooks/useToast';
 import { uploadArticleImages } from "@/services/api";
@@ -102,7 +102,7 @@ const ArticleCover = (props:{init: boolean}) => {
                 }
             } as TBody<IArticleUploadImage>).then(res => {
                 if(res.status==200) {
-                    let src = BASE_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
+                    let src = API_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
                     arrImg[0].src = src;
                     setImgState((prev) => ({
                         ...prev,

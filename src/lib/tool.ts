@@ -286,7 +286,7 @@ export const isURL = (URL: string) => {
   }
 };
 
-export const loadImage = (src: string, getBase64?: boolean): Promise<[HTMLImageElement, string?]> => {
+export const loadImage = (src: string, getBase64?: boolean, scale?: boolean): Promise<[HTMLImageElement, string?]> => {
   return new Promise(function(resolve, reject){
       var img = new Image();
       img.src = src;
@@ -309,6 +309,21 @@ export const loadImage = (src: string, getBase64?: boolean): Promise<[HTMLImageE
       }  
   })
 }
+// 缩放图片
+const scaleImg = (img: HTMLImageElement) => {
+  let t = 200;
+  let scale = 1;
+  let width = img.width;
+  let height = img.height;
+  if (width > t || height > t) {
+    if (width > height) {
+      scale = t / width;
+    }else {
+      scale = t / height;
+    }
+  }
+  return [width * scale, height * scale];
+};
 
 function readBuffer(file: File, start = 0, end = 2) { 
   return new Promise((resolve, reject) => { 

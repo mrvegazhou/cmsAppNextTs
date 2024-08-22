@@ -3,8 +3,6 @@ import styled from "styled-components";
 
 /** className*/
 export const itemClassName = classNames([
-    "d-none",
-    "d-lg-block",
     "shadow-sm",
     "text-secondary",
     "bg-white",
@@ -26,6 +24,8 @@ export const iconClassName = classNames([
 export const DivDom = styled.div`
     width:55px;
     height:55px;
-    line-height:55px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     opacity:0.7;
 `

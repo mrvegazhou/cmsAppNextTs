@@ -23,7 +23,8 @@ export const writeArticleInitValue = {
     coverImage: initCoverImage,
     description: "",
     createTime: null,
-    isSetCatalog: 0
+    isSetCatalog: 0,
+
 } as IArticleInit;
 export const writeArticleAtom = atomWithStorage<IArticleInit>('writeArticleData', writeArticleInitValue);
 
@@ -55,9 +56,11 @@ const defaultStorage = createJSONStorage(() => {
     }
 });
 export const writeArticleNoteAtom = 
-    atomWithStorage<Comments>('writeArticleNoteData', writeArticleNoteInitValue, 
-    //@ts-ignore
-    defaultStorage, 
-    {getOnInit: true}
-);
+    atomWithStorage<Comments>(
+      'writeArticleNoteData', 
+      writeArticleNoteInitValue, 
+      //@ts-ignore
+      defaultStorage, 
+      {getOnInit: true}
+    );
 

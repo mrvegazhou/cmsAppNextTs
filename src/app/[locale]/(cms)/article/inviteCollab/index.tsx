@@ -9,7 +9,7 @@ import { writeArticleAtom } from "@/store/articleData";
 import type { TBody } from '@/types';
 import type { IData, IUser, IArticleCollabView } from '@/interfaces';
 import { IUserList } from "@/interfaces"; 
-import { throttle } from "lodash"
+import { throttle } from "lodash-es"
 import LoaderComp from '@/components/loader/loader';
 import { searchUserList, inviteCollab, collabViewList, exitCollab } from "@/services/api";
 import Modal from '@/components/modal';

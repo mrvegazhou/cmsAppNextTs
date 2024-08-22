@@ -33,6 +33,7 @@ function findAndTransformEmoji(node: TextNode): null | TextNode {
 
     if (emojiData !== undefined) {
       const [emojiStyle, emojiText] = emojiData;
+      
       let targetNode;
 
       if (i === 0) {

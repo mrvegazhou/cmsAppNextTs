@@ -1,26 +1,32 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $generateHtmlFromNodes } from '@lexical/html';
 import { useMutation } from '@tanstack/react-query';
 import Avatar from "../../../(auth)/login/avatar";
 import InviteCollab from "../inviteCollab";
-import { debounce } from "lodash"
+import { debounce } from "lodash-es"
 import { useAtom, useAtomValue } from 'jotai'
 import { writeArticleAtom } from "@/store/articleData";
 import { useInterval } from 'ahooks';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import "./index.scss";
+import type { TMetadata } from '@/types';
 import { TBody } from '@/types';
 import { saveArticleDraft } from '@/services/api';
 import { IArticle, IArticleDraft, IData } from '@/interfaces';
 import { canEditAtom } from '@/store/articleData';
 import { CLIENT_TPYES, SAVE_TYPE } from '@/lib/constant';
 import { getUserAgent } from '@/lib/tool';
+import {writeArticleNoteAtom } from '@/store/articleData';
+import { saveMarkTag, replaceSpan } from "@/components/richEditor2/utils/node";
+import { Comments } from "@/store/articleData";
 
 
 export default function ArticleHeader(props: {
   checkCollabFunc: Function;
+  metadata: TMetadata;
 }): JSX.Element {
   const t = useTranslations('ArticleEditPage');
 
@@ -38,13 +44,25 @@ export default function ArticleHeader(props: {
   const [articleData, setArticleData] = useAtom(writeArticleAtom);
 
   const [editor] = useLexicalComposerContext();
+
+  const [articleNoteInfo, setArticleNoteInfo] = useAtom(writeArticleNoteAtom);
+  // 保存标注
+  const saveNotes = (marks: Array<string>) => {
+    let newArticleNoteInfo = articleNoteInfo.filter((item, idx) => marks.includes(item.id));
+    setArticleNoteInfo(newArticleNoteInfo);
+    return newArticleNoteInfo;
+  };
+
   // 获取富文本编辑的内容
   const handleSaveNodes = () => {
     let content = "";
     editor.update(() => {
-      // const htmlString = $generateHtmlFromNodes(editor, null);
-      content = JSON.stringify(editor.getEditorState())
-    });
+            // 返回过滤后的标注列表
+            let marks = saveMarkTag();
+            saveNotes(marks);
+            content = $generateHtmlFromNodes(editor, null);
+    }, {discrete: true});
+    content = replaceSpan(content);
     return content;
   };
 
@@ -123,7 +141,7 @@ export default function ArticleHeader(props: {
 
   return (
     <>
-      <div id="richEditorHeader" className="d-flex justify-content-between align-items-center border-bottom" style={{ height: "50px" }}>
+      <div id="richEditorHeader" className="d-flex justify-content-between align-centent-center align-items-center border-bottom" style={{ height: "65px" }}>
         <div className="pe-4">
           <a href="#" className="text-decoration-none" title={t('goHome')}>
             <i className="iconfont icon-shouye ms-3 fs-3 text-secondary"></i>
@@ -132,7 +150,8 @@ export default function ArticleHeader(props: {
         <input
           placeholder={t('enterArticleTitle')}
           onChange={handleTitle}
-          className="input-placeholder w-100 border-0 fs-5 shadow-none min-vw-50 text-left "
+          value={articleData.title}
+          className="input-placeholder w-100 border-0 fs-5 shadow-none min-vw-50 text-left"
           style={{ outline: "none" }}
           spellCheck="false"
           maxLength={300}

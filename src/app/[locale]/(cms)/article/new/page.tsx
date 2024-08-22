@@ -21,6 +21,7 @@ export default async function Page({
         const metadata = new Metadata();
         metadata.setReferer('origin');
         metadata.setLocale(locale);
+        
         return searchParams.v === 'h5' ? (
             <NewArticlePage metadata={JSON.parse(JSON.stringify(metadata))} />
         ) : (

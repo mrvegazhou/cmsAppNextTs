@@ -3,8 +3,7 @@ import Metadata from '@/lib/metadata';
 import { customException, getMetadata } from '@/lib/tool';
 import type { IData, ISiteConfig } from '@/interfaces';
 import HomePage from './(home)/home/home';
-// import ResetPage from '@/app/[locale]/reset/reset';
-import type { Metadata as MetadataNext } from 'next';
+import ResetPage from './_common/reset/reset';
 // import HomeH5Page from '@/app/[locale]/mobile/home/h5';
 import { createTranslator } from 'next-intl';
 import { getSiteConfig } from '@/services/api';
@@ -23,10 +22,10 @@ export default async function Page({ params }: Props) {
     }) as Response;
     const responses = await Promise.all([pageInfo]);
     const resp1 = await ((await responses[0]) as Response).json();
-
+    
     const metadata = new Metadata();
     metadata.set('siteConfig', "xxx");
-
+    
     return (<HomePage metadata={JSON.parse(JSON.stringify(metadata))}/>);
 
     // return searchParams.v === 'h5' ? (
@@ -35,6 +34,6 @@ export default async function Page({ params }: Props) {
     //   <HomePage metadata={metadata.toString()} />
     // );
   } catch (e) {
-    // return <ResetPage error={e} />;
+    return <ResetPage error={JSON.parse(JSON.stringify(e))} />;
   }
 }
