@@ -5,8 +5,6 @@ const useClickOutside = (callback: () => void) => {
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            console.log(ref.current , "-c--");
-            
             // @ts-ignore
             if (ref.current && !ref.current.contains(event.target)) {
                 callback();

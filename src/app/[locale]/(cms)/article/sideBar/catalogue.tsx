@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, RefObject } from "react";
+import { useState, useLayoutEffect, RefObject } from "react";
 import classNames from "classnames";
 import DividerComp from "@/components/divider/divider";
 import CreateCatalog from "@/components/catalogNavbar";

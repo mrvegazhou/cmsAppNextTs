@@ -2,14 +2,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from 'next-intl';
 import { useMutation } from '@tanstack/react-query';
-import type { IData, IImageState, IArticleUploadImage, IArticleImgRes } from '@/interfaces';
+import type { IData, IImageState, IUploadImageResp, IUploadImages } from '@/interfaces';
 import { useAtom, useAtomValue } from 'jotai'
 import { canEditAtom, writeArticleAtom } from "@/store/articleData";
 import type { TBody } from '@/types';
-import { API_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
+import { API_URL, MAX_FILE_SIZE_IN_KB, PERSONAL_IMAGE_URL } from '@/lib/constant';
 import { handleDrop, convertBytesToKB, loadImage } from "@/lib/tool";
 import useToast from '@/hooks/useToast';
-import { uploadArticleImages } from "@/services/api";
+import { uploadImages } from "@/services/api";
 import LoaderComp from '@/components/loader/loader';
 import './index.scss';
 import classNames from "classnames";
@@ -45,8 +45,8 @@ const ArticleCover = (props:{init: boolean}) => {
     }, []);
 
     const uploadArticleCoverMutation = useMutation({
-        mutationFn: async (variables: TBody<IArticleUploadImage>) => {
-            return (await uploadArticleImages(variables)) as IData<IArticleImgRes>;
+        mutationFn: async (variables: TBody<IUploadImages>) => {
+            return (await uploadImages(variables)) as IData<IUploadImageResp>;
         },
     });
 
@@ -86,7 +86,7 @@ const ArticleCover = (props:{init: boolean}) => {
             }
             return {
                 src: src,
-                name: file.name,
+                fileName: file.name,
                 height: newHeight,
                 width: newWidth
             };
@@ -97,12 +97,12 @@ const ArticleCover = (props:{init: boolean}) => {
             uploadArticleCoverMutation.mutateAsync({ 
                 data: {
                     formData: fd,
-                    type: 2,
-                    articleId: articleData.id
+                    type: '2',
+                    resourceId: articleData.id+""
                 }
-            } as TBody<IArticleUploadImage>).then(res => {
+            } as TBody<IUploadImages>).then(res => {
                 if(res.status==200) {
-                    let src = API_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
+                    let src = API_URL + PERSONAL_IMAGE_URL + res.data.imageName;
                     arrImg[0].src = src;
                     setImgState((prev) => ({
                         ...prev,
@@ -111,7 +111,7 @@ const ArticleCover = (props:{init: boolean}) => {
                         loading: false
                     }));
                     // 保存到文章recoil
-                    const articleId = res.data.articleId;
+                    const articleId = res.data.resourceId;
                     setArticleData({...articleData, ...{coverImage: arrImg[0], id: articleId}});
                 } else {
                     show({
@@ -150,7 +150,7 @@ const ArticleCover = (props:{init: boolean}) => {
             <LoaderComp loading={uploadArticleCoverMutation.isPending} className='d-flex flex-column' style={{width:'152px'}}>
             <>
             <label className={classNames("add-img-label", {"cursor-pointer": !imgState.image.src, "disabled cursor-not-allowed pe-none": !canEdit})}>
-                <input type="file" accept=".jpeg, .jpg, .png" multiple={false} className="d-none" onChange={onFileUpload} ref={fileUploadRef} />
+                <input type="file" accept=".jpeg, .jpg, .png, .bmp" multiple={false} className="d-none" onChange={onFileUpload} ref={fileUploadRef} />
                 {imgState.image.src ? (
                     <div className="add-cover-img">
                         <img src={imgState.image.src} width={imgState.image.width} height={imgState.image.height} alt={imgState.image.tag} />

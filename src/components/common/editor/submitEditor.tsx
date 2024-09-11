@@ -10,16 +10,17 @@ import { useMutation } from '@tanstack/react-query';
 import type { TBody, TMetadata } from '@/types';
 import type { IData, IArticleDraft, IArticle } from '@/interfaces';
 import { saveArticleDraft, saveArticle } from "@/services/api";
-import { getUserAgent } from "@/lib/tool";
+import { CharCounter, getUserAgent } from "@/lib/tool";
 import { debounce } from "lodash-es"
 import {writeArticleNoteAtom } from '@/store/articleData';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import { $generateHtmlFromNodes } from '@lexical/html';
-import { CLIENT_TPYES } from "@/lib/constant";
+import { ARTICLE_WORDS_LIMIT, CLIENT_TPYES } from "@/lib/constant";
 import { Comments } from "@/store/articleData";
-import { saveMarkTag, replaceSpan } from "@/components/richEditor2/utils/node";
+import { saveMarkTag, replaceSpan, filterEmptyNodes } from "@/components/richEditor2/utils/node";
 import { staticRouter } from "@/lib/constant/router";
 import { metadataAtom } from "@/store/settingData";
+import { $getRoot } from "lexical";
 
 
 interface propsType {
@@ -49,9 +50,6 @@ const SubmitEditor = forwardRef((props: propsType, ref): JSX.Element => {
             return;
         } else if (!/^[\s\S]*.*[^\s][\s\S]*$/.test(articleData.title)) {
             show({ type: 'DANGER', message: t('titleContentErr') });
-            return;
-        } else if (articleData.content.length < 20) {
-            show({ type: 'DANGER', message: t('contentLenErr') });
             return;
         } else if (articleData.tags.length == 0) {
             show({ type: 'DANGER', message: t('articleTagErr') });
@@ -170,14 +168,29 @@ const SubmitEditor = forwardRef((props: propsType, ref): JSX.Element => {
 
         // 获取文章内容
         let content = "";
+        let wordsNum = 0;
         let newArticleNoteInfo: Comments = [];
         editor.update(() => {
+            const editorState = editor.getEditorState();
+            const nodes = Array.from(editorState._nodeMap);
+            // 去除空格
+            filterEmptyNodes(nodes);
+            filterEmptyNodes(nodes.reverse());
+
+            // 检查字数
+            let content = $getRoot().getTextContent();
+            wordsNum = CharCounter(content);
+
             // 返回过滤后的标注列表
             let marks = saveMarkTag();
             newArticleNoteInfo = saveNotes(marks);
             content = $generateHtmlFromNodes(editor, null);
         }, {discrete: true});
-        
+        // 如果content为空
+        if (content=="" || wordsNum<ARTICLE_WORDS_LIMIT) {
+            show({ type: 'DANGER', message: t('contentLenErr') });
+            return;
+        }
         content = replaceSpan(content);
         setArticleData(prev => {
             return {...prev, content: content};

@@ -35,6 +35,7 @@ import {
   ImagePayload,
 } from '../../nodes/ImageNode';
 import ImageUploader from './uploadImage';
+import type { TPostType } from '@/types';
 
 export type InsertImagePayload = Readonly<ImagePayload>;
 
@@ -47,12 +48,15 @@ export function InsertImageDialog({
   activeEditor,
   onClose,
   height=160,
-  resizable = true
+  resizable = true,
+  type="article"
 }: {
   activeEditor: LexicalEditor;
   onClose: () => void;
   height?: number;
   resizable?: boolean;
+  type?: TPostType;
+  resourceId?: string;
 }): JSX.Element {
 
   const insertImg = (e: React.MouseEvent<HTMLSpanElement> | null, img: InsertImagePayload) => {
@@ -73,7 +77,7 @@ export function InsertImageDialog({
 
   return (
     <>
-      <ImageUploader multi={false} height={height} onClose={()=>{onClose();}} insertImg={insertImg} />
+      <ImageUploader multi={false} height={height} onClose={()=>{onClose();}} insertImg={insertImg} type={type} />
     </>
   );
 }

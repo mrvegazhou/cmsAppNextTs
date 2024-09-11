@@ -149,6 +149,9 @@ dependencies:
   react-error-boundary:
     specifier: ^4.0.13
     version: 4.0.13(react@18.3.1)
+  react-intersection-observer-hook:
+    specifier: ^3.0.1
+    version: 3.0.1(react-dom@18.3.1)(react@18.3.1)
   react-transition-group:
     specifier: ^4.4.5
     version: 4.4.5(react-dom@18.3.1)(react@18.3.1)
@@ -3128,6 +3131,16 @@ packages:
 
   /react-fast-compare@3.2.2:
     resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==, tarball: https://registry.npmmirror.com/react-fast-compare/-/react-fast-compare-3.2.2.tgz}
+    dev: false
+
+  /react-intersection-observer-hook@3.0.1(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-nehzFUV+jVY49tc9FOm4yJHrmFFtCmsBZKiN1rUUB2675CMBf6kKu1ekuTqvCnmh4XG7RFP3bMyAevfqfV94xw==, tarball: https://registry.npmmirror.com/react-intersection-observer-hook/-/react-intersection-observer-hook-3.0.1.tgz}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     dev: false
 
   /react-is@16.13.1:

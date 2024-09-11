@@ -3,6 +3,7 @@ import { COOKIE_EXPIRES, TOKEN_NAME, REFRESH_TOKEN_NAME } from '@/lib/constant';
 import { aesEncryptStr, aesDecryptStr } from '@/lib/tool';
 import { TOKEN_SECRET } from '@/lib/constant/app';
 import { jwtDecode } from 'jwt-decode';
+import { isNullOrUnDefOrEmpty } from '../is';
 
 export const USER_TOKEN = {
     set: ({ token, refreshToken }: {token: string, refreshToken: string}) => {
@@ -27,10 +28,10 @@ export const USER_TOKEN = {
          token = cookie.get(TOKEN_NAME);
          refreshToken = cookie.get(REFRESH_TOKEN_NAME);
    
-         if(typeof token!='undefined' && token!="") {
+         if(!isNullOrUnDefOrEmpty(token)) {
             token = aesDecryptStr(token, TOKEN_SECRET)
          }
-         if(typeof refreshToken!='undefined' && refreshToken!="") {
+         if(!isNullOrUnDefOrEmpty(refreshToken)) {
             refreshToken = aesDecryptStr(refreshToken, TOKEN_SECRET)
          }
       } catch(e) {
@@ -48,3 +49,20 @@ export const USER_TOKEN = {
        return this.get().token !== null;
    },
 };
+
+export function setCookie(name: string, value: string, days: number) {
+   const expires = new Date();
+   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+}
+export function getCookie (name: string) {
+   const matches = document.cookie.match(
+       new RegExp(
+         `(?:^|; )${name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1")}=([^;]*)`
+       )
+     );
+     return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+export function delCookie (name: string) {
+   setCookie(name, "", -1);
+}

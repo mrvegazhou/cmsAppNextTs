@@ -23,7 +23,6 @@ import type { TBody } from '@/types';
 import { useAtomValue, useSetAtom } from 'jotai'
 import { goBackAtom, loginAtom, userDataAtom } from "@/store/userData";
 import { useSearchParams, useRouter } from 'next/navigation'
-import dayjs from 'dayjs';
 
 
 const useLogin = (close: (()=>void) | null = null) => {
@@ -169,7 +168,7 @@ const useLogin = (close: (()=>void) | null = null) => {
           backURL = goBackURL;
         }
         if (backURL) {
-          router.push(backURL);
+          // router.push(backURL);
         }
         if(close) {
           close();

@@ -8,12 +8,12 @@ import { useTranslations } from 'next-intl';
 import dynamic from "next/dynamic";
 import { itemClassName, iconClassName, DivDom } from "./class";
 import { userDataAtom } from "@/store/userData";
-import { IArticleToolBarData } from '@/interfaces';
 import { currentArticleDataAtom, articleToolBarAtom } from '@/store/articleData';
 import { doArticleLike, doArticleUnlike } from "@/services/api";
 const BadgeComp = dynamic(() => import("@/components/badge/badge"), {
     ssr: false,
 });
+
 
 const Likes = () => {
     const { show } = useToast();
@@ -82,7 +82,7 @@ const Likes = () => {
     return (
         <>
           <DivDom className={classNames([itemClassName], {'pe-none': doing})} onClick={doLike}>
-            <BadgeComp count={articleToolBarData.likeCount} style={{top:-20, left:30, backgroundColor:'rgba(var(--bs-secondary-rgb), 0.8)'}}>
+            <BadgeComp count={articleToolBarData.likeCount??0} style={{top:-20, left:30, backgroundColor:'rgba(var(--bs-secondary-rgb), 0.8)'}}>
                 <i className={classNames([iconClassName, "icon-like-o", hasLike ? 'text-danger' : 'text-secondary'])}></i>
             </BadgeComp>
           </DivDom>

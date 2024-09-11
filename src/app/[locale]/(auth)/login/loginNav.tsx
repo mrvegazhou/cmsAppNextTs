@@ -1,5 +1,4 @@
 'use client';
-
 import {
     type MouseEvent,
     useCallback,
@@ -11,7 +10,7 @@ import {
     useImperativeHandle,
     useMemo
 } from 'react';
-import { useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import RegisterNav from '../register/registerNav';
 import LoginForgetNav from './loginForgetNav';
 import Captcha from '@/components/captcha/Captcha';
@@ -41,7 +40,7 @@ const LoginNav = () => {
 export default memo(LoginNav);
 
 export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
-    
+    const [loginIdent, setLoginIdent] = useAtom(loginAtom);
     // 显示忘记密码
     const [showForgetPwd, setShowForgetPwd] = useState(false);
     // 显示注册
@@ -80,6 +79,7 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
     // 关闭modal
     const onClickCloseModal = useCallback(() => {
         setOpen(false);
+        setLoginIdent(false);
     }, []);
 
     const clearInput = useCallback(() => {
@@ -145,19 +145,25 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
         }
     }, [strength]);
 
-    const loginIdent = useAtomValue(loginAtom);
     useEffect(() => {
         setOpen(loginIdent);
     }, [loginIdent]);
     
     return (
+        <>
+        <style jsx>{`
+                .zIndex {
+                    z-index: 9999;
+                }
+        `}</style>
         <Modal
             title={t('login')}
             isOpen={open}
-            onClosed={()=>{setOpen(false);}}
+            onClosed={()=>{setOpen(false);setLoginIdent(false);}}
             type="light"
             useButton={false}
             minWidth={600}
+            className="zIndex"
         >
             <div className="modal-body">
             { showRegister && (
@@ -210,6 +216,7 @@ export const LoginModal = forwardRef((props: {isOpen?: boolean}, ref) => {
             )}
             </div>
         </Modal>
+        </>
     );
 });
 LoginModal.displayName = "LoginModal";

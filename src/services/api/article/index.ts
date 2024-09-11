@@ -4,7 +4,6 @@ import type {
   IData, 
   IArticle, 
   IArticleId, 
-  IArticleUploadImages, 
   IArticleCollabView, 
   ICollabTokenInfo, 
   IArticleDraft, 
@@ -15,7 +14,6 @@ import {
     ARTICLE_LIKE,
     ARTICLE_UNLIKE,
     ARTICLE_TOOLBAR_DATA,
-    ARTICLE_UPLOAD_IMAGE,
     COLLAB_VIEW,
     EXIT_COLLAB,
     INVITE_COLLAB,
@@ -25,7 +23,7 @@ import {
     ARTICLE_DARFT_HISTORY,
     ARTICLE_DARFT_INFO,
     API_URL
-} from '@/lib/constant'
+} from '@/lib/constant';
 import { fetch as refreshFetch } from "@/lib/api/refreshFetch";
 
 
@@ -85,27 +83,6 @@ export const getArticleToolBarData = (
 ): Promise<Response | IData<IArticleToolBarData>> => {
   let config = createConfig(params, { method: 'POST', baseURL: API_BASE_URL});
   const url = config.baseURL + ARTICLE_TOOLBAR_DATA;
-  return refreshFetch(url, config).then(
-    handleReqMiddleware
-  );
-};
-
-export const uploadArticleImages = (
-  params: TBody<IArticleUploadImages>
-): Promise<Response | IData<any>> => {
-  const { formData, type, articleId } = params.data as any;
-  formData.append('type', type);
-  formData.append('articleId', articleId ?? 0)
-  const config = createConfig(params, {
-    method: 'POST',
-    baseURL: API_BASE_URL,
-    body: formData,
-    headers: {
-      'Accept': 'application/json'
-    }
-  });
-  delete config.data;
-  const url = config.baseURL + ARTICLE_UPLOAD_IMAGE;
   return refreshFetch(url, config).then(
     handleReqMiddleware
   );

@@ -109,10 +109,26 @@ export function isNull(val: unknown): val is null {
 	return val === null;
 }
 
+export function isEmpty(val: string): boolean {
+	return val.trim() === "";
+}
+
 export function isNullAndUnDef(val: unknown): val is null | undefined {
 	return isUnDef(val) && isNull(val);
 }
 
 export function isNullOrUnDef(val: unknown): val is null | undefined {
 	return isUnDef(val) || isNull(val);
+}
+
+export function isNullOrUnDefOrEmpty(val: unknown): val is null | undefined {
+	return isUnDef(val) || isNull(val) || isEmpty(val);
+}
+
+export function isZeroOrNullOrUndef(val: unknown): val is null | undefined {
+	return isUnDef(val) || isNull(val) || val==0;
+}
+
+export function isNullOrUnDefOrLen0(val: any[]) : boolean {
+	return val.length == 0 || isUnDef(val) || isNull(val);
 }

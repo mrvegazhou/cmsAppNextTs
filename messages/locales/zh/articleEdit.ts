@@ -39,7 +39,7 @@ export default {
     
     titleLenErr: "标题不能大于200个字",
     titleContentErr: "请检查标题内容",
-    contentLenErr: "文章内容不能小于20个字",
+    contentLenErr: "文章内容不能小于140个字",
     articleTagErr: "文章需要设置标签",
     articleTypeErr: "文章需要设置分类",
 

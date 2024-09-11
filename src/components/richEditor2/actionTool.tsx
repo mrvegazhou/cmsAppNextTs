@@ -15,12 +15,6 @@ import { useAtomValue } from 'jotai';
 import { collabTokenInfoAtom } from '@/store/articleData';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { canEditAtom } from "@/store/articleData";
-import { visitTree } from "@/components/richEditor2/utils/node";
-import type {LexicalNode} from 'lexical'
-import {$isTextNode} from 'lexical'
-import {
-  $isMarkNode
-} from './nodes/CustomMarkNode';
 import type { TMetadata } from '@/types';
 
 

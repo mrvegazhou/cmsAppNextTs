@@ -5,10 +5,13 @@ import type {
 import {
     $isElementNode,
     $getRoot,
-    $isTextNode
+    $isTextNode,
+    ParagraphNode,
+    TextNode
 } from 'lexical';
 import {$isMarkNode} from '@lexical/mark';
 import {$addNodeStyle} from '@lexical/selection';
+import { ImageNode } from '../nodes/ImageNode';
 
 export const visitTree = (
     currentNode: ElementNode,
@@ -60,4 +63,19 @@ export const saveMarkTag = () => {
         }
     });
     return marks;
+};
+
+export const filterEmptyNodes = (nodes: [string, LexicalNode][]) => {
+  for (const [, node] of nodes) {
+    if (node instanceof ParagraphNode) {
+      let nodeTmp = node.getChildren()[0];
+      if (nodeTmp instanceof TextNode) {
+        const content = nodeTmp.getTextContent().trim();
+        if (content) {
+          break;
+        }
+        node.remove();
+      }
+    }
+  }
 };

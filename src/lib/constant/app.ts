@@ -1,11 +1,11 @@
 export const TOKEN_NAME =
   process.env.NODE_ENV === 'production' && process.env.APP_URL_HTTPS === 'true'
-    ? '_token'
-    : '__token';
+    ? '__t'
+    : '__t';
 export const REFRESH_TOKEN_NAME =
   process.env.NODE_ENV === 'production' && process.env.APP_URL_HTTPS === 'true'
-    ? '_r_token'
-    : '__r_token';
+    ? '__rt'
+    : '__rt';
 
 export const SET_COOKIE = 'Set-Cookie';
 export const LOCATION = 'location';
@@ -17,7 +17,9 @@ export const CONTENT_TYPE = 'content-type';
 export const X_POWERED_BY_HEADER = {
   [X_POWERED_BY]: 'www.baidu.com',
 };
-
+// 评论常数
+export const COMMENT_WORDS_LIMIT = 1000;
+export const COMMENT_IMGS_LIMIT = 1;
 // 客户端类型
 export const CLIENT_TPYES = {
   WAP: 'wap',
@@ -35,14 +37,15 @@ export const PWD_STRENGTH = {
   MEDIUM: 2,
   STRONG: 3,
 };
-
+// 文章字数
+export const ARTICLE_WORDS_LIMIT = 140;
 // 上传图片限制
 export const MAX_FILE_SIZE_IN_KB = 10000;
 
 export const REFRESH_TOKEN_BUFFER = 3600;
 
 export const COOKIE_EXPIRES = 365;
-export const TOKEN_SECRET = "TOKEN_SECRET";
+export const TOKEN_SECRET = "0123456789abcdef";
 
 export const SEND_EMAIL_CODE_MODE = "SEND_EMAIL_CODE";
 export const CHANGE_PWD_MODEE = "CHANGE_PWD";
@@ -54,7 +57,7 @@ export const BASE_URL = "http://localhost:3000/api";
 export const API_URL = "http://localhost:3015/api";
 // 图片展示
 export const IMAGE_URL = "/image/static/";
-export const ARTICLE_PERSONAL_IMAGE_URL =  IMAGE_URL + "p/"; 
+export const PERSONAL_IMAGE_URL =  IMAGE_URL + "p/"; 
 export const GEN_CAPTCHA_URL = "/user/captcha/email";
 export const LOGIN_BY_EMAIL = "/user/login/email";
 export const LOGOUT_BY_EAMIL = "/user/logout/email";
@@ -86,10 +89,12 @@ export const ARTICLE_UNLIKE = "/article/unlike";
 export const ARTICLE_TOOLBAR_DATA = "/article/toolBarData";
 // 文章收藏
 export const ARTICLE_COLLECTION = "/article/collection";
-// 图片上传
-export const ARTICLE_UPLOAD_IMAGE = "/article/uploadImage";
 // 图片列表
-export const ARTICLE_IMAGE_LIST = "/image/personalImageList";
+export const PERSONAL_IMAGE_LIST = "/image/personalImageList";
+// 删除图片
+export const DELETE_IMAGE = "/image/del";
+// 上传评论、回复、举报图片
+export const UPLOAD_IMAGE = "/image/upload";
 // tag
 export const APP_TAG_LIST = "/tag/list";
 // 分类
@@ -114,3 +119,15 @@ export const SAVE_ARTICLE = "/article/save/article";
 export const ARTICLE_DARFT_HISTORY = "/article/draft/history";
 // 草稿信息
 export const ARTICLE_DARFT_INFO = "/article/draft/info";
+// 保存文章评论
+export const SAVE_ARTICLE_COMMENT = "/article/save/comment";
+// 保存回复评论
+export const SAVE_ARTICLE_REPLY = "/article/save/reply";
+// 文章评论列表
+export const ARTICLE_COMMENT_LIST = "/article/comment/list";
+// 评论回复列表
+export const ARTICLE_REPLY_LIST = "/article/reply/list";
+// 举报原因
+export const REPORT_REASON_LIST = "/report/reason/list"
+// 举报
+export const SEND_REPORT = "/report/send/reason"

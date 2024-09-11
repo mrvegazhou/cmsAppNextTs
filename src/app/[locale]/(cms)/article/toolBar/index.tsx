@@ -39,10 +39,9 @@ const ToolBar = () => {
   return (
       <>
         <DivCom>
-          {/* 点赞信息 */}
           <Likes />
           {/* 评论 */}
-          <a className="text-decoration-none" data-bs-toggle="offcanvas" href="#offcanvasArticleComments">
+          <a className="text-decoration-none" aria-controls="offcanvasArticleComments" data-bs-toggle="offcanvas" href="#offcanvasArticleComments">
           <Comment />
           </a>
           {/* 收藏信息 */}
@@ -51,19 +50,17 @@ const ToolBar = () => {
           <Share />
         </DivCom>
 
-        <div className="offcanvas offcanvas-end" data-bs-scroll="true" aria-labelledby="offcanvasScrollingLabel" style={{width: '35%'}} data-bs-backdrop="false" id="offcanvasArticleComments">
+        <div className="offcanvas offcanvas-end" data-bs-scroll="false" aria-labelledby="offcanvasScrollingLabel" style={{width: '35%'}} data-bs-backdrop="false" id="offcanvasArticleComments">
             <div className="offcanvas-header">
-                <h6 className="offcanvas-title" id="offcanvasExampleLabel">{t('comment')}</h6>
+                <h6 className="offcanvas-title" id="offcanvasScrollingLabel">{t('comment')}</h6>
                 <div className="btn-close cursor-pointer" data-bs-dismiss="offcanvas" aria-label="Close"></div>
             </div>
-            <div className="offcanvas-body">
+            <div className="offcanvas-body" >
                 <div id="xxx">
-                  <ArticleComments comments={[]}/>
-
+                  <ArticleComments />
                 </div>
             </div>
         </div>
-
       </>
     );
 };

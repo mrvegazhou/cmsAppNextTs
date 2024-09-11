@@ -6,7 +6,8 @@ import React,
     MouseEvent, 
     forwardRef, 
     useEffect,
-    ChangeEvent
+    ChangeEvent,
+    Suspense
 } from 'react';
 import classNames from 'classnames';
 import { useTranslations } from 'next-intl';
@@ -14,22 +15,23 @@ import useToast from '@/hooks/useToast';
 import LoaderComp from '@/components/loader/loader';
 import Image from 'next/image'
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { API_URL, MAX_FILE_SIZE_IN_KB, ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
+import { API_URL, MAX_FILE_SIZE_IN_KB, PERSONAL_IMAGE_URL } from '@/lib/constant';
 import { handleDrop, loadImage, convertBytesToKB, isImageType, isFormDataEmpty } from '@/lib/tool';
-import { uploadArticleImages } from '@/services/api';
-import type { IImageList, IImage, IData, IArticleUploadImages } from '@/interfaces';
+import type { IImageList, IImage, IData, IUploadImages } from '@/interfaces';
 import type { TBody } from '@/types';
 import { ImagePayload } from '../../nodes/ImageNode';
 import type {Position} from '../../nodes/InlineImageNode';
-import { getPersonalImageList, getPersonalImageListConf } from '@/services/api/image';
+import { getPersonalImageList, getPersonalImageListConf, uploadImages } from '@/services/api';
 import { useMap } from 'ahooks';
 import { useAtom } from "jotai";
 import { writeArticleAtom } from "@/store/articleData";
 import { InlineImagePayload } from '../../nodes/InlineImageNode';
 import { canEditAtom } from '@/store/articleData';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import "./uploadImage.scss";
-
+import { imgInfoAtom } from '@/store/imgs';
+import { isZeroOrNullOrUndef } from '@/lib/is';
+import type { TPostType } from '@/types';
 
 export type ImageProps = ImagePayload & { deleteImage?: Function; fileName: string; position?: Position};
 export type InsertInlineImagePayload = Readonly<InlineImagePayload>;
@@ -43,6 +45,8 @@ export type Props = {
     class?: string;
     onClose: () => void;
     insertImg: (e: MouseEvent<HTMLSpanElement> | null, img: ImagePayload | InlineImagePayload) => void;
+    type?: TPostType;
+    resourceId?: number;
 };
 
 export type State = {
@@ -75,6 +79,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
 
     const t = useTranslations('RichEditor');
     const canEdit = useAtomValue(canEditAtom);
+    const setImgInfo = useSetAtom(imgInfoAtom);
 
     const [articleData, setArticleData] = useAtom(writeArticleAtom);
 
@@ -123,7 +128,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                 setTotalPage(res.data.totalPage);
                 let imgs: IImage[] = [];
                 res.data.imgList.forEach((img, idx) => {
-                    img.src = API_URL + ARTICLE_PERSONAL_IMAGE_URL;
+                    img.src = API_URL + PERSONAL_IMAGE_URL;
                     imgs.push(img);
                 });
                 return imgs;
@@ -137,10 +142,10 @@ const ImageUploader = forwardRef((props: Props, ref) => {
     // 选中网络图片
     const handleCheckImg = (e: React.MouseEvent<HTMLDivElement>, image: IImage) => {
         handleDrop(e);
-        if (get(image.name)) {
-            remove(image.name);
+        if (get(image.fileName)) {
+            remove(image.fileName);
         } else {
-            set(image.name, image)
+            set(image.fileName, image)
         }
     };
 
@@ -180,7 +185,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
         let arrImgs: ImageProps[] = Array.from(checkedImgs).map((item) => {
             let image = item[1];
             let insert = {
-                src: API_URL + ARTICLE_PERSONAL_IMAGE_URL + image.name,
+                src: API_URL + PERSONAL_IMAGE_URL + image.fileName,
                 fileName: image.tag,
                 width: image.width,
                 altText: '',
@@ -286,9 +291,9 @@ const ImageUploader = forwardRef((props: Props, ref) => {
         e.type == "change" && (e.target.reset && e.target.reset());
     };
 
-    const uploadArticleImageMutation = useMutation({
-        mutationFn: async (variables: TBody<IArticleUploadImages>) => {
-            return (await uploadArticleImages(variables)) as IData<any>;
+    const uploadImageMutation = useMutation({
+        mutationFn: async (variables: TBody<IUploadImages>) => {
+            return (await uploadImages(variables)) as IData<any>;
         },
     });
 
@@ -306,22 +311,39 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                     // 插入图片
                     props.insertImg(e, imgState.images[0]);
                 } else {
-                    uploadArticleImageMutation.mutateAsync({ 
+                    let type = 1;
+                    let resourceId = articleId ?? 0;
+                    if (props.type=='article') {
+                        type = 1;
+                    } else if (props.type=='comment') {
+                        type = 3;
+                        resourceId = props.resourceId ?? 0;
+                    } else if (props.type=='reply') {
+                        type = 4;
+                        resourceId = props.resourceId ?? 0;
+                    } else if (props.type=='report') {
+                        type = 5;
+                        resourceId = props.resourceId ?? 0;
+                    }
+                    uploadImageMutation.mutateAsync({ 
                         data: {
                             formData,
-                            type: 1,
-                            articleId: articleId ?? 0
+                            type: type+"",
+                            resourceId: resourceId+""
                         }
                     }).then(res => {
                         if(res.status==200) {
                             let arrImgs = imgState.images.map((image, i) => {
                                 if(image.fileName==res.data.fileName) {
-                                    if ((articleId==null || articleId==0) && res.data.articleId!=0) {
-                                        setArticleData(prev => {
-                                            return {...prev, id: res.data.articleId}
-                                        });
+                                    if (props.type=='article') {
+                                        if (isZeroOrNullOrUndef(articleId) && res.data.resourceId!=0) {
+                                            setArticleData(prev => {
+                                                return {...prev, id: res.data.resourceId}
+                                            });
+                                        }
                                     }
-                                    let src = API_URL + ARTICLE_PERSONAL_IMAGE_URL + res.data.imageName;
+                                    
+                                    let src = API_URL + PERSONAL_IMAGE_URL + res.data.imageName;
                                     return {
                                         src: src,
                                         fileName: image.fileName,
@@ -339,6 +361,8 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                             setImgState(newObj);
                             // 插入图片
                             props.insertImg(e, newObj.images[0]);
+                            let imageInfo: IImage = Object.assign({}, newObj.images[0]);
+                            setImgInfo(imageInfo);
                         } else {
                             show({
                                 type: 'DANGER',
@@ -346,12 +370,12 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                             });
                         }
                     }).catch(err => {
-                        show({
-                            type: 'DANGER',
-                            message: t('imageUploadErr')
+                            show({
+                                type: 'DANGER',
+                                message: t('imageUploadErr')
+                            });
                         });
-                    });
-                }
+                    }
             }
         } else {
             _uploadFileByNet();
@@ -453,7 +477,7 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                                     );
                                 })
                                 :
-                                <div className='uploadImage' onClick={uploadFileOnchange}>
+                                <div className='uploadImage' onClick={uploadFileOnchange} >
                                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path fillRule="evenodd" clipRule="evenodd" d="M12 0C11.4477 0 11 0.447716 11 1V11H1C0.447715 11 0 11.4477 0 12C0 12.5523 0.447716 13 1 13H11V23C11 23.5523 11.4477 24 12 24C12.5523 24 13 23.5523 13 23V13H23C23.5523 13 24 12.5523 24 12C24 11.4477 23.5523 11 23 11H13V1C13 0.447715 12.5523 0 12 0Z" fill="#999999"></path>
                                     </svg>
@@ -503,9 +527,9 @@ const ImageUploader = forwardRef((props: Props, ref) => {
                             {(!imageListQuery.isLoading && !imageListQuery.isError) && imageListQuery.data?.map((item, idx) => {
                                 return (
                                     <div key={idx} className='img-picker-item' onClick={(e)=>{ handleCheckImg(e, item);}}>
-                                        <i role="img" aria-describedby="图片描述" title={item.name} className={classNames("img-i", {"img-selected": checkedImgs.has(item.name)})}
+                                        <i role="img" aria-describedby="图片描述" title={item.fileName} className={classNames("img-i", {"img-selected": checkedImgs.has(item.fileName)})}
                                             style={{backgroundImage: 'url("https://tse2-mm.cn.bing.net/th/id/OIP-C.g9UbVfyVZX-SfD09JcYr5QHaEK?rs=1&pid=ImgDetMain")'}}>
-                                            <span className={classNames("img-checkbox", {"img-selected": checkedImgs.has(item.name)})}></span>
+                                            <span className={classNames("img-checkbox", {"img-selected": checkedImgs.has(item.fileName)})}></span>
                                         </i>
                                         <strong className="img-title">{item.tag}</strong>
                                     </div>

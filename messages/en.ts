@@ -6,11 +6,13 @@ import OtherPage from './locales/en/other';
 import Page from './locales/en/page';
 import LoginPage from './locales/en/login';
 import ArticleComment from './locales/en/articleComment';
+import ReportReasonPage from './locales/en/reportReason';
 
 const en = {
     ArticleEditPage,
     ArticleIdPage,
     ArticleComment,
+    ReportReasonPage,
     Navbar,
     RichEditor,
     OtherPage,

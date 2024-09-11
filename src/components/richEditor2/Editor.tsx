@@ -67,7 +67,6 @@ import { useRouter } from "next/navigation";
 import { staticRouter } from '@/lib/constant/router';
 import { goBackAtom } from '@/store/userData';
 import { GetCurrentUrl } from '@/lib/tool';
-import { USER_TOKEN } from '@/lib/constant';
 
 
 interface propsType {

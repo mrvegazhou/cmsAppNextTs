@@ -17,7 +17,7 @@ const Comment = () => {
 
   return (
         <>
-          <DivDom className={classNames([itemClassName])} onClick={scrollToAnchor}>
+          <DivDom className={classNames([itemClassName])} >
             <BadgeComp count={currentArticleData.commentCount} style={{top:-20, left:30, backgroundColor:'rgba(var(--bs-secondary-rgb), 0.8)'}}>
                 <i className={classNames([iconClassName, "iconfont icon-comment"])}></i>
             </BadgeComp>

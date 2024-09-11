@@ -38,7 +38,7 @@ export default {
 
     titleLenErr: "The title cannot exceed 200 words",
     titleContentErr: "Please check the title",
-    contentLenErr: "The content of the article cannot be less than 20 words",
+    contentLenErr: "The content of the article cannot be less than 140 words",
     articleTagErr: "The label must be filled in",
     articleTypeErr: "Category must be filled in",
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useAtom, useSetAtom } from 'jotai'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useMutation } from '@tanstack/react-query';
 import { currentArticleDataAtom, articleToolBarAtom } from '@/store/articleData';
 import useToast from '@/hooks/useToast';
@@ -15,10 +15,12 @@ import styles from './articleId.module.scss'
 import ToolBar from '../toolBar';
 import { IArticle, IArticleToolBarData, IData, IArticleId } from '@/interfaces';
 import { getArticleToolBarData } from '@/services/api';
+import { articleIdAtom } from '@/store/articleData';
 import Sidebar from "@/app/[locale]/(cms)/article/sideBar/sideBar";
+import { isNullAndUnDef } from '@/lib/is';
 
 
-export default function ArticleIdPage({ metadata, articleInfo }: { metadata: TMetadata; articleInfo:IArticle; }) {
+export default function ArticleIdPage({ metadata, articleInfo }: { metadata: TMetadata; articleInfo: IArticle; }) {
     const setCurrentArticleInfo = useSetAtom(currentArticleDataAtom);
 
     useEffect(() => {
@@ -28,46 +30,45 @@ export default function ArticleIdPage({ metadata, articleInfo }: { metadata: TMe
     return (
         <>
           <Header metadata={metadata} />
-          <ArticleId metadata={metadata} articleId={articleInfo.id} />
+          <ArticleId metadata={metadata} articleInfo={articleInfo} />
           <Footer metadata={metadata} />
         </>
     );
 }
 
-const ArticleId = ({ metadata, articleId }: { metadata: TMetadata; articleId: number; }) => {
+const ArticleId = ({ metadata, articleInfo }: { metadata: TMetadata; articleInfo: IArticle }) => {
     const { show } = useToast();
-
-    const [isOpen, setIsOpen] = useState(false);
-    const [hasBackdrop, setHasBackdrop] = useState(true);
 
     const navContent = useRef<HTMLDivElement>(null);
 
-    const [articleToolBarData, setArticleToolBarData] = useAtom(articleToolBarAtom);
+    const setArticleToolBarData = useSetAtom(articleToolBarAtom);
 
     const getToolBarMutation = useMutation({
         mutationFn: async (variables: TBody<IArticleId>) => {
           return await getArticleToolBarData(variables) as IData<IArticleToolBarData>;
         }
     });
-
+    
     useEffect(() => {
-        getToolBarMutation.mutateAsync({ data: {articleId: articleId} }).then(res => {
-            if (res.status==200) {
-                let data = res.data;
-                setArticleToolBarData(pre => {
-                    return { ...pre, 
-                        likeCount: data.likeCount, 
-                        commentCount: data.commentCount, 
-                        collectionCount: data.collectionCount,
-                        shareCount: data.shareCount,
-                        isLiked: data.isLiked,
-                        isCollected: data.isCollected,
-                        favorites: data.favorites,
-                        isReport: data.isReport
-                    };
-                });
-            }
-        });
+        if (!isNullAndUnDef(articleInfo.id)) {
+            getToolBarMutation.mutateAsync({ data: {articleId: articleInfo.id} }).then(res => {
+                if (res.status==200) {
+                    let data = res.data;
+                    setArticleToolBarData(pre => {
+                        return { ...pre, 
+                            likeCount: data.likeCount, 
+                            commentCount: data.commentCount, 
+                            collectionCount: data.collectionCount,
+                            shareCount: data.shareCount,
+                            isLiked: data.isLiked,
+                            isCollected: data.isCollected,
+                            favorites: data.favorites,
+                            isReport: data.isReport
+                        };
+                    });
+                }
+            });
+        }
     }, [])
 
     return (

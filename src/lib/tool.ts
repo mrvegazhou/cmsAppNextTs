@@ -9,7 +9,8 @@ import punycode from 'punycode';
 import qs from 'query-string'
 import { type CookieSerializeOptions, serialize } from "cookie";
 
-export const aesEncryptStr = (str: string, key: string, IV: string = '') => {
+
+export const aesEncryptStr = (str: string, key: string, IV: string = '0123456789abcdef') => {
     str = (str + '').replace(/\n*$/g, '').replace(/\n/g, '');
     return CryptoJS.AES.encrypt(str, CryptoJS.enc.Utf8.parse(key), {
         iv: CryptoJS.enc.Utf8.parse(IV),
@@ -18,12 +19,11 @@ export const aesEncryptStr = (str: string, key: string, IV: string = '') => {
     }).toString();
 };
   
-export const aesDecryptStr = (str: string, key: string, IV: string = '') => {
+export const aesDecryptStr = (str: string, key: string, IV: string = '0123456789abcdef') => {
     str = (str + '').replace(/\n*$/g, '').replace(/\n/g, '');
     let newKey = CryptoJS.enc.Utf8.parse(key);
-	  var iv = CryptoJS.enc.Utf8.parse(IV);
     const decrypt = CryptoJS.AES.decrypt(str, newKey, {
-      iv: iv,
+      iv: CryptoJS.enc.Utf8.parse(IV),
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7
     });

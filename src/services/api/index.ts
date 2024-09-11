@@ -8,3 +8,5 @@ export * from './siteInfo';
 export * from './article';
 export * from './tag';
 export * from './type';
+export * from './image';
+export * from './report';

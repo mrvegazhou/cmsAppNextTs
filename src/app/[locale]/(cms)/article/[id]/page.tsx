@@ -53,15 +53,6 @@ const getArticleInfo = async (id: string) => {
     return null;
 }
 
-const getArticleToolBar = async (id: number) => {
-    const toolBarData = await getArticleToolBarData({ data: {articleId: id} }) as Response;
-    let toolBarRes = await toolBarData.json() as IData<IArticleToolBarData>
-    if( toolBarRes?.status==200 ) {
-      return toolBarRes.data;
-    }
-    return {isLiked: false, isCollected: false, favorites: {}, isReport: false };
-}
-
 export default async function Page({
     params,
     searchParams = {},
@@ -79,8 +70,6 @@ export default async function Page({
         if (articleInfo==null) {
             return <NotFound locale={params.locale}/>
         }
-
-        let toolBarData = await getArticleToolBar(articleInfo.id);
 
         const metadata = new Metadata();
         metadata.set('page', "xxxx");

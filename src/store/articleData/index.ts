@@ -13,7 +13,7 @@ export const articleToolBarAtom = atom<IArticleToolBarData>({} as IArticleToolBa
 // collab 协同是否连接
 export const articleCollabIsConnectedAtom = atom<boolean>(false);
 
-export const initCoverImage = {name:'', width:0, height:0, tag:'', src:''};
+export const initCoverImage = {fileName:'', width:0, height:0, tag:'', src:''};
 export const writeArticleInitValue = {
     id: null,
     title: "",
@@ -24,7 +24,6 @@ export const writeArticleInitValue = {
     description: "",
     createTime: null,
     isSetCatalog: 0,
-
 } as IArticleInit;
 export const writeArticleAtom = atomWithStorage<IArticleInit>('writeArticleData', writeArticleInitValue);
 
@@ -62,5 +61,5 @@ export const writeArticleNoteAtom =
       //@ts-ignore
       defaultStorage, 
       {getOnInit: true}
-    );
+);
 
