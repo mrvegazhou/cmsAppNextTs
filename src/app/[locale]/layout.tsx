@@ -6,7 +6,7 @@ export default function Layout({ children, params: { locale } }: Props) {
     
     return (
         <html lang={locale} data-bs-theme="auto">
-            <body suppressHydrationWarning={true}>
+            <body suppressHydrationWarning={true} className='mainBgColor'>
                 <MainLayout params={{locale: locale}}>{children}</MainLayout>
             </body>
         </html>

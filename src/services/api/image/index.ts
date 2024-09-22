@@ -5,7 +5,7 @@ import {
     PERSONAL_IMAGE_LIST,
     API_URL,
     UPLOAD_IMAGE,
-    DEL_IMAGE
+    DELETE_IMAGE_BY_ID
 } from '@/lib/constant'
 import { fetch as refreshFetch } from "@/lib/api/refreshFetch";
 
@@ -54,8 +54,8 @@ export const uploadImages = (
     );
 };
 
-export const delImageByName = (
-  params: TBody<{name: string}>
+export const delImageById = (
+  params: TBody<{id: number; imgName?: string}>
 ) => {
   let config = createConfig(params, {
       method: 'POST', 
@@ -63,7 +63,7 @@ export const delImageByName = (
       headers: {
         'Content-Type': 'application/json'
   }});
-  const url = config.baseURL + DELETE_IMAGE;
+  const url = config.baseURL + DELETE_IMAGE_BY_ID;
   return refreshFetch(url, config).then(
     handleReqMiddleware
   );

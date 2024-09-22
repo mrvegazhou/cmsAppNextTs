@@ -64,6 +64,7 @@ function ToastWrapper(
           setCustomToastsProps((prevState) => ({
             ...prevState,
             toasts: [...prevState.toasts, { ...toastProps, isShow: true, id }],
+            containerStyle: toastProps.containerStyle
           }));
         });
   
@@ -226,6 +227,7 @@ const Toasts = ({
             ? customToastsProps.toastContainerClass
             : 'top-0 start-50 translate-middle-x',
         )}
+        style={customToastsProps.containerStyle}
       >
         {customToastsProps.toasts.map((toast) => {
           const {

@@ -75,7 +75,7 @@ import { userDataAtom } from "@/store/userData";
 import { useAtom } from 'jotai';
 import { canEditAtom, writeArticleNoteAtom } from '@/store/articleData';
 import { IArticleNote as Thread, IArticleNoteComment as Comment } from '@/types';
-// import { AppContext } from '@/contexts/app';
+import Drawer from "@/components/drawer";
 
 
 export const INSERT_INLINE_COMMAND: LexicalCommand<void> = createCommand(
@@ -942,34 +942,10 @@ export default function CommentPlugin({
     );
   }, [editor, markNodeMap]);
 
-  // 点击offcanvas以外的元素隐藏offcanvas
-  // const offCanvsRef = useRef<HTMLDivElement>(null);
-  // const clickOffCavasRef = useRef<HTMLDivElement>(null); 
-  // const context = React.useContext(AppContext);
-  // useEffect(() => {
-  //   const instance = (
-  //     context.bootstrap ?? window.bootstrap
-  //   );
-  //   if (instance && offCanvsRef.current) {
-  //     new instance.Offcanvas(offCanvsRef.current);
-  //   }
-  //   // 组件卸载时销毁 Offcanvas
-  //   return () => {
-  //     if (offCanvsRef.current) {
-  //       const offcanvas = instance.Offcanvas.getInstance(offCanvsRef.current);
-  //       if (offcanvas) {
-  //         offcanvas.dispose();
-  //       }
-  //     }
-  //   };
-  // }, []);
-  // useClickAway(() => {
-  //   const instance = ( context.bootstrap ?? window.bootstrap );
-  //   if (offCanvsRef.current) {
-  //     // @ts-ignore
-  //     instance.Offcanvas.getInstance(offCanvsRef.current).hide();
-  //   }
-  // }, [offCanvsRef, clickOffCavasRef]);
+  const [commentsVisible, setCommentsVisible] = useState(false);
+  const toggleCommentsVisible = () => {
+    setCommentsVisible(!commentsVisible);
+  };
 
   return (
     <>
@@ -984,17 +960,19 @@ export default function CommentPlugin({
           document.body,
         )}
       
-        <div className='text-decoration-none' data-bs-toggle="offcanvas" data-bs-target="#offcanvasComments">
+        <div className='text-decoration-none' onClick={toggleCommentsVisible}>
           {t('articleComment')}
         </div>
-        <div className="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" id="offcanvasComments">
-            <div className="offcanvas-header">
-                <h6 className="offcanvas-title text-nowrap" id="offcanvasExampleLabel">
-                  {t('articleComment')}  <small className='text-secondary'>{commentStore.isCollaborative() && "["+t('articleCommentCollab')+"]"}</small>
-                </h6>
-                <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div className="offcanvas-body">
+        <Drawer
+                title={<>{t('articleComment')}<small className='text-secondary'>{commentStore.isCollaborative() && "["+t('articleCommentCollab')+"]"}</small></>}
+                isOpen={commentsVisible}
+                onClose={()=>setCommentsVisible(false)}
+                size={500}
+                hasBackdrop={false}
+                usePortal={false}
+                hasOverLay={false}
+                placement="right"
+            >
               <CommentsPanel
                 comments={comments}
                 submitAddComment={submitAddComment}
@@ -1002,8 +980,7 @@ export default function CommentPlugin({
                 activeIDs={activeIDs}
                 markNodeMap={markNodeMap}
               />
-            </div>
-        </div>
+        </Drawer>
     </>
   );
 }

@@ -26,6 +26,7 @@ export interface OverlayProps extends IProps, Omit<TransitionProps, 'timeout'> {
     backdropProps?: React.HTMLProps<HTMLDivElement>;
     portalProps?: PortalProps;
     hasBackdrop?: boolean;
+    hasOverLay?: boolean;
     unmountOnExit?: boolean;
     transitionName?: string;
     onEnter?: (node: HTMLElement, isAppearing: boolean) => void;
@@ -42,6 +43,7 @@ export default function Overlay(props: OverlayProps) {
         style,
         isOpen: _ = false,
         prefixCls = 'w-overlay',
+        hasOverLay = true,
         usePortal = true,
         maskClosable = true,
         backdropProps = {},
@@ -165,7 +167,7 @@ export default function Overlay(props: OverlayProps) {
                         style={style}
                         ref={overlay}
                         className={[
-                            prefixCls,
+                            hasOverLay ? prefixCls : '',
                             className,
                             !usePortal ? `${prefixCls}-inline` : null,
                             isOpen ? `${prefixCls}-enter-done` : null,
@@ -193,7 +195,7 @@ export default function Overlay(props: OverlayProps) {
             }}
         </CSSTransition>
     );
-    
+        
     if (visible && usePortal) {
         return <Portal {...{ ...portalProps }}>{TransitionGroupComp}</Portal>;
     } else {

@@ -20,6 +20,7 @@ export const X_POWERED_BY_HEADER = {
 // 评论常数
 export const COMMENT_WORDS_LIMIT = 1000;
 export const COMMENT_IMGS_LIMIT = 1;
+export const REPORT_DESC_WORD_LIMIT = 500;
 // 客户端类型
 export const CLIENT_TPYES = {
   WAP: 'wap',
@@ -92,7 +93,7 @@ export const ARTICLE_COLLECTION = "/article/collection";
 // 图片列表
 export const PERSONAL_IMAGE_LIST = "/image/personalImageList";
 // 删除图片
-export const DELETE_IMAGE = "/image/del";
+export const DELETE_IMAGE_BY_ID = "/image/deleteById";
 // 上传评论、回复、举报图片
 export const UPLOAD_IMAGE = "/image/upload";
 // tag
@@ -126,7 +127,7 @@ export const SAVE_ARTICLE_REPLY = "/article/save/reply";
 // 文章评论列表
 export const ARTICLE_COMMENT_LIST = "/article/comment/list";
 // 评论回复列表
-export const ARTICLE_REPLY_LIST = "/article/reply/list";
+export const ARTICLE_COMMENT_REPLY_LIST = "/article/reply/list";
 // 举报原因
 export const REPORT_REASON_LIST = "/report/reason/list"
 // 举报

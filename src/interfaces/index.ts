@@ -10,7 +10,6 @@ export * from './article';
 export * from './report';
 export * from './image';
 export * from './html';
-export * from './reply';
 export * from './comment';
 export * from './style';
 export * from './user';

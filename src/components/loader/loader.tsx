@@ -11,6 +11,7 @@ export interface LoaderProps extends IProps, HTMLDivProps {
     vertical?: boolean;
     tip?: React.ReactNode;
     indicator?: React.ReactNode;
+    indicatorComp?: JSX.Element;
     children?: any | React.ReactNode;
 }
 
@@ -27,6 +28,7 @@ const LoaderComp = (props: LoaderProps = {}) => {
         bgColor,
         children,
         indicator,
+        indicatorComp,
         fullscreen = false,
         ...otherProps
     } = props;
@@ -41,7 +43,7 @@ const LoaderComp = (props: LoaderProps = {}) => {
         ),
         [],
     );
-
+    
     const tipsView = useMemo(
         () => (
           <div
@@ -51,19 +53,23 @@ const LoaderComp = (props: LoaderProps = {}) => {
               .trim()}
             style={{ color, backgroundColor: bgColor }}
           >
-            <div className={`${prefixCls}-tips-nested`}>
-              {indicator || indicatorView}
-              {tip && (
-                <div
-                  className={[`${prefixCls}-text`, vertical ? `${prefixCls}-vertical` : null]
-                    .filter(Boolean)
-                    .join(' ')
-                    .trim()}
-                >
-                  {tip}
-                </div>
-              )}
-            </div>
+            {indicatorComp ? (
+              <>{indicatorComp}</>
+            ) : (
+              <div className={`${prefixCls}-tips-nested`}>
+                {indicator || indicatorView}
+                {tip && (
+                  <div
+                    className={[`${prefixCls}-text`, vertical ? `${prefixCls}-vertical` : null]
+                      .filter(Boolean)
+                      .join(' ')
+                      .trim()}
+                  >
+                    {tip}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         ),
         [fullscreen, bgColor, prefixCls, vertical, tip],

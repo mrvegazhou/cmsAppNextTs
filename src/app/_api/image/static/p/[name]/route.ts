@@ -5,7 +5,7 @@ import {
   apiResponse,
   createConfig,
 } from '@/lib/api';
-import { ARTICLE_PERSONAL_IMAGE_URL } from '@/lib/constant';
+import { PERSONAL_IMAGE_URL } from '@/lib/constant';
 
 export async function GET(request: NextRequest, { params }: any) {
   try {
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: any) {
       }).name,
     });
     const response = await fetch(
-      config.baseURL + ARTICLE_PERSONAL_IMAGE_URL + config.name,
+      config.baseURL + PERSONAL_IMAGE_URL + config.name,
       config
     );
     const data = await response.blob();

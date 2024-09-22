@@ -9,11 +9,10 @@ type GetStyleOptions = {
     placement: OverlayStyl['placement'];
     usePortal: OverlayTriggerProps['usePortal'];
     autoAdjustOverflow: OverlayTriggerProps['autoAdjustOverflow'];
-    fixed: boolean;
 };
 
 export function getStyle(options: GetStyleOptions) {
-    let { trigger: triggerDom, popup: popupDom, placement, usePortal, autoAdjustOverflow, fixed } = options || {};
+    let { trigger: triggerDom, popup: popupDom, placement, usePortal, autoAdjustOverflow} = options || {};
     const sty = {
         left: 0,
         top: 0,
@@ -28,7 +27,6 @@ export function getStyle(options: GetStyleOptions) {
     const winSizeWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
     sty.placement = placement;
-
     let scrollTop = getScroll((triggerDom as HTMLElement).ownerDocument!.documentElement, true);
     const scrollLeft = getScroll((triggerDom as HTMLElement).ownerDocument!.documentElement);
     const trigger = {
@@ -43,11 +41,8 @@ export function getStyle(options: GetStyleOptions) {
     const bottom = winSizeHeight - trigger.bottom;
     const right = winSizeWidth - trigger.left - trigger.width;
 
-    if (fixed) {
-        sty.top = trigger.top;
-    } else {
-        sty.top = trigger.top + scrollTop;
-    }
+    sty.top = trigger.top + scrollTop;
+    
     sty.left = trigger.left;
 
     if (!usePortal) {

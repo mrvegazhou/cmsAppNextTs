@@ -15,9 +15,8 @@ export const replaceImgTagWithImage = (content: string): string => {
     // 使用替换函数来修改匹配到的内容
     const replacedContent = content.replace(imgTagRegex, (match, attributes) => {
         // 将 img 替换为 Image
-        return `<Image ${attributes}>`;
+        return `<image ${attributes} οnErrοr='οnerrοr=null;src="https://images.cnblogs.com/cnblogs_com/shine1234/1762510/t_200511080227tx.jpg?a=1589272519142' />`;
     });
-
     return replacedContent;
 }
 
@@ -25,4 +24,8 @@ export const containsImgTag = (str: string): boolean => {
     // 正则表达式匹配img标签
     const imgTagRegex = /<img\s+[^>]*>/i;
     return imgTagRegex.test(str);
+}
+
+export const formatNumber = (number: number): string => {
+    return new Intl.NumberFormat('en-US').format(number);
 }

@@ -82,6 +82,8 @@ const Navbar = ({
   let lastScrollTop = 0;
   const handleScroll = () => {
     let scrollTop = document.documentElement.scrollTop || document.body.scrollTop; //滚动条滚动高度
+    let maxDistance = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    if (maxDistance<=25) return;
     if (scrollTop > lastScrollTop) {
       setIsShow(false);
     } else {

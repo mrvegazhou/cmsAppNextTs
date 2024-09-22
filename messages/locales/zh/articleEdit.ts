@@ -140,4 +140,9 @@ export default {
     noData: "没有相关数据",
     selectCategory: "请选择分类",
     loginPrompt: "请登录后再发布文章",
+
+    // 封面图片
+    imageUploadLimit: "图片大小限制在",
+    imageUploadErr: "上传图片错误",
+    imageDeleteErr: "删除图片错误",
 };

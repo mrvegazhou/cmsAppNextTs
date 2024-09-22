@@ -21,8 +21,7 @@ export interface OverlayTriggerProps extends IProps, OverlayProps {
     delay?: Delay;
     children?: React.ReactNode | React.ReactElement;
     transitionName?: string;
-    zIndex?: number;
-    fixed?: boolean;
+    zIndex?: number | undefined;
 }
 
 export interface OverlayTriggerState {
@@ -101,6 +100,7 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
         onEnter = noop,
         ...other
     } = props;
+    
     const zIndexNum = other.zIndex ?? 999;
     const zIndex = useRef<number>(zIndexNum);
     const triggerRef = useRef<HTMLElement>();
@@ -163,7 +163,6 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
             popup: popupRef.current as HTMLElement | IBoundingClientRect,
             usePortal,
             autoAdjustOverflow,
-            fixed: other.fixed!,
         });
         setOverlayStyl({ ...styls, zIndex: zIndex.current });
         onVisibleChange(isOpen);
@@ -219,7 +218,8 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
 
     function handleHide(isOutside: boolean) {
         clearTimeouts();
-        if (!isOutside && props.isOutside) return;
+        if (!isOutside && !props.isOutside) return;
+
         hoverStateRef.current = 'hide';
 
         const delay = normalizeDelay(props.delay);
@@ -250,6 +250,7 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
         ) {
             isOutside = false;
         }
+        
         if ((!related || related !== target) && !contains(target, related)) {
             handler(isOutside, e);
         }
@@ -278,13 +279,14 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
 
     function handleEnter(node: HTMLElement, isAppearing: boolean) {
         onEnter && onEnter(node, isAppearing);
+
+        // 这里控制top left
         const styls = getStyle({
             placement: overlayStyl.placement || placement,
             trigger: triggerRef.current as HTMLElement | IBoundingClientRect,
             popup: popupRef.current as HTMLElement | IBoundingClientRect,
             usePortal,
-            autoAdjustOverflow,
-            fixed: other.fixed!
+            autoAdjustOverflow
         });
         setOverlayStyl({ ...styls, zIndex: zIndex.current });
     }
@@ -314,7 +316,7 @@ const OverTrigger = React.forwardRef<OverlayTriggerRef, OverlayTriggerProps>((pr
         }
     }
     overlayProps.style = { ...overlayProps.style, ...overlayStyl };
-
+        
     return (
         <React.Fragment>
             {cloneElement(

@@ -1,0 +1,83 @@
+.headerContainer {
+    display: flex;
+    flex-direction: column;
+    width: 270px;
+    padding: 0.8rem;
+    .headerInfo {
+        display: flex;
+        line-height: 1.2;
+        .avatar {
+            margin-right: 1rem;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            img {
+                border-radius: 50%;
+                -o-object-fit: cover;
+                object-fit: cover;
+                background-color: #f7f8fa;
+            }
+        }
+        .userInfo {
+            display: flex;
+            flex-direction: column;
+            max-width: 180px;
+            .username {
+                font-size: 1rem;
+                cursor: pointer;
+                line-height: 1.2rem;
+                text-decoration: none;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            .position {
+                margin: .333rem 0 0;
+                font-size: 0.9rem;
+                line-height: 1.5rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+
+    .metaInfo {
+        display: flex;
+        flex: 1 1 auto;
+        justify-content: space-around;
+        align-items: center;
+        align-content: center;
+        margin-top: 1rem;
+        .metaItem {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            align-self: center;
+            .count {
+                font-size: 0.9rem;
+                font-weight: 500;
+                line-height: 1.5rem;
+            }
+            .title {
+                font-size: 0.9rem;
+                line-height: 1.5rem;
+            }
+        }
+    }
+    .operateBtn {
+        display: flex;
+        flex: 1 1 auto;
+        justify-content: space-around;
+        align-items: center;
+        align-content: center;
+        margin-top: 1rem;
+        a {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            align-self: center;
+            width: 90px;
+        }
+    }
+}

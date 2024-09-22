@@ -12,7 +12,7 @@ interface Confirm {
     title?: React.ReactNode;
     cancelText?: string;
     id?:string;
-    zIndex?: number;
+    zIndex?: number | undefined;
 }
   
 export function ConfirmComp(props: Confirm) {
@@ -72,8 +72,7 @@ export interface PopoverProps extends OverlayTriggerProps {
   content?: React.ReactNode;
   visibleArrow?: boolean;
   onClick?: Function;
-  zIndex?: number;
-  fixed: boolean;
+  zIndex?: number | undefined;
 }
 
 
@@ -88,7 +87,6 @@ const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
         placement = 'top',
         usePortal = true,
         visibleArrow = true,
-        fixed = false,
         className, 
         content,
         ...other
@@ -106,7 +104,8 @@ const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
         // @ts-ignore
         hide: () => overLayRef.current.hide(),
         // @ts-ignore
-        show: () => overLayRef.current.show()
+        show: () => overLayRef.current.show(),
+        getOpenStatus: () => { return isOpen; }
     }));
 
     const renderArrow = () => {
@@ -135,7 +134,7 @@ const PopoverComp = React.forwardRef<PopoverRef, PopoverProps>((props, ref) => {
                 {...other}
                 isOpen={isOpen}
                 placement={placement}
-                fixed={fixed}
+                usePortal={usePortal}
                 overlay={
                     <div className={cls}>
                         {visibleArrow && renderArrow()}

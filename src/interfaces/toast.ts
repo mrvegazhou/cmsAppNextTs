@@ -8,6 +8,7 @@ export interface IToastProps {
     isShowHeader?: boolean;
     isShowContent?: boolean;
     toastClass?: string;
+    containerStyle?: React.CSSProperties;
     animation?: boolean;
     autohide?: boolean;
     delay?: number;
@@ -41,5 +42,6 @@ export interface IToastPropsSuper extends IToastProps {
 export interface IToastsProps {
     toasts: IToastPropsSuper[];
     toastContainerClass?: string;
+    containerStyle?: React.CSSProperties;
 }
   

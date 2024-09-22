@@ -12,5 +12,7 @@ export default {
     saveCommentErr: "保存评论失败",
     copySuccess: "复制成功",
     copyErr: "复制失败",
-    image: "图片"
+    image: "图片",
+    viewAllReplies: "查看全部$d条回复",
+    replyTitle: "评论回复"
 }

@@ -27,12 +27,6 @@ import { useSetAtom } from "jotai";
 import { showLoginModalAtom, loginAtom } from "@/store/userData";
 
 
-import { createHeadlessEditor } from "@lexical/headless";
-import type { LexicalEditor } from 'lexical';
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
-import {$isTextNode, $createNodeSelection, $setSelection, $getRoot} from 'lexical'
-
-
 interface propsType {
   metadata: TMetadata;
 }

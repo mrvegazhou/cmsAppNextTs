@@ -7,13 +7,15 @@ import type {
     IArticleComment,
     ICommentListReq,
     IArticleReply,
-    IArticleCommentListResp
+    IArticleCommentListResp,
+    ICommentRepliesReq,
+    ICommentList
 } from '@/interfaces';
 import {
     API_URL,
     SAVE_ARTICLE_COMMENT,
     ARTICLE_COMMENT_LIST,
-    ARTICLE_REPLY_LIST,
+    ARTICLE_COMMENT_REPLY_LIST,
     SAVE_ARTICLE_REPLY
 } from '@/lib/constant';
 import { fetch as refreshFetch } from "@/lib/api/refreshFetch";
@@ -75,4 +77,22 @@ export const saveArticleReply = (
     return refreshFetch(url, config).then(
       handleReqMiddleware
     );
+};
+
+// 获取评论下的回复列表
+export const getCommentReplies = (
+  params: TBody<ICommentRepliesReq>
+): Promise<Response | IData<ICommentList>> => {
+  let config = createConfig(params, {
+    method: 'POST', 
+    baseURL: API_BASE_URL,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+  });
+  const url = config.baseURL + ARTICLE_COMMENT_REPLY_LIST;
+  return fetch(url, config).then(
+    handleReqMiddleware
+  );
 };

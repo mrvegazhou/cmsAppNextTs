@@ -527,7 +527,7 @@ export default function ToolbarPlugin({
                         height={300}
                         resizable={true}
                       />
-                    ), 810, 'zIndex');
+                    ), {minWidth:810, cls:'zIndex'});
                   }}
               />
               <Menu.Item
@@ -540,7 +540,7 @@ export default function ToolbarPlugin({
                         activeEditor={activeEditor}
                         onClose={onClose}
                       />
-                    ), 500);
+                    ), {minWidth: 500});
                   }}
               />
               <Menu.Item
@@ -577,7 +577,7 @@ export default function ToolbarPlugin({
                         activeEditor={activeEditor}
                         onClose={onClose}
                       />
-                    ), 500);
+                    ), {minWidth: 500});
                   }}
               />
               <Menu.Item
@@ -590,7 +590,7 @@ export default function ToolbarPlugin({
                         activeEditor={activeEditor}
                         onClose={onClose}
                       />
-                    ), 500);
+                    ), {minWidth: 500});
                   }}
               />
               <Menu.Item

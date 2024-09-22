@@ -6,6 +6,7 @@ export interface IArticleComment {
   userId: number;
   articleId: number;
   content: string;
+  contentComp: React.ReactNode;
   replyCount: number;
   likeCount: number;
   dislikeCount: number;
@@ -26,9 +27,12 @@ export interface IComment extends IArticleComment {
   userInfo: IUser;
 }
 
+// 回复列表
 export interface ICommentList {
   comment: IComment;
   replies: IArticleReply[];
+  currentTime?: number;
+  hasNext?: boolean;
 }
 
 export interface IArticleCommentListResp {
@@ -38,6 +42,7 @@ export interface IArticleCommentListResp {
   hasNext: boolean;
 }
 
+// 保存评论 
 export interface ICommentReq {
   userId: number;
   articleId: number;
@@ -54,9 +59,18 @@ export interface IReplyReq {
   currentTime: number;
 }
 
+// 获取评论列表
 export interface ICommentListReq {
   currentTime: number;
   articleId: number;
+  page: number;
+  orderBy: string;
+}
+
+// 请求获取评论的回复列表
+export interface ICommentRepliesReq {
+  currentTime: number;
+  commentId: number;
   page: number;
   orderBy: string;
 }
@@ -74,7 +88,8 @@ export interface Emoji {
 
 export interface IPostTypeVal {
   type: TPostType;
-  pid?: number;
+  commentId?: number;
+  replyId?: number;
 }
 
 export interface ICommentReport {

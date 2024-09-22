@@ -17,7 +17,6 @@ export default async function Page({
     try {
         const locale = await getLocale();
         
-        const token = authMiddleware(cookies());
         const metadata = new Metadata();
         metadata.setReferer('origin');
         metadata.setLocale(locale);

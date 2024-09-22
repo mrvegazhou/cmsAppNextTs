@@ -1,0 +1,303 @@
+@import "../../../../../styles/variables.scss";
+.commentList {
+    box-sizing: border-box;
+    margin: 0px;
+    min-width: 0px;
+    min-height: 100%;
+    .commentContent {
+        box-sizing: border-box;
+        margin: 0px;
+        min-width: 0px;
+        display: flex;
+        padding: 10px 15px 12px 15px;
+        .commentUserHeader {
+            margin: 0px;
+            min-width: 0px;
+            flex: 0 0 auto;
+            .headerImg {
+                box-sizing: border-box;
+                margin: 0px;
+                min-width: 0px;
+                max-width: 100%;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                filter: brightness(0.95);
+                display: block;
+                position: relative;
+                background-color: rgb(248, 248, 250);
+                flex: 0 0 auto;
+                overflow: hidden;
+            }
+        }
+        .commentUserContent {
+            box-sizing: border-box;
+            margin: 0px 0px 0px 10px;
+            min-width: 0px;
+            flex: 1 1 auto;
+            .commentUserName {
+                box-sizing: border-box;
+                margin: 0px;
+                min-width: 0px;
+                -webkit-box-pack: justify;
+                justify-content: space-between;
+                color: $fontColor;
+                display: flex;
+                height: 20px;
+                line-height: 20px;
+                .userName {
+                    height: 16px;
+                    display: flex;
+                    align-items: center;
+                    a {
+                        box-sizing: border-box;
+                        margin: 0px;
+                        min-width: 0px;
+                        font-size: 15px;
+                        font-weight: bold;
+                        text-decoration: none;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                    }
+                    i {
+                        font-size: 12px;
+                        margin-right: 5px;
+                        color: #6c757d!important;
+                    }
+                    > a:first-child {
+                        margin-right: 5px;
+                        color: rgb(55, 58, 64);
+                    }
+                    .replyUserName {
+                        color: #6c757d !important;
+                    }
+                }
+                .userMiddle {
+                    box-sizing: border-box;
+                    margin: 0px;
+                    min-width: 0px;
+                    -webkit-box-align: center;
+                    align-items: center;
+                    justify-content: stretch;
+                    flex-wrap: wrap;
+                    flex: 1 999999 auto;
+                    display: flex;
+                    max-height: 30px;
+                    overflow: hidden;
+                }
+                .more {
+                    margin: 2px 8px 2px 2px;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                    font-size: 17px;
+                    font-weight: 600;
+                }
+            }
+            .userComment {
+                box-sizing: border-box;
+                margin: 4px 0px 0px;
+                min-width: 0px;
+                overflow: hidden;
+                color: rgb(55, 58, 64);
+                overflow-wrap: break-word;
+                font-size: 15px;
+                line-height: 21px;
+                unicode-bidi: isolate;
+            }
+            .dateAddrReply {
+                box-sizing: border-box;
+                margin: 4px 0px 0px;
+                min-width: 0px;
+                -webkit-box-align: center;
+                align-items: center;
+                display: flex;
+                line-height: 1.7;
+                .dateAddr {
+                    box-sizing: border-box;
+                    margin: 0px;
+                    min-width: 0px;
+                    -webkit-box-align: center;
+                    align-items: center;
+                    flex: 1 1 auto;
+                    font-size: 14px;
+                    color: $fontColor;
+                    display: flex;
+                    span {
+                        margin: 0px 4px 0px 0px;
+                    }
+                }
+                .replyLike {
+                    box-sizing: border-box;
+                    margin: 0px;
+                    min-width: 0px;
+                    -webkit-box-align: center;
+                    align-items: center;
+                    justify-content: center;
+                    flex: 0 0 auto;
+                    display: flex;
+                    .btn {
+                        display: inline-block;
+                        padding: 0px;
+                        font-size: 14px;
+                        line-height: inherit;
+                        color: rgb(132, 145, 165);
+                        text-align: center;
+                        cursor: pointer;
+                        background: none transparent;
+                        border: none;
+                        border-radius: 0px;
+                        height: auto;
+                        margin-left: 16px;
+                        span {
+                            display: inline-flex;
+                            align-items: center;
+                        }
+                        i {
+                            font-size: 15px;
+                        }
+                    }
+                }
+                
+            }
+            .commentEditor {
+                position: relative;
+                margin: 8px 0px 0px;
+                min-width: 0px;
+                flex: 1 1 auto;
+                display: flex;
+            }
+            .quoteContent {
+                word-break: break-all;
+                text-overflow: ellipsis;
+                background-color: $bgColor;
+                position: relative;
+                max-height: 3em;
+                overflow: hidden;
+                line-height: 1.5;
+                font-size: 13px;
+                border-radius: 4px;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                margin-top: 10px;
+                opacity: 0.6;
+            }
+        }
+    }
+    .commentContentReply {
+        line-height: 1.7;
+        padding-left: 15px;
+        margin-bottom: 40px;
+        .toUser {
+            display: flex;
+            align-items: center;
+            i {
+                margin: 0 2px 0 2px;
+            }
+        }
+    }
+    .replyLine {
+        min-width: 0px;
+        position: relative;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-bottom: 10px;
+        height: 55px;
+        line-height: 55px;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: justify;
+        justify-content: space-between;
+        display: flex;
+        .replyLineCount {
+            margin: 0px;
+            min-width: 0px;
+            font-size: 15px;
+            color: rgb(55, 58, 64);
+            font-weight: 600;
+        }
+        &::before {
+            display: block;
+            content: " ";
+            position: absolute;
+            inset: -50%;
+            pointer-events: none;
+            transform: scale(0.5, 0.5);
+            border-bottom: 1px solid rgba(16, 22, 26, 0.1);
+        }
+        .sort {
+            box-sizing: border-box;
+            margin: 0px;
+            min-width: 0px;
+            border: 2px solid rgb(248, 248, 250);
+            border-radius: 3px;
+            font-size: 12px;
+            line-height: 24px;
+            font-weight: 600;
+            background-color: rgb(248, 248, 250);
+            display: flex;
+
+            .sortDefault {
+                box-sizing: border-box;
+                margin: 0px;
+                min-width: 0px;
+                color: rgb(129, 133, 143);
+                border-radius: 2px;
+                text-align: center;
+                cursor: pointer;
+                width: 50px;
+                height: 24px;
+                background-color: transparent;
+            }
+
+            .sortNew {
+                margin: 0px;
+                min-width: 0px;
+                color: rgb(129, 133, 143);
+                border-radius: 2px;
+                text-align: center;
+                cursor: pointer;
+                width: 50px;
+                height: 24px;
+                background-color: transparent;
+            }
+
+            .sortSelected {
+                background-color: rgb(255, 255, 255);
+                color: rgb(25, 27, 31);
+            }
+        }
+    }
+}
+.divider {
+    border-top: 15px solid rgba(132, 145, 165, 0.1);
+}
+.commentBottomEditor {
+    z-index: 99996;
+    position: absolute;
+    background-color: #f9f9f9;
+    width: 100%;
+    bottom: 50px;
+    left: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: flex;
+    border-top: 1px solid rgb(235, 236, 237);
+    .headerImg {
+        align-self: center;
+        margin: 0 10px 0 15px;
+        min-width: 0px;
+        max-width: 100%;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+        cursor: pointer;
+    }
+    .editorHeight {
+        min-height: 70px;
+        margin: 5px 5px 5px 0px;
+    }
+}
+

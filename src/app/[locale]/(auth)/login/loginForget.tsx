@@ -65,7 +65,7 @@ export default function LoginForget({ email }: { email: string }) {
                 ></Captcha>
             )}
             <div className='form-row text-center mt-4'>
-                <button name="confirmVerify" disabled={changeNewPwdByEmailCodeMutation.isPending} type="button" className="w-50 btn btn-outline-primary " onClick={onSubmitChangePwdByEmailCode}>{t('modifyPassword')}</button>
+                <button name="confirmVerify" disabled={changeNewPwdByEmailCodeMutation.isPending} type="button" className="w-50 btn btn-outline-primary" onClick={onSubmitChangePwdByEmailCode}>{t('modifyPassword')}</button>
             </div>    
         </>
     );

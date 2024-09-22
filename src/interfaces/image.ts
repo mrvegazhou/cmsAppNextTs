@@ -4,12 +4,14 @@ import type {
 
 export interface IImage extends IBase {
     fileName: string;
+    imgName?: string;
     width?: number;
     height?: number;
     dataRawWidth?: string;
     dataRawHeight?: string;
     tag?: string;
     src?: string;
+    imgId?: number;
 }
 
 export interface IImageList {
@@ -25,6 +27,7 @@ export type IImageState = {
     err?: Error | null;
     uploaded?: boolean;
     resourceId?: number;
+    imgId?: number;
 };
 
 export interface IUploadImages {
@@ -37,4 +40,5 @@ export interface IUploadImageResp {
     imageName: string; 
     fileName: string; 
     resourceId: number;
+    imgId?: number;
 }

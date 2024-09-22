@@ -19,8 +19,8 @@ interface TreeItem {
 class CreateCatalog {
     contentEl: any;
     option: CatalogProps;
-    $catelog: HTMLElement;
-    $content: HTMLElement | null;
+    $catelog?: HTMLElement;
+    $content?: HTMLElement | null;
     // 点击跳转不触发scroll事件
     clickToScroll = false; 
     allCatelogs: any;
@@ -44,11 +44,15 @@ class CreateCatalog {
 
         // 目录元素
         const $catelog = option.catelogEl instanceof HTMLElement ? option.catelogEl : document.getElementById(option.catelogEl);
-       
+        
+        this.option = option;
+
+        if ($content===null) return;
+
         let allCatelogs = $content!.querySelectorAll(option.selector.join());
 
         let tree = this.getCatelogsTree(allCatelogs);
-        this.option = option;
+        
         // 点击跳转不触发scroll事件
         let clickToScroll = false;
         // @ts-ignore
@@ -253,7 +257,7 @@ class CreateCatalog {
      *  设置选中的项
      */
     setActiveItem(id: any) {
-        let catelogs = this.$catelog.querySelectorAll('[data-target]');
+        let catelogs = this.$catelog!.querySelectorAll('[data-target]');
         // @ts-ignore
         catelogs = Array.prototype.slice.call(catelogs);
         let activeTarget = null, c;
@@ -268,7 +272,7 @@ class CreateCatalog {
 
                 const top = this.getElementTop(c as HTMLElement, this.$catelog)
                 if (top==null) return;
-                this.$catelog.scrollTop = top - this.$catelog.offsetHeight / 2
+                this.$catelog!.scrollTop = top - this.$catelog!.offsetHeight / 2
                 // c.scrollIntoView({
                 //   behavior: 'smooth'
                 // })
@@ -352,6 +356,7 @@ class CreateCatalog {
 
     // 重新构建目录
     rebuild() {
+        if (!this.$content) return;
         this.allCatelogs = this.$content!.querySelectorAll(this.option.selector.join());
         let tree = this.getCatelogsTree(this.allCatelogs);
         // @ts-ignore

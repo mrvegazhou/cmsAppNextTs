@@ -1,18 +1,20 @@
-import { useEffect, useState, useRef, useCallback, forwardRef } from "react";
+import { useEffect, useState, useRef, useCallback, forwardRef, useTransition, useDeferredValue } from "react";
 import classNames from 'classnames';
-import { filter, includes, lowerCase, debounce } from "lodash-es"
+import { filter, includes, lowerCase } from "lodash-es"
 import { EmojiGroup } from "@/interfaces";
 import styles from './emojis.module.scss'
 import { EMOJIS } from "@/lib/emojis/store";
 import { emojisAtom } from "@/store/comment";
+import LoaderComp from '@/components/loader/loader';
 import { useAtom } from "jotai";
 
 interface propsType {
     insertEmoji: (e: React.MouseEvent<Element>, s: string) => void;
 }
-const Emojis = forwardRef<HTMLDivElement, propsType>((props, ref) => {
-
+const Emojis = forwardRef((props: propsType, ref) => {
+    const [isPending, startTransition] = useTransition();
     const [search, setSearch] = useState('');
+    const deferredValue = useDeferredValue(search);
     const [groupIdx, setGroupIdx] = useState(0);
     const dataRef = useRef<EmojiGroup[]>([]);
     const [recentlyUsed, setRecentlyUsed] = useAtom(emojisAtom);
@@ -59,25 +61,20 @@ const Emojis = forwardRef<HTMLDivElement, propsType>((props, ref) => {
         loadEmojisData();
     }, []);
 
-    // 创建一个防抖函数，延迟时间为300毫秒
-    const debouncedOnChange = debounce((value: string) => {
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        startTransition(() => setSearch(value));
+    };    
+
+    useEffect(() => {
         let filterData = filter(dataRef.current[groupIdx]['emojis'], (item) =>{
-            return includes(lowerCase(item.name_en), lowerCase(value)) || includes(lowerCase(item.name_zh), lowerCase(value))
+            return includes(lowerCase(item.name_en), lowerCase(deferredValue)) || includes(lowerCase(item.name_zh), lowerCase(deferredValue))
         });
         setData(prev => {
             prev[groupIdx]['emojis'] = filterData;
             return [...prev];
         });
-    }, 300);
-
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        setSearch(value);
-    };    
-
-    useEffect(() => {
-        debouncedOnChange(search);
-    }, [search])
+    }, [deferredValue])
 
     const addEmojis = useCallback((emoji: string) => {
         if (!recentlyUsed.includes(emoji)) {
@@ -112,16 +109,20 @@ const Emojis = forwardRef<HTMLDivElement, propsType>((props, ref) => {
                     return (<button key={index} className={classNames(styles.btn, groupIdx==num ? styles['selected'] : '')} onClick={() => {setGroupIdx(num);}} >{value}</button>) // 假设每个item都是一个简单的字符串
                 })}
             </div>
-            <div className={classNames(styles.emojisList)}>
-                {data.length>0 && data[groupIdx]['emojis'].map((emoji, colIndex) => {
-                    let emojiStr = emoji.emoji;
-                    return (
-                        <div key={colIndex} className={classNames("text-center cursor-pointer", styles.emojisCol)} onClick={(e) => {insertEmoji(e, emojiStr)}}>
-                        {emojiStr}
-                        </div>
-                    );
-                })}
-            </div>
+            <LoaderComp size="large" loading={isPending}>
+            <>
+                <div className={classNames(styles.emojisList)}>
+                    {data.length>0 && data[groupIdx]['emojis'].map((emoji, colIndex) => {
+                        let emojiStr = emoji.emoji;
+                        return (
+                            <div key={colIndex} className={classNames("text-center cursor-pointer", styles.emojisCol)} onClick={(e) => {insertEmoji(e, emojiStr)}}>
+                            {emojiStr}
+                            </div>
+                        );
+                    })}
+                </div>
+            </>
+            </LoaderComp>
         </div>
         </>
     );

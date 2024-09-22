@@ -12,5 +12,7 @@ export default {
     saveCommentErr: "Failed to save comment",
     copySuccess: "Copy success",
     copyErr: "Copy error",
-    image: "image"
+    image: "image",
+    viewAllReplies: "View all $d replies.",
+    replyTitle: "Comment reply",
 }

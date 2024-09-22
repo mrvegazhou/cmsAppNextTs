@@ -1,6 +1,5 @@
 import * as React from 'react';
-import {useRef, useState, forwardRef, useImperativeHandle} from 'react';
-
+import {useRef, useState, forwardRef, useImperativeHandle, MutableRefObject} from 'react';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
@@ -23,17 +22,20 @@ import ContentEditable from '../ui/ContentEditable';
 import classNames from 'classnames';
 
 import type { TMetadata } from '@/types';
-
+import { IPostTypeVal } from '@/interfaces';
 import styles from './SimpleEditor.module.scss';
 import ToolBar from './toolBar';
 import { COMMENT_WORDS_LIMIT } from '@/lib/constant';
 
-
 interface propsType {
-  metadata: TMetadata | null;
+  metadata?: TMetadata | null;
   cls?: string;
+  showToolBar?: boolean;
+  emojisplacement?: string;
+  placeholderText?: string;
+  extraData?: IPostTypeVal;
 }
-const SimpleEditor = forwardRef((prop: propsType, ref): JSX.Element => {
+const SimpleEditor = forwardRef((props: propsType, ref): JSX.Element => {
     const {historyState} = useSharedHistoryContext();
     const [editor] = useLexicalComposerContext();
     const isEditable = useLexicalEditable();
@@ -48,14 +50,15 @@ const SimpleEditor = forwardRef((prop: propsType, ref): JSX.Element => {
         focusEditor
     }));
     
-    const text = "文明发言";
+    const text = props.placeholderText ?? "文明发言";
     const placeholder = <Placeholder className={styles.placeholder}>{text}</Placeholder>;
 
-    const [showToolBar, setShowToolBar] = useState<boolean>(true);
+    const [showToolBar, setShowToolBar] = useState<boolean>(props.showToolBar??true);
     const simpleRef = useRef(null);
+
     useClickAway(() => {
         setShowToolBar(false);
-    }, [simpleRef]);
+    }, [simpleRef, document.getElementById('hideCommentEmoji')]);
 
     return (
         <>
@@ -64,7 +67,7 @@ const SimpleEditor = forwardRef((prop: propsType, ref): JSX.Element => {
                     display: none;
                 }
             `}</style>
-            <div className={classNames(styles.simpleDiv, prop.cls)} onClick={()=>{setShowToolBar(true)}} ref={simpleRef}>
+            <div className={classNames(styles.simpleDiv, props.cls)} id="simpleEditorContainer" onClick={()=>{setShowToolBar(true)}} ref={simpleRef}>
                 <RichTextPlugin
                     contentEditable={
                         <ContentEditable className={styles.simpleEditor} />
@@ -72,7 +75,10 @@ const SimpleEditor = forwardRef((prop: propsType, ref): JSX.Element => {
                     ErrorBoundary={LexicalErrorBoundary}
                     placeholder={placeholder}
                 />
-                <ToolBar cls={classNames(showToolBar ? '' : 'd-none')} />
+                <ToolBar cls={classNames(showToolBar ? '' : 'd-none')} 
+                    emojisplacement={props.emojisplacement}
+                    extraData={props.extraData}
+                />
                 <MaxLengthPlugin maxLength={COMMENT_WORDS_LIMIT} />
                 <ImagesPlugin />
                 {/* 链接 */}
@@ -82,7 +88,6 @@ const SimpleEditor = forwardRef((prop: propsType, ref): JSX.Element => {
                 <ClearEditorPlugin />
                 <HistoryPlugin externalHistoryState={historyState} />
             </div>
-            
         </>
     );
 });

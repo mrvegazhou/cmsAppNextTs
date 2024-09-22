@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import { CLEAR_EDITOR_COMMAND } from 'lexical';
 import { $generateHtmlFromNodes } from '@lexical/html';
-import { ARTICLE_PERSONAL_IMAGE_URL, CLIENT_TPYES, SAVE_TYPE } from "@/lib/constant";
+import { PERSONAL_IMAGE_URL, CLIENT_TPYES, SAVE_TYPE } from "@/lib/constant";
 import { ITag } from "@/interfaces";
 import ContentComp from "@/app/[locale]/(cms)/article/[id]/articleContent";
 import { showLoginModalAtom } from "@/store/userData";
@@ -90,7 +90,7 @@ const HistoryEditor = (props: propsType) => {
                         content: data.content,
                         tags: data.tags as ITag[],
                         typeId: data.typeId,
-                        coverImage: {name:'', width:0, height:0, tag:'', src: ARTICLE_PERSONAL_IMAGE_URL + data.coverUrl},
+                        coverImage: {fileName:'', width:0, height:0, tag:'', src: PERSONAL_IMAGE_URL + data.coverUrl},
                         description: data.description,
                         createTime: createTime.format("YYYY-MM-DD HH:mm:ss"),
                         isSetCatalog: data.isSetCatalog

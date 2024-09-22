@@ -52,8 +52,6 @@ export default function InsertVideoIframeDialog({
                     const { srcID } = getVideoSrc(inputText, TENCENT_URL, 'TENCENT');
                     setEmbedResult({src: `https://v.qq.com/txp/iframe/player.html?vid=${srcID}`, srcType: 'TENCENT' as SourceType});
                 }
-                console.log(isBilibili(inputText), '--isBilibili(inputText)--');
-                
             }, 100),
         [],
     );

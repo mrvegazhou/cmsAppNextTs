@@ -1,5 +1,6 @@
 .simpleEditor {
-    overflow: hidden;
+    overflow-y: auto;
+    max-height: 150px;
     outline: none;
 }
 .simpleDiv {

@@ -11,17 +11,22 @@ import * as React from 'react';
 import Modal from '@/components/modal';
 import { PortalProps } from '@/components/portal/portal';
 
-
+interface propsType {
+  minWidth?: number;
+  height?: string;
+  width?: string;
+  cls?: string;
+  bodyStyle?: React.CSSProperties;
+  portalProps?: PortalProps;
+}
 export default function useModal(): [
   JSX.Element | null,
-  (title: string, showModal: (onClose: () => void) => JSX.Element, minWidth?: number, cls?: string, portalProps?: PortalProps) => void,
+  (title: string, showModal: (onClose: () => void) => JSX.Element, props?: propsType) => void,
 ] {
   const [modalContent, setModalContent] = useState<null | {
     content: JSX.Element;
     title: string;
-    minWidth?: number;
-    cls?: string;
-    portalProps?: PortalProps;
+    props?: propsType;
   }>(null);
 
   const [open, setOpen] = useState(false);
@@ -35,7 +40,7 @@ export default function useModal(): [
     if (modalContent === null) {
       return null;
     }
-    const {title, content, minWidth, cls, portalProps} = modalContent;
+    const {title, content, props} = modalContent;
     return (
       <Modal
         title={title}
@@ -43,9 +48,12 @@ export default function useModal(): [
         onClosed={()=>{setOpen(false);onClose();}}
         type="light"
         useButton={false}
-        minWidth={minWidth ?? 350}
-        className={cls}
-        portalProps={portalProps}
+        minWidth={props?.minWidth ?? 350}
+        height={props?.height}
+        width={props?.width}
+        className={props?.cls}
+        bodyStyle={props?.bodyStyle}
+        portalProps={props?.portalProps}
       >
          {content}
       </Modal>
@@ -57,17 +65,13 @@ export default function useModal(): [
       title: string,
       // eslint-disable-next-line no-shadow
       getContent: (onClose: () => void) => JSX.Element,
-      minWidth?: number,
-      cls?: string,
-      portalProps?: PortalProps
+      props?: propsType,
     ) => {
       setOpen(true);
       setModalContent({
         title,
         content: getContent(onClose),
-        minWidth: minWidth,
-        cls: cls,
-        portalProps: portalProps
+        props
       });
     },
     [onClose],

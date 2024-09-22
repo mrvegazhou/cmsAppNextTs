@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, forwardRef, useRef } from 'react';
+import { useEffect, useCallback, useState, forwardRef, useRef, MutableRefObject, useImperativeHandle } from 'react';
 import classNames from 'classnames';
 import {$getRoot, $getSelection, CLEAR_EDITOR_COMMAND} from 'lexical';
 import type {LexicalNode} from 'lexical'
@@ -11,35 +11,36 @@ import PopoverComp from "@/components/popover/popover";
 import {InsertImageDialog} from '../plugins/ImagesPlugin';
 import useModal from '@/hooks/useModal/show';
 import Emojis from './emojis';
-import { commentListAtom, emojisAtom } from "@/store/comment";
+import { commentListAtom, emojisAtom, replyListAtom } from "@/store/comment";
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useMutation } from '@tanstack/react-query';
 import { CharCounter, handleDrop } from '@/lib/tool';
 import { COMMENT_WORDS_LIMIT, COMMENT_IMGS_LIMIT } from '@/lib/constant';
 import useToast from '@/hooks/useToast';
 import type { TBody } from '@/types';
-import { IArticleComment, IComment, ICommentList, ICommentReq, IReplyReq, IData, IArticleReply } from '@/interfaces';
+import { IArticleComment, IComment, ICommentList, ICommentReq, IReplyReq, IData, IArticleReply, IPostTypeVal } from '@/interfaces';
 import { saveArticleComment, saveArticleReply } from '@/services/api/comment';
 import { currentArticleDataAtom } from '@/store/articleData';
 import { userDataAtom } from '@/store/userData';
 import { loginAtom } from '@/store/userData';
 import { useAtom } from 'jotai';
+import dayjs from 'dayjs';
 import styles from './toolBar.module.scss';
 import { isNullAndUnDef } from '@/lib/is';
-import { postTypeValAtom } from '@/store/editorPost';
 import { containsImgTag } from '@/lib/stringTool';
-
+import DOMPurify from 'dompurify';
 
 interface propsType {
     cls?: string;
+    emojisplacement?: string;
+    extraData?: IPostTypeVal;
 }
-const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
+const Toolbar = forwardRef((props: propsType, ref) => {
     const [islogin, setLoginModal] = useAtom(loginAtom);
     const articleInfo = useAtomValue(currentArticleDataAtom);
     const userData = useAtomValue(userDataAtom);
     const setCommentList = useSetAtom(commentListAtom);
-    // 判断post类型
-    const postTypeVal = useAtomValue(postTypeValAtom);
+    const setReplies = useSetAtom(replyListAtom);
  
 
     const { show } = useToast();
@@ -65,7 +66,7 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
               resizable={false}
               type='comment'
             />
-        ), 810, 'zIndex', {container: selfToolBarRef.current!}); // zIndex是class name
+        ), {minWidth:810, cls:'zIndex', portalProps:{container: selfToolBarRef.current!}}); // zIndex是class name
         handleDrop(e);
     }, [editor]);
 
@@ -94,10 +95,6 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
             return (await saveArticleReply(variables)) as IData<IArticleReply>;
         },
     });
-
-    useEffect(() => {
-
-    }, []);
 
     // 提交评论
     const submitComment = () => {
@@ -130,7 +127,8 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
 
             // 判断字符串是否包含<img>标签
             if (containsImgTag(htmlContent)) {
-                let cleanedContent = htmlContent.replace(/<br\s*\/?>/g, '\n');
+                let cleanedContent = DOMPurify.sanitize(htmlContent);
+                cleanedContent = cleanedContent.replace(/<br\s*\/?>/g, '\n');
                 cleanedContent = cleanedContent.replace(/<(?!(?:\/?img)[^>]*>)[^>]*>/g, '');
                 // 使用正则表达式匹配 img 标签并修改 src 属性
                 const imgTagRegex = /<img ([^>]*)src="([^"]+)"([^>]*>)/gi;
@@ -157,6 +155,7 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
         }, {discrete: true});
 
         let mutationTemp;
+        const postTypeVal = props.extraData!;
         if (postTypeVal.type==="comment") {
             let data = {
                 userId: userData.id,
@@ -171,7 +170,8 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
                 userId: userData.id,
                 articleId: articleId,
                 content: htmlContent,
-                commentId: postTypeVal.pid
+                commentId: postTypeVal.commentId,
+                replyId: postTypeVal.replyId
             } as IReplyReq;
             mutationTemp = saveReplyMutation.mutateAsync({
                 data: data
@@ -186,6 +186,7 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
                 if (postTypeVal.type==="comment") {
                     let commentInfo: ICommentList = {} as ICommentList;
                     let data = res.data as IComment;
+                    data.createTime = dayjs(data.createTime).format('YYYY-MM-DD HH:mm:ss');
                     commentInfo = Object.assign({}, {comment:data, replies: []});
                     setCommentList(prev => {
                         return [commentInfo, ...prev]
@@ -200,7 +201,6 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
                                     item.replies = [];
                                 }
                                 let replies = [replyInfo, ...item.replies];
-                                console.log(replyInfo, replies, '----')
                                 ++item.comment.replyCount;
                                 newCommentList.push({comment: item.comment, replies: replies});
                             } else {
@@ -208,6 +208,11 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
                             }
                         }
                         return newCommentList;
+                    });
+                    
+                    // 回复列表
+                    setReplies(prev => {
+                        return [replyInfo, ...prev];
                     });
                 }
                 
@@ -241,17 +246,17 @@ const Toolbar = forwardRef<HTMLDivElement, propsType>((props, ref) => {
             });
         })
     }, [editor]);
-
+    const imgEmojiRef = useRef(null);
+    
     return (
         <div className={classNames(styles.toolBar, props.cls)} ref={selfToolBarRef}>
-            <div className={styles.imgEmoji}>
-                <div></div>
+            <div className={styles.imgEmoji} ref={imgEmojiRef}>
                 <button type="button" className={styles.btn} onClick={(e) => showImage(e)}>
                     <i className='iconfont icon-ic_image_upload' />
                 </button>
                 <button type="button" className={styles.btn}>
-                    <PopoverComp trigger="click" placement="bottom" usePortal={false} content={content} zIndex="9999">
-                        <i className='iconfont icon-biaoqingemoji' />
+                    <PopoverComp trigger="click" placement={props.emojisplacement??"bottom"} portalProps={{container: document.getElementById('hideCommentEmoji')}} usePortal={true} content={content} zIndex="99995">
+                        <i className='iconfont icon-biaoqingemoji'/>
                     </PopoverComp>
                 </button>
                 

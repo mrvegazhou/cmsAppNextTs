@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle, useRef } from "react";
 import classNames from 'classnames';
 import { useTranslations } from 'next-intl';
@@ -6,7 +7,7 @@ import Modal from '@/components/modal';
 import type { TBody } from '@/types';
 import { IData, IReportReasonReq, IReportReason, ReportReasonCondition, IImageState } from '@/interfaces';
 import { getReportReasonList, sendReportReason, getReportReasonsQueryConf } from "@/services/api";
-import { API_URL, PERSONAL_IMAGE_URL } from '@/lib/constant';
+import { REPORT_DESC_WORD_LIMIT } from '@/lib/constant';
 import styles from "./index.module.scss";
 import { isNullOrUnDef } from "@/lib/is";
 import useToast from '@/hooks/useToast';
@@ -62,11 +63,25 @@ export const ReportComp = forwardRef((props: propsType, ref) => {
         if (!isNullOrUnDef(reportReasons[idx].nodes) && reportReasons[idx].nodes.length>0) {
             setReportReasonChilren(reportReasons[idx].nodes);
         }
+        if (scrollContainerRef.current) {
+            // 滚动到具有特定 ID 的元素
+            const reportReasonsId = document.getElementById('reportReasonsId');
+            if (reportReasonsId) {
+              scrollContainerRef.current.scrollTop = reportReasonsId.offsetTop - 60;
+            }
+        }
     }, [reportReasons]);
 
     const checkReason = useCallback((reasonId: number, condition: ReportReasonCondition) => {
         setReasonId(reasonId);
         setReasonCondition(condition);
+        if (scrollContainerRef.current) {
+            // 滚动到具有特定 ID 的元素
+            const reportReasonsDescId = document.getElementById('reportReasonsDescId');
+            if (reportReasonsDescId) {
+              scrollContainerRef.current.scrollTop = reportReasonsDescId.offsetTop;
+            }
+        }
     }, []);
 
     const fileUploadRef = useRef<HTMLInputElement | null>(null);
@@ -79,9 +94,10 @@ export const ReportComp = forwardRef((props: propsType, ref) => {
     } = useUploadImg({
         fileUploadRef: fileUploadRef, 
         type: 5,
-        width: 100,
+        size: 100,
         limitStr: t('imageUploadLimit'),
-        uploadErrStr: t('imageUploadErr')
+        uploadErrStr: t('imageUploadErr'),
+        deleteErrStr: t('imageDeleteErr')
     });
     
     
@@ -94,11 +110,28 @@ export const ReportComp = forwardRef((props: propsType, ref) => {
             return;
         }
         // 相同的图片不用上传
-        const imgState = await onFileUpload(e);
+        await onFileUpload(e);
         
     }, [imgs]);
 
+    // 输入描述
+    const inputAreaRef = useRef(null);
+    const [reportReasonDesc, setReportReasonDesc] = useState<string>("");
+    const getReportReasonDesc = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        let val = e.target.value;
+        if (val.length>REPORT_DESC_WORD_LIMIT) {
+            return;
+        }
+        setReportReasonDesc(val);
+    }, []);
+    const getDescWordCount = () => {
+        return `${reportReasonDesc.length}`;
+    };
+
     useImperativeHandle(ref, () => ({ showReportModal: showReportModal }));
+
+    // div内定位滑动
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     return (
         <>
@@ -110,10 +143,11 @@ export const ReportComp = forwardRef((props: propsType, ref) => {
                 useButton={false}
                 minWidth={490}
                 className={styles.zIndex}
+
             >
                 <div className={styles.reportModal}>
-                    <div className={styles.reportReasonNode}>
-                        <div className={styles.reasonName}><span className={styles.asterisk}>* &nbsp;</span>请选择举报类型</div>
+                    <div className={styles.reportReasonNode} ref={scrollContainerRef}>
+                        <div className={styles.reasonName}><span className={styles.asterisk}>* &nbsp;</span>{t('chooseReportReason')}</div>
                         <div className={styles.reportReasonNodeItems}>
                         {reportReasons.map((reportReason, idx) => {
                             return (
@@ -125,7 +159,7 @@ export const ReportComp = forwardRef((props: propsType, ref) => {
                         </div>
                         {(reportReasonChilren.length>0 &&
                             (<>
-                                <div className={styles.reasonName}><span className={styles.asterisk}>* &nbsp;</span>请选择具体原因</div>
+                                <div className={styles.reasonName} id="reportReasonsId"><span className={styles.asterisk}>* &nbsp;</span>{t('chooseReportSpecificReason')}</div>
                                 <div className={styles.reportReasonNodeItems}>
                                 {reportReasonChilren.map((reportReason, idx) => {
                                     return (
@@ -139,10 +173,10 @@ export const ReportComp = forwardRef((props: propsType, ref) => {
                         )}
                         {(!isNullOrUnDef(reasonConditon.desc) && reasonConditon.desc.isShow) && (
                             <>
-                                <div className={styles.reasonName}>请填写举报信息</div>
+                                <div className={styles.reasonName} id="reportReasonsDescId">{t('fillReportDesc')}</div>
                                 <div className={styles.reportInput}>
-                                    <textarea className={styles.reportInputArea} rows={5} placeholder="您可以提供详细的举报说明，便于我们更快处理，如：哪部分的文字/图片存在「涉政不当言论」。（选填）"></textarea>
-                                    <div className={styles.wordCount}>0&nbsp;/&nbsp;500</div>
+                                    <textarea ref={inputAreaRef} value={reportReasonDesc} onChange={(e)=>getReportReasonDesc(e)} className={styles.reportInputArea} rows={5} placeholder="您可以提供详细的举报说明，便于我们更快处理，如：哪部分的文字/图片存在「涉政不当言论」。（选填）"></textarea>
+                                    <div className={styles.wordCount}>{getDescWordCount()}&nbsp;/&nbsp;{REPORT_DESC_WORD_LIMIT}</div>
                                 </div>
                             </>
                         )}
@@ -163,17 +197,17 @@ export const ReportComp = forwardRef((props: propsType, ref) => {
                                 return (
                                     <div className={styles.imgsItem} key={idx}>
                                         <img src={img.image.src}  alt={img.image.fileName} className={styles.img} />
-                                        <i className="iconfont icon-close" onClick={()=>delImg(idx)}/>
+                                        <i className="iconfont icon-close" onClick={()=>delImg(idx, img.image.imgId!, img.image.imgName!)}/>
                                     </div>
                                 );
                             })}
                         </div>
                         )}
                         <div className={styles.rules}>
-                            了解更多社区规则，请点击：<a href="https://zhuanlan.zhihu.com/p/506696688">《社区规范》</a>
+                            {t('learnMore')}<a href="https://zhuanlan.zhihu.com/p/506696688">{t('standards')}</a>
                         </div>
                         <div className={styles.submit}>
-                            <button name="confirmVerify" disabled={false} type="button" className="w-50 btn btn-outline-primary " >提交</button>
+                            <button name="confirmVerify" disabled={false} type="button" className="w-50 btn btn-outline-primary">{t('submit')}</button>
                         </div>
                     </div>
                 </div>

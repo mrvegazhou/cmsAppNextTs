@@ -140,4 +140,8 @@ export default {
     selectCategory: "Please select a category",
     loginPrompt: "Please log in before publishing the article",
 
+    // 封面图片
+    imageUploadLimit: "Image size is limited to ",
+    imageUploadErr: "upload error",
+    imageDeleteErr: "delete errror",
 }

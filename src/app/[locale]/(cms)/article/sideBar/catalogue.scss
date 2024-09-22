@@ -49,3 +49,15 @@
     width: 15rem;
 }
 
+@keyframes catalogueFadeOut {
+    from {
+      display: block;
+    }
+    to {
+      display: none;
+    }
+}
+.catalogueFadeOutAnimation {
+    animation: catalogueFadeOut 1s ease-out forwards;
+}
+

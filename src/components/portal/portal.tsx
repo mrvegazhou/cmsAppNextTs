@@ -10,6 +10,13 @@ export interface PortalProps {
      * @default document.body
      */
     container?: HTMLElement;
+    /**
+     * Callback invoked when the children of this `Portal` have been added to the DOM.
+     * @deprecated v4.9.0+
+     */
+    onChildrenMount?: (portalElement: HTMLElement) => void;
+    /** @deprecated v4.9.0+ */
+    visible?: boolean;
 }
 
 export default function Portal(props: PortalProps) {
@@ -20,7 +27,7 @@ export default function Portal(props: PortalProps) {
     useEffect(() => {
         return () => {
             if (defaultNode.current && containerRef.current) {
-                containerRef.current.removeChild && containerRef.current.removeChild(defaultNode.current);
+                containerRef.current.removeChild(defaultNode.current);
                 defaultNode.current = undefined;
             }
         };
@@ -29,13 +36,14 @@ export default function Portal(props: PortalProps) {
     if (!canUseDOM) {
         return null;
     }
+    
     if (!containerRef.current) {
         containerRef.current = document.body;
     }
+    
     if (!defaultNode.current) {
         defaultNode.current = document.createElement('div');
         containerRef.current.appendChild(defaultNode.current);
     }
     return ReactDOM.createPortal(props.children, defaultNode.current);
 }
-  

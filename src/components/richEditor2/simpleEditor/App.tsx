@@ -1,17 +1,20 @@
 
-import { forwardRef, Suspense, useCallback, useImperativeHandle, useRef, useState } from 'react';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useLexicalEditable } from '@lexical/react/useLexicalEditable';
+import { forwardRef, Suspense, useCallback, useImperativeHandle, useRef, useState, MutableRefObject } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import Editor from './SimpleEditor';
 import PlaygroundEditorTheme from '../themes/CmsEditorTheme';
 import { SkeletonLayout } from "@/components/skeleton/layout";
 import { SimpleAppNodes } from '../nodes/AppNodes';
+import { IPostTypeVal } from '@/interfaces';
 
 interface propsType {
   cls?: string;
+  showToolBar?: boolean;
+  emojisplacement?: string;
+  placeholderText?: string;
+  extraData?: IPostTypeVal;
 }
-const App = forwardRef((prop: propsType, ref): JSX.Element => {
+const App = forwardRef((props: propsType, ref): JSX.Element => {
 
   const initialConfig = {
     editorState: null,
@@ -32,7 +35,7 @@ const App = forwardRef((prop: propsType, ref): JSX.Element => {
     }
   };
 
-  const [cls, setCls] = useState(prop.cls);
+  const [cls, setCls] = useState(props.cls);
   const changeCls = (cls: string) => {
     setCls(cls);
   };
@@ -59,7 +62,12 @@ const App = forwardRef((prop: propsType, ref): JSX.Element => {
   return (
     <Suspense fallback={<Loading />}>
       <LexicalComposer initialConfig={initialConfig}>
-        <Editor metadata={null} ref={simpleEditorRef} cls={cls} />
+        <Editor metadata={null} ref={simpleEditorRef} cls={cls} 
+          showToolBar={props.showToolBar} 
+          emojisplacement={props.emojisplacement}
+          placeholderText={props.placeholderText}
+          extraData={props.extraData}
+        />
       </LexicalComposer>
     </Suspense>
   );

@@ -1,0 +1,45 @@
+.loadingTipsNested {
+    svg {
+        height: 100%;
+        width: 100%;
+        animation: loaderRotate 2s linear infinite;
+        transform-origin: center center;
+        fill: currentcolor;
+        vertical-align: middle;
+        circle {
+            stroke-dasharray: 1, 200;
+            stroke-dashoffset: 0;
+            animation: loaderDash 1.5s ease-in-out infinite, loaderColor 6s ease-in-out infinite;
+            stroke-linecap: round;
+        }
+    }
+}
+@keyframes loaderRotate {
+    to {
+        transform: rotate(1turn);
+    }
+}
+@keyframes loaderDash {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35;
+    }
+    to {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124;
+    }
+}
+@keyframes loaderColor {
+    0%,
+    to {
+        stroke: currentColor;
+    }
+    80%,
+    90% {
+        stroke: currentColor;
+    }
+}

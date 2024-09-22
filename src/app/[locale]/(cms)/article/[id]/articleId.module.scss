@@ -1,4 +1,4 @@
-
+@import "../../../../../styles/variables.scss";
 .contentBody {
     word-break: break-word;
     line-height: 1.75;
@@ -6,4 +6,174 @@
     font-size: 16px;
     overflow-x: hidden;
     color: #333;
+}
+.mainContainer {
+    position: relative;
+    margin: 0 auto;
+    max-width: 1140px;
+    margin-top: 60px;
+    .view {
+        margin-top: 4rem;
+        .aritcleArea {
+            margin-bottom: 1.5rem;
+            position: relative;
+            width: 870px;
+            max-width: 100%;
+            box-sizing: border-box;
+            .article {
+                padding-left: 2.5rem;
+                padding-right: 2.5rem;
+                position: relative;
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+                overflow: hidden;
+                border-radius: 4px 4px 0 0;
+                background-color: $articleBgColor;
+                .articleTitle {
+                    margin: 0 0 1.3rem;
+                    font-size: 2rem;
+                    font-weight: 600;
+                    line-height: 1.2;
+                }
+                .authorInfoBlock {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 1.667rem;
+                    .authorInfoBox {
+                        display: flex;
+                        min-width: 0;
+                        flex-grow: 1;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        flex-wrap: wrap;
+                        .authorName {
+                            height: 2rem;
+                            display: flex;
+                            align-items: center;
+                            margin-right: 16px;
+                            .username {
+                                font-size: 14px;
+                                font-weight: 400;
+                                line-height: 22px;
+                                display: flex;
+                                align-items: center;
+                                cursor: pointer;
+                                text-decoration: none;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                max-width: 160px;
+                            }
+                        }
+                        .metaBox {
+                            flex-shrink: 0;
+                            font-size: 14px;
+                            line-height: 22px;
+                            display: flex;
+                            align-items: center;
+                            color: $fontColor3;
+                            .time {
+                                color: $fontColor3;
+                                margin-right: 16px;
+                                white-space: nowrap;
+                            }
+                            svg {
+                                margin-right: 5px;
+                            }
+                            .viewsCount {
+                                margin-right: 16px;
+                                white-space: nowrap;
+                            }
+                            .readTime {
+                                display: flex;
+                                align-items: center;
+                            }
+                        }
+                    }
+                }
+                .articleViewer {
+                    word-break: break-word;
+                    line-height: 1.75;
+                    font-weight: 400;
+                    font-size: 16px;
+                    overflow-x: hidden;
+                }
+            }
+            .articleEnd {
+                padding-left: 2.5rem;
+                padding-right: 2.5rem;
+                padding-top: 10px;
+                border-radius: 0 0 4px 4px;
+                padding-bottom: 20px;
+                background-color: $articleBgColor;
+                margin-bottom: 20px;
+                .tagList {
+                    display: flex;
+                    font-size: 1rem;
+                    line-height: 2;
+                    flex-wrap: wrap;
+                    align-items: flex-start;
+                    .tagListTitle {
+                        flex-shrink: 0;
+                        margin-right: 8px;
+                        font-size: 14px;
+                    }
+                    .tagListContainer {
+                        display: flex;
+                        flex-wrap: wrap;
+                        .tagItem {
+                            font-size: 14px;
+                            cursor: pointer;
+                            text-decoration: none;
+                            background-color: $grayColor3;
+                            color: $fontColor2;
+                            display: flex;
+                            align-items: center;
+                            margin: 0 1rem 1rem 0;
+                            padding: 0 1rem;
+                            border-radius: 4px;
+                            transition: background-color .15s linear;
+                        }
+                    }
+                }
+            }
+            .commentContainer {
+                padding-left: 2.5rem;
+                padding-right: 2.5rem;
+                padding-top: 10px;
+                border-radius: 0 0 4px 4px;
+                padding-bottom: 40px;
+                background-color: $articleBgColor;
+            }
+        }
+        .rightSideBarContainer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 16rem;
+        }
+        .leftSideBarContainer {
+
+        }
+        .recommendedArea {
+            position: relative;
+            width: 870px;
+            max-width: 100%;
+            box-sizing: border-box;
+            background-color: $articleBgColor;
+            .recommendedTitle {
+                border-radius: 4px;
+                padding-left: 2rem;
+                padding-right: 2rem;
+                border-bottom: 1px solid $bgColor2;
+                width: 100%;
+                .title {
+                    line-height: 3rem;
+                    padding: 20px 0 16px;
+                }
+            }
+        }
+    }
 }

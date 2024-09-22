@@ -29,7 +29,8 @@ export interface ModalProps extends IProps, OverlayProps {
   bodyStyle?: React.CSSProperties;
   maxWidth?: number;
   minWidth?: number;
-  width?: number;
+  width?: string;
+  height?: string;
   onCancel?: (evn: React.MouseEvent<HTMLButtonElement> & MouseEvent) => void;
   onConfirm?: (evn: React.MouseEvent<HTMLButtonElement> & MouseEvent) => void;
   portalProps?: PortalProps;
@@ -58,6 +59,7 @@ const Modal: React.ForwardRefExoticComponent<ModalProps & React.RefAttributes<Ov
     maxWidth = 500,
     minWidth = 320,
     width,
+    height,
     isCloseButtonShown = true,
     onCancel = noop,
     onConfirm = noop,
@@ -81,7 +83,7 @@ const Modal: React.ForwardRefExoticComponent<ModalProps & React.RefAttributes<Ov
     try {
       // @ts-ignore
       onCancel && (await onCancel(e));
-    } catch (e) {}
+    } catch (e) { }
     setIsOpen(false);
     setLoading(false);
   }
@@ -90,14 +92,14 @@ const Modal: React.ForwardRefExoticComponent<ModalProps & React.RefAttributes<Ov
     try {
       // @ts-ignore
       onConfirm && (await onConfirm(e));
-    } catch (e) {}
+    } catch (e) { }
     setIsOpen(false);
     setLoading(false);
   }
 
   return (
     <Overlay usePortal={usePortal} isOpen={isOpen} {...other} onClose={onClose} className={cls}>
-      <div className={`${prefixCls}-container`} id="w-modal">
+      <div className={`${prefixCls}-container`} id="w-modal" style={{height}}>
         <div
           className={[
             `${prefixCls}-inner`,
@@ -107,11 +109,11 @@ const Modal: React.ForwardRefExoticComponent<ModalProps & React.RefAttributes<Ov
             .filter(Boolean)
             .join(' ')
             .trim()}
-          style={{ maxWidth, minWidth, width }}
+          style={{maxWidth, minWidth, width, height}}
         >
           {(title || icon) && (
             <div className={`${prefixCls}-header`}>
-              {icon && <i className='w-icon iconfont icon-duihuakuang-xinxi fs-5'/>}
+              {icon && <i className='w-icon iconfont icon-duihuakuang-xinxi fs-5' />}
               {title && <span>{title}</span>}
               {isCloseButtonShown && <button type="button" className="btn-close" aria-label="Close" onClick={(e) => handleCancel(e)}></button>}
             </div>

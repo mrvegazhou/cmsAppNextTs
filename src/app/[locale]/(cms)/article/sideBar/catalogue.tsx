@@ -2,10 +2,13 @@ import { useState, useLayoutEffect, RefObject } from "react";
 import classNames from "classnames";
 import DividerComp from "@/components/divider/divider";
 import CreateCatalog from "@/components/catalogNavbar";
-import './catalogue.scss'
+import'./catalogue.scss'
 
-
-const Catalogue = ({navContent}:{navContent: RefObject<HTMLElement>}) => {
+export interface propsType {
+    navContent?: RefObject<HTMLElement>;
+    isShow?: boolean;
+}
+const Catalogue = (props: propsType) => {
     const rebuildCatalog = () => {
         let catalog = new CreateCatalog({
           contentEl: 'articleContent',
@@ -27,7 +30,7 @@ const Catalogue = ({navContent}:{navContent: RefObject<HTMLElement>}) => {
 
     return (
         <>
-            <div className={classNames(['mainBgColor overflow-auto catelogFrame'])} >
+            <div className={classNames(['mainBgColor overflow-auto catelogFrame'], {"catalogueFadeOutAnimation": !props.isShow})} >
                 <DividerComp>
                     <span className="title">
                         目录 {show ? <i onClick={() => setShow(false)} className="iconfont icon-xiangshang cursor-pointer"></i> : <i onClick={() => setShow(true)} className="iconfont icon-xiangxia cursor-pointer"></i>}

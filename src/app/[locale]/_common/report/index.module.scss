@@ -20,7 +20,7 @@ $bgColor: #e9ecef;
         .reasonName {
             margin: 0px;
             min-width: 0px;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 16px;
             color: rgb(25, 27, 31);
             margin-bottom: 10px;
@@ -61,6 +61,7 @@ $bgColor: #e9ecef;
             margin: 8px 0px 0px;
             min-width: 0px;
             .reportInputArea {
+                outline: none;
                 overflow: auto;
                 height: auto;
                 padding: 5px;

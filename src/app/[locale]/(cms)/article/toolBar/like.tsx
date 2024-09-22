@@ -10,6 +10,9 @@ import { itemClassName, iconClassName, DivDom } from "./class";
 import { userDataAtom } from "@/store/userData";
 import { currentArticleDataAtom, articleToolBarAtom } from '@/store/articleData';
 import { doArticleLike, doArticleUnlike } from "@/services/api";
+import { IData } from "@/interfaces";
+import { useMutation } from '@tanstack/react-query';
+import { TBody } from "@/types";
 const BadgeComp = dynamic(() => import("@/components/badge/badge"), {
     ssr: false,
 });
@@ -31,6 +34,18 @@ const Likes = () => {
         }
     }, []);
 
+    const doUnlikeMutation = useMutation({
+        mutationFn: async (variables: TBody<{articleId: number}>) => {
+            return (await doArticleUnlike(variables)) as IData<boolean>;
+        },
+    });
+
+    const doLikeMutation = useMutation({
+        mutationFn: async (variables: TBody<{articleId: number}>) => {
+            return (await doArticleLike(variables)) as IData<boolean>;
+        },
+    });
+
     const doLike = () => {
         debounce(() => {
             setDoing(true);
@@ -46,32 +61,35 @@ const Likes = () => {
                 likeCount -= 1;
                 setHasLike(false);
                 setArticleToolBarData({...articleToolBarData, isLiked:false, likeCount: likeCount<0 ? 0 : likeCount});
-                doArticleUnlike({data: {articleId: currentArticleData.id}}).then(() => {
-                    setCurrentArticleData(_data => ({
-                    ..._data,
-                    likeCount: _data.likeCount! - 1
-                    }));
-                }).catch(() => {
-                    show({
-                        type: 'DANGER',
-                        message: t('cancelLikeErr'),
-                    });
+                doLikeMutation.mutateAsync({
+                    data: { articleId: currentArticleData.id }
+                }).then(res => {
+                    if (res.status == 200) {
+                        setCurrentArticleData(_data => ({
+                            ..._data,
+                            likeCount: _data.likeCount! - 1
+                        }));
+                    }
+                }).catch((res) => {
+                    show({type: 'DANGER', message: t('cancelLikeErr')});
                     return;
                 });
             } else {
                 likeCount += 1;
                 setHasLike(true);
                 setArticleToolBarData({...articleToolBarData, isLiked:true, likeCount: likeCount});
-                doArticleLike({data: {articleId: currentArticleData.id}}).then(() => {
-                    setCurrentArticleData(_data => ({
-                    ..._data,
-                    likeCount: _data.likeCount! + 1
-                    }));
-                }).catch(() => {
-                    show({
-                        type: 'DANGER',
-                        message: t('likeArticleErr'),
-                    });
+
+                doUnlikeMutation.mutateAsync({
+                    data: { articleId: currentArticleData.id }
+                }).then(res => {
+                    if (res.status == 200) {
+                        setCurrentArticleData(_data => ({
+                            ..._data,
+                            likeCount: _data.likeCount! + 1
+                        }));
+                    }
+                }).catch((res) => {
+                    show({type: 'DANGER', message: t('likeArticleErr')});
                     return;
                 });
             }
@@ -79,9 +97,11 @@ const Likes = () => {
         }, 500)();
     };
 
+    let flagDoing = doing || doLikeMutation.isPending || doUnlikeMutation.isPending;
+
     return (
         <>
-          <DivDom className={classNames([itemClassName], {'pe-none': doing})} onClick={doLike}>
+          <DivDom className={classNames([itemClassName], {'pe-none': flagDoing})} onClick={doLike}>
             <BadgeComp count={articleToolBarData.likeCount??0} style={{top:-20, left:30, backgroundColor:'rgba(var(--bs-secondary-rgb), 0.8)'}}>
                 <i className={classNames([iconClassName, "icon-like-o", hasLike ? 'text-danger' : 'text-secondary'])}></i>
             </BadgeComp>
