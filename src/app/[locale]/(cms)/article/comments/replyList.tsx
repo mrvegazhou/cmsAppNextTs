@@ -16,7 +16,7 @@ import LoaderComp from '@/components/loader/loader';
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { containsImgTag, replaceImgTagWithImage, replaceImgWithText } from "@/lib/stringTool";
 import styles from "./replyList.module.scss";
-import { COMMENT_KEY } from "@/lib/constant/queryKey";
+import { QUERY_KEY } from "@/lib/constant/queryKey";
 import { replyListAtom } from "@/store/comment";
 
 interface propsType {
@@ -90,7 +90,7 @@ const ReplyList = (props: propsType) => {
 
     // 获取类型列表
     const getCommentRepliesQuery = useQuery({
-        queryKey: [COMMENT_KEY.REPLIES, commentId, page, currentTime, orderBy],
+        queryKey: [QUERY_KEY.REPLIES, commentId, page, currentTime, orderBy],
         queryFn: async ({ queryKey }) => {
             const data = {commentId: 73, currentTime: queryKey[3], page: queryKey[2], orderBy: orderBy} as ICommentRepliesReq;
             return (await getCommentReplies({data: data})) as IData<ICommentList>;

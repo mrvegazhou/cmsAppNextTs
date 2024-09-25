@@ -1,7 +1,8 @@
 import { createConfig, handleReqMiddleware } from '@/lib/api';
-import type { IData, IUser, IUserList } from '@/interfaces';
+import type { IData, IUser, IUserByNameReq, IUserList } from '@/interfaces';
 import { API_URL, USER_INFO, SEARCH_USER_LIST } from '@/lib/constant';
 import type { TBody } from '@/types';
+import { fetch as refreshFetch } from "@/lib/api/refreshFetch";
 
 const API_BASE_URL = API_URL;
 
@@ -15,10 +16,10 @@ export const getUserInfo = (
 };
 
 export const searchUserList = (
-  params?: TBody<{name: string; page: number}>
+  params?: TBody<IUserByNameReq>
 ): Promise<Response | IData<IUserList>> => {
   let config = createConfig(params, {method: "POST", baseURL: API_BASE_URL});
-  return fetch(config.baseURL + SEARCH_USER_LIST, config).then(
+  return refreshFetch(config.baseURL + SEARCH_USER_LIST, config).then(
     handleReqMiddleware
   );
 };

@@ -31,9 +31,6 @@ export default function ArticleIdPage({ metadata, articleInfo }: { metadata: TMe
         <div className=''>
             <Header metadata={metadata} />
             <ArticleId metadata={metadata} articleInfo={articleInfo} />
-            <Suspense>
-                <ImagePreview />
-            </Suspense>
             <Footer metadata={metadata} />
         </div>
     );
@@ -187,6 +184,7 @@ ziplist没有结构体定义, 官方文档描述其为: 一种特殊结构的双
 
             {/* 评论的表情层 */}
             <div id='hideCommentEmoji'></div>
+            <ImagePreview isViewerOpen={false} ident="articleCententView" />
         </>
     )
 };

@@ -18,7 +18,7 @@ import { CharCounter, handleDrop } from '@/lib/tool';
 import { COMMENT_WORDS_LIMIT, COMMENT_IMGS_LIMIT } from '@/lib/constant';
 import useToast from '@/hooks/useToast';
 import type { TBody } from '@/types';
-import { IArticleComment, IComment, ICommentList, ICommentReq, IReplyReq, IData, IArticleReply, IPostTypeVal } from '@/interfaces';
+import { IArticleComment, IComment, ICommentList, ICommentReq, IReplyReq, IData, IArticleReply, IPostTypeVal, IImage } from '@/interfaces';
 import { saveArticleComment, saveArticleReply } from '@/services/api/comment';
 import { currentArticleDataAtom } from '@/store/articleData';
 import { userDataAtom } from '@/store/userData';
@@ -27,8 +27,9 @@ import { useAtom } from 'jotai';
 import dayjs from 'dayjs';
 import styles from './toolBar.module.scss';
 import { isNullAndUnDef } from '@/lib/is';
-import { containsImgTag } from '@/lib/stringTool';
+import { containsImgTag, removeExtraBrTags } from '@/lib/stringTool';
 import DOMPurify from 'dompurify';
+import Image from "next/image";
 
 interface propsType {
     cls?: string;
@@ -53,6 +54,7 @@ const Toolbar = forwardRef((props: propsType, ref) => {
     const selfToolBarRef = useRef(null);
 
     const [imgNodeCount, setImgNodeCount] = useState(0);
+    const [img, setImg] = useState<IImage>();
 
     const showImage = useCallback((e: React.MouseEvent<Element>) => {
         if (imgNodeCount>COMMENT_IMGS_LIMIT) {
@@ -98,6 +100,7 @@ const Toolbar = forwardRef((props: propsType, ref) => {
 
     // 提交评论
     const submitComment = () => {
+
         if (JSON.stringify(userData)==='{}' || isNullAndUnDef(userData)) {
             show({type: 'DANGER', message: t('notLogged')});
             setLoginModal(true);
@@ -119,6 +122,7 @@ const Toolbar = forwardRef((props: propsType, ref) => {
             const root = $getRoot();
             
             htmlContent = $generateHtmlFromNodes(editor, null);
+            console.log(htmlContent)
             if (htmlContent=="") {
                 show({type: 'DANGER', message: t('commentIsEmpty')});
                 return;
@@ -127,6 +131,8 @@ const Toolbar = forwardRef((props: propsType, ref) => {
 
             // 判断字符串是否包含<img>标签
             if (containsImgTag(htmlContent)) {
+                // 去除多余的br标签
+                htmlContent = removeExtraBrTags(htmlContent);
                 let cleanedContent = DOMPurify.sanitize(htmlContent);
                 cleanedContent = cleanedContent.replace(/<br\s*\/?>/g, '\n');
                 cleanedContent = cleanedContent.replace(/<(?!(?:\/?img)[^>]*>)[^>]*>/g, '');
@@ -141,6 +147,8 @@ const Toolbar = forwardRef((props: propsType, ref) => {
             } else {
                 htmlContent = texts;
             }
+            console.log(htmlContent, "---htmlContent---");
+            
             
             let nums = CharCounter(texts)
             if (nums>COMMENT_WORDS_LIMIT) {
@@ -153,7 +161,7 @@ const Toolbar = forwardRef((props: propsType, ref) => {
             }
 
         }, {discrete: true});
-
+        return;
         let mutationTemp;
         const postTypeVal = props.extraData!;
         if (postTypeVal.type==="comment") {
@@ -249,32 +257,39 @@ const Toolbar = forwardRef((props: propsType, ref) => {
     const imgEmojiRef = useRef(null);
     
     return (
-        <div className={classNames(styles.toolBar, props.cls)} ref={selfToolBarRef}>
-            <div className={styles.imgEmoji} ref={imgEmojiRef}>
-                <button type="button" className={styles.btn} onClick={(e) => showImage(e)}>
-                    <i className='iconfont icon-ic_image_upload' />
-                </button>
-                <button type="button" className={styles.btn}>
-                    <PopoverComp trigger="click" placement={props.emojisplacement??"bottom"} portalProps={{container: document.getElementById('hideCommentEmoji')}} usePortal={true} content={content} zIndex="99995">
-                        <i className='iconfont icon-biaoqingemoji'/>
-                    </PopoverComp>
-                </button>
-                
-                <div className='d-flex justify-content-between align-items-center align-centent-center h-50'>
-                    <div className="vr"></div>
-                </div>
-                <div className={styles.emojiList}>
-                    {emojisRecentlyUsed.map((emoji, index) => (
-                        <span className={styles.recentEmojis} key={index} onClick={(e) => insertEmoji(e, emoji)}>{emoji}</span>
-                    ))}
-                </div>
+        <div className={styles.toolbarContainer}>
+            <div className={styles.imgs}>
+                {img && (
+                    <Image />
+                )}
             </div>
-            <div className={styles.submit}>
-                <span className={styles.gap}></span>
-                <button type="button" disabled={isDisabled} onClick={submitComment} className="btn-sm btn btn-outline-primary">{t('submit')}</button>
+            <div className={classNames(styles.toolBar, props.cls)} ref={selfToolBarRef}>
+                <div className={styles.imgEmoji} ref={imgEmojiRef}>
+                    <button type="button" className={styles.btn} onClick={(e) => showImage(e)}>
+                        <i className='iconfont icon-ic_image_upload' />
+                    </button>
+                    <button type="button" className={styles.btn}>
+                        <PopoverComp trigger="click" placement={props.emojisplacement??"bottom"} portalProps={{container: document.getElementById('hideCommentEmoji')}} usePortal={true} content={content} zIndex="99995">
+                            <i className='iconfont icon-biaoqingemoji'/>
+                        </PopoverComp>
+                    </button>
+                    
+                    <div className='d-flex justify-content-between align-items-center align-centent-center h-50'>
+                        <div className="vr"></div>
+                    </div>
+                    <div className={styles.emojiList}>
+                        {emojisRecentlyUsed.map((emoji, index) => (
+                            <span className={styles.recentEmojis} key={index} onClick={(e) => insertEmoji(e, emoji)}>{emoji}</span>
+                        ))}
+                    </div>
+                </div>
+                <div className={styles.submit}>
+                    <span className={styles.gap}></span>
+                    <button type="button" disabled={isDisabled} onClick={submitComment} className="btn-sm btn btn-outline-primary">{t('submit')}</button>
+                </div>
+                {/* 弹出框 */}
+                {modal}
             </div>
-            {/* 弹出框 */}
-            {modal}
         </div>
     );
 });

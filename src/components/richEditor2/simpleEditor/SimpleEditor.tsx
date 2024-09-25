@@ -1,5 +1,6 @@
+'use client';
 import * as React from 'react';
-import {useRef, useState, forwardRef, useImperativeHandle, MutableRefObject} from 'react';
+import {useRef, useState, forwardRef, useImperativeHandle, useEffect} from 'react';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
@@ -56,6 +57,10 @@ const SimpleEditor = forwardRef((props: propsType, ref): JSX.Element => {
     const [showToolBar, setShowToolBar] = useState<boolean>(props.showToolBar??true);
     const simpleRef = useRef(null);
 
+    useEffect(() => {
+        
+    }, []);
+    
     useClickAway(() => {
         setShowToolBar(false);
     }, [simpleRef, document.getElementById('hideCommentEmoji')]);
@@ -67,7 +72,7 @@ const SimpleEditor = forwardRef((props: propsType, ref): JSX.Element => {
                     display: none;
                 }
             `}</style>
-            <div className={classNames(styles.simpleDiv, props.cls)} id="simpleEditorContainer" onClick={()=>{setShowToolBar(true)}} ref={simpleRef}>
+            <div className={classNames(styles.simpleDiv, props.cls)} onClick={()=>{setShowToolBar(true)}} ref={simpleRef}>
                 <RichTextPlugin
                     contentEditable={
                         <ContentEditable className={styles.simpleEditor} />

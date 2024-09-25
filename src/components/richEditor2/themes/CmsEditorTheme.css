@@ -35,7 +35,7 @@
   line-height: 1.7;
 }
 .CmsEditorTheme__h2 {
-  font-size: 18px;
+  font-size: 15px;
   color: rgb(101, 103, 107);
   font-weight: 700;
   margin: 0;
@@ -43,7 +43,7 @@
   line-height: 1.7;
 }
 .CmsEditorTheme__h3 {
-  font-size: 14px;
+  font-size: 12px;
   color: rgb(101, 103, 107);
   margin: 0;
   text-transform: uppercase;
@@ -126,8 +126,8 @@
   overflow-y: scroll;
   overflow-x: scroll;
   table-layout: fixed;
-  width: max-content;
-  margin: 30px 0;
+  width: fit-content;
+  margin: 0px 25px 30px 0px;
 }
 .CmsEditorTheme__tableSelection *::selection {
   background-color: transparent;
@@ -292,30 +292,30 @@
   padding: 0;
   margin: 0;
   list-style-type: upper-alpha;
-  list-style-position: inside;
+  list-style-position: outside;
 }
 .CmsEditorTheme__ol3 {
   padding: 0;
   margin: 0;
   list-style-type: lower-alpha;
-  list-style-position: inside;
+  list-style-position: outside;
 }
 .CmsEditorTheme__ol4 {
   padding: 0;
   margin: 0;
   list-style-type: upper-roman;
-  list-style-position: inside;
+  list-style-position: outside;
 }
 .CmsEditorTheme__ol5 {
   padding: 0;
   margin: 0;
   list-style-type: lower-roman;
-  list-style-position: inside;
+  list-style-position: outside;
 }
 .CmsEditorTheme__ul {
   padding: 0;
   margin: 0;
-  list-style-position: inside;
+  list-style-position: outside;
 }
 .CmsEditorTheme__listItem {
   margin: 0 32px;

@@ -5,7 +5,7 @@ import type {
 
 export interface IUser extends IBase {
   nickname: string;
-  phone: string;
+  phone?: string;
   email: string;
   avatarUrl?: string;
   about?: string;
@@ -16,6 +16,12 @@ export interface IUserList {
   userList: IUser[];
   page?: number;
   totalPage?: number;
+  hasNextPage?: boolean;
+}
+
+export interface IUserByNameReq {
+  name: string;
+  page?: number;
 }
 
 

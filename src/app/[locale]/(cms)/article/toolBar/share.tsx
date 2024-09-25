@@ -13,9 +13,9 @@ const Share = () => {
   );
 
   const content = (
-    <div className={classNames(['me-10 p-2 bg-white rounded-2'])} >
+    <div className={classNames(['me-10 p-2 bg-white rounded-2'])} style={{width:"100px"}}>
       <div className="d-flex flex-column bd-highlight text-secondary">
-        <OverTrigger placement="right" trigger="click" overlay={tooltip} position="fixed">
+        <OverTrigger placement="right" trigger="click" overlay={tooltip}>
           <div className="p-2 cursor-pointer">微信</div>
         </OverTrigger>
         <div className="p-2 cursor-pointer">新浪微博</div>
@@ -26,7 +26,7 @@ const Share = () => {
 
   return (
       <div>
-        <PopoverComp trigger="click" placement="right" content={content} usePortal={false} fixed={true} style={{position:'fixed'}}>
+        <PopoverComp trigger="click" placement="right" content={content} usePortal={false}>
           <DivDom className={classNames([itemClassName, "text-center border"])}>
             <i className={classNames([iconClassName, "icon-fenxiangcopy"])}></i>
           </DivDom>

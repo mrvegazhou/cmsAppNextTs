@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback, useTransition } from "react";
 import classNames from 'classnames';
 import dayjs from 'dayjs';
-import { useTranslations } from 'next-intl';
+import {useTranslations} from 'next-intl';
 import { useAtom, useAtomValue } from 'jotai'
 import copy from 'copy-to-clipboard';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -25,11 +25,11 @@ import { ReportComp } from "@/app/[locale]/_common/report/report";
 import useModal from '@/hooks/useModal/show';
 import ReplyList from "./replyList";
 import AvatarPop from "../../user/avatar/avatarPop";
-import { COMMENT_KEY } from "@/lib/constant/queryKey";
-import { PhotoProvider, PhotoView } from 'react-photo-view';
-import 'react-photo-view/dist/react-photo-view.css';
+import { QUERY_KEY } from "@/lib/constant/queryKey";
 import { TBody } from "@/types";
-
+import { nanoid } from 'nanoid';
+import ImagePreview from "@/app/[locale]/_common/imagePreview";
+import Image from "next/image";
 
 interface propsType {
     mode?: string;
@@ -45,7 +45,7 @@ const ArticleComments = (props: propsType) => {
     const [currentTime, setCurrentTime] = useState<number>(Date.now());
     const [page, setPage] = useState<number>(1);
     const [orderBy, setOrderBy] = useState<string>("score");
-    const [hasNextPage, setHasNextPage] = useState<boolean>(true);
+    const [hasNextPage, setHasNextPage] = useState<boolean>(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error>();
 
@@ -62,14 +62,16 @@ const ArticleComments = (props: propsType) => {
     };
 
     const getCommentListQuery = useQuery({
-        queryKey: [COMMENT_KEY.COMMENT, articleInfo.id, page, currentTime, orderBy],
+        queryKey: [QUERY_KEY.COMMENT, articleInfo.id, page, currentTime, orderBy],
         queryFn: async ({ queryKey }) => {
             const data = {articleId: articleInfo.id, currentTime: currentTime, page: page, orderBy: orderBy} as ICommentListReq;
             return (await getArticleCommentList({data: data})) as IData<IArticleCommentListResp>;
         },
     });
 
-    
+    // 图片预览
+    const imagePreviewRef = useRef(null);
+    const [images, setImages] = useState<string[]>([]);
 
     useEffect(() => {
         if (getCommentListQuery.data) {
@@ -85,14 +87,15 @@ const ArticleComments = (props: propsType) => {
                                 let comment = item.comment;
                                 comment.createTime = dayjs(comment.createTime).format('YYYY-MM-DD HH:mm:ss');
                                 if (containsImgTag(comment.content)) {
-                                    comment.contentComp = extractTextAndImages(comment.content);
+                                    // @ts-ignore
+                                    comment.contentComp = extractTextAndImages(comment.content, (src:string)=>{setImages([src]);imagePreviewRef.current.show();});
                                 }
                                 let replies = [];
                                 if (!isNullOrUnDef(item.replies)) {
                                     for (let reply of item.replies) {
                                         reply.createTime = dayjs(reply.createTime).format('YYYY-MM-DD HH:mm:ss');
                                         if (containsImgTag(reply.content)) {
-                                            reply.contentComp = extractTextAndImages(reply.content)
+                                            reply.contentComp = extractTextAndImages(reply.content, ()=>console.log(9))
                                         }
                                         reply.toReplyContent = replaceImgWithText(reply.toReplyContent ?? "", `[${t('image')}]`);
                                         replies.push(reply);
@@ -175,17 +178,17 @@ const ArticleComments = (props: propsType) => {
     }, []);
 
     // 点赞和不喜欢
-    const doUnlikeMutation = useMutation({
-        mutationFn: async (variables: TBody<{articleId: number}>) => {
-            return (await doCommentDislike(variables)) as IData<boolean>;
-        },
-    });
+    // const doUnlikeMutation = useMutation({
+    //     mutationFn: async (variables: TBody<{articleId: number}>) => {
+    //         return (await doCommentDislike(variables)) as IData<boolean>;
+    //     },
+    // });
 
-    const doLikeMutation = useMutation({
-        mutationFn: async (variables: TBody<{articleId: number}>) => {
-            return (await doCommentLike(variables)) as IData<boolean>;
-        },
-    });
+    // const doLikeMutation = useMutation({
+    //     mutationFn: async (variables: TBody<{articleId: number}>) => {
+    //         return (await doCommentLike(variables)) as IData<boolean>;
+    //     },
+    // });
     const handleLike = useCallback((id: number) => {
 
     }, []);
@@ -328,7 +331,7 @@ const ArticleComments = (props: propsType) => {
                             const createTime = replyInfo.createTime;
                             const mapId = replyInfo.id + "-reply";
                             let toReplyContent = replyInfo.toReplyContent ?? "";
-                            return ( 
+                            return (
                                 <div className={classNames(styles.commentContent, styles.indent)} key={idx2}>
                                     <div className={styles.commentUserHeader}>
                                         <a href="" target="_blank" className="">
@@ -412,7 +415,7 @@ const ArticleComments = (props: propsType) => {
                 </div>
                 <div id="commentImgs">
                 <LoaderComp className="w-100" indicatorComp={<Skeleton num={3} height={10} />} loading={!getCommentListQuery.isSuccess || loading}>
-                    <CommentListDiv />
+                    {/* <CommentListDiv /> */}
                 </LoaderComp>
                 </div>
                 {mode==="drawer" ? 
@@ -433,6 +436,7 @@ const ArticleComments = (props: propsType) => {
             </div>
             <ReportComp ref={reportRef} />
             {modal}
+            <ImagePreview images={images} isViewerOpen={false} ref={imagePreviewRef}/>
         </>
     );
 }
@@ -451,7 +455,7 @@ const ArticleCommentEditor = () => {
 };
 
 // 使用正则表达式提取文本和 img 标签
-export const extractTextAndImages = (content: string) => {
+export const extractTextAndImages = (content: string, func: (src:string)=>void) => {
     const imgRegex = /<img\s+[^>]*src\s*=\s*['"]([^'"]+)['"][^>]*>/g;
     const parts: (string | JSX.Element)[] = [];
 
@@ -476,15 +480,11 @@ export const extractTextAndImages = (content: string) => {
 
       // 添加 Image 组件
       parts.push(
-        <PhotoProvider key={src} bannerVisible={true}>
-            <PhotoView src={src}>
-                <img src={src} alt={alt} width={width} height={height}/>
-            </PhotoView>
-        </PhotoProvider>
+        <Image key={nanoid()} src={src} alt={alt} width={Number(width)} height={Number(height)} onClick={()=>func(src)} />
       );
       lastIndex = end;
     }
-  
+
     // 添加剩余的文本部分
     if (lastIndex < content.length) {
       parts.push(content.slice(lastIndex));

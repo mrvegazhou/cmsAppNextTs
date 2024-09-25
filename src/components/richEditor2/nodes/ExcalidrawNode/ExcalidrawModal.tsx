@@ -13,6 +13,7 @@ import {
     AppState,
     BinaryFiles,
     ExcalidrawImperativeAPI,
+    ExcalidrawInitialDataState
 } from '@excalidraw/excalidraw/types/types';
 import * as React from 'react';
 import { ReactPortal, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -20,6 +21,7 @@ import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import Modal from '@/components/modal';
 
+export type ExcalidrawInitialElements = ExcalidrawInitialDataState['elements'];
 
 export type ExcalidrawElementFragment = {
     isDeleted?: boolean;
@@ -149,31 +151,31 @@ export default function ExcalidrawModal({
     }, [elements, files, onDelete]);
 
     const save = () => {
-        if (elements.filter((el) => !el.isDeleted).length > 0) {
-            const appState = excalidrawAPI?.getAppState()!;
+        if (elements && elements.filter((el) => !el.isDeleted).length > 0) {
+            const appState = excalidrawAPI?.getAppState();
             // We only need a subset of the state
             const partialState: Partial<AppState> = {
-                exportBackground: appState.exportBackground,
-                exportScale: appState.exportScale,
-                exportWithDarkMode: appState.theme === 'dark',
-                isBindingEnabled: appState.isBindingEnabled,
-                isLoading: appState.isLoading,
-                name: appState.name,
-                theme: appState.theme,
-                viewBackgroundColor: appState.viewBackgroundColor,
-                viewModeEnabled: appState.viewModeEnabled,
-                zenModeEnabled: appState.zenModeEnabled,
-                zoom: appState.zoom,
+              exportBackground: appState?.exportBackground,
+              exportScale: appState?.exportScale,
+              exportWithDarkMode: appState?.theme === 'dark',
+              isBindingEnabled: appState?.isBindingEnabled,
+              isLoading: appState?.isLoading,
+              name: appState?.name,
+              theme: appState?.theme,
+              viewBackgroundColor: appState?.viewBackgroundColor,
+              viewModeEnabled: appState?.viewModeEnabled,
+              zenModeEnabled: appState?.zenModeEnabled,
+              zoom: appState?.zoom,
             };
             onSave(elements, partialState, files);
-        } else {
+          } else {
             // delete node if the scene is clear
             onDelete();
-        }
+          }
     };
 
     const discard = () => {
-        if (elements.filter((el) => !el.isDeleted).length === 0) {
+        if (elements && elements.filter((el) => !el.isDeleted).length === 0) {
             // delete node if the scene is clear
             onDelete();
         } else {
